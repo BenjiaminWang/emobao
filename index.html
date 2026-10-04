@@ -1,0 +1,462 @@
+<!-- ================================================================
+     index.html   v17
+     日期：2026-09-30
+     改动：
+     - qx6 标题栏加"‹ 主屏"返回按钮
+     - 其余同 v16
+     ================================================================ -->
+     <!DOCTYPE html>
+     <html lang="zh-CN">
+     <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+         <title>情绪宝 · 身心互动</title>
+         <link rel="icon" href="data:,">
+         <link rel="stylesheet" href="style.css">
+         <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+         <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+     </head>
+     <body class="main-page">
+     
+         <!-- ============ 状态栏 ============ -->
+         <div class="qx0-status-bar">
+             <div class="date" id="status_date"></div>
+             <div class="brand" id="status_title">情绪宝 / Emo Treasure</div>
+             <div class="user" id="status_user">👤 访客</div>
+         </div>
+     
+         <!-- ============ 菜单条 ============ -->
+         <div class="qx0-menu-bar" id="menu_bar">
+             <button class="menu-item" data-page="qx1" data-i18n="menu_perceive">感知</button>
+             <button class="menu-item" data-page="qx2" data-i18n="menu_regulate">调节</button>
+             <button class="menu-item" data-page="qx3" data-i18n="menu_report">报告</button>
+             <button class="menu-item" data-page="qx4" data-i18n="menu_qa">问答</button>
+             <button class="menu-item" data-page="qx5" data-i18n="menu_assessment">测评</button>
+             <button class="menu-item" data-page="qx6" data-i18n="menu_settings">设置</button>
+         </div>
+     
+         <!-- ============ 主屏背景 ============ -->
+         <div class="qx0-content">
+             <img id="qx0_bg" class="qx0-bg-image" alt="">
+         </div>
+     
+         <!-- ============ qx1 情绪感知 ============ -->
+         <div class="qx-function-layer" id="qx1_layer">
+             <div class="qx1-container" id="qx1_container">
+                 <div class="qx1-top-row">
+                     <div class="qx1-emotion-area">
+                         <div class="qx1-section-title">今日情绪</div>
+                         <div class="qx1-emotion-wheel" id="qx1_emotion_wheel"></div>
+                     </div>
+                     <div class="qx1-impact-area">
+                         <div class="qx1-section-title">生活事件</div>
+                         <div class="qx1-impact-body">
+                             <div class="qx1-impact-chart" id="qx1_impact_chart"></div>
+                             <div class="qx1-impact-summary" id="qx1_impact_summary"></div>
+                             <div class="qx1-heart-col heart-white" id="qx1_heart_icon" title="点击查看 HRV 图">
+                                 <svg class="heart-svg heart-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+                                     <path fill="none" stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                                           d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
+                                 </svg>
+                                 <svg class="heart-svg heart-red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+                                     <path fill="#E53935" d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
+                                     <path fill="none" stroke="#FFD600" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M8 60 H34 L42 44 L52 76 L62 52 L72 68 L80 60 H112"/>
+                                 </svg>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+     
+                 <div class="qx1-mid-row">
+                     <div class="qx1-picker-section">
+                         <div class="qx1-section-title">可选生活事件</div>
+                         <div class="qx1-tree" id="qx1_tree"></div>
+                     </div>
+                     <div class="qx1-events-area">
+                         <div class="qx1-section-title">当日生活事件</div>
+                         <div class="qx1-event-list" id="qx1_event_list"></div>
+                     </div>
+                     <div class="qx1-detail-area">
+                         <div class="qx1-section-title">事件属性</div>
+                         <div class="qx1-event-detail disabled" id="qx1_event_detail">
+                             <div class="qx1-detail-block">
+                                 <div class="qx1-detail-options">
+                                     <label class="qx1-radio"><input type="radio" name="qx1_nature" value="好事"> 好</label>
+                                     <label class="qx1-radio"><input type="radio" name="qx1_nature" value="坏事"> 坏</label>
+                                     <span class="qx1-radio-plain">事</span>
+                                 </div>
+                             </div>
+                             <div class="qx1-detail-block">
+                                 <div class="qx1-detail-title">影响程度</div>
+                                 <div class="qx1-impact-options">
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="1"><span class="qx1-impact-dot"></span><span class="qx1-impact-label">轻</span></label>
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="2"><span class="qx1-impact-dot"></span><span class="qx1-impact-label">中</span></label>
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="3"><span class="qx1-impact-dot"></span><span class="qx1-impact-label">重</span></label>
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="4"><span class="qx1-impact-dot"></span><span class="qx1-impact-label">极重</span></label>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+     
+                 <div class="qx1-bottom-row">
+                     <div class="qx1-hrv-capture-area">
+                         <div class="qx1-hrv-capture-header">
+                             <div class="qx1-section-title">心率与 HRV 采集</div>
+                             <div class="qx1-hrv-capture-timer" id="qx1_hrv_timer">0 / 120 秒</div>
+                         </div>
+                         <div class="qx1-hrv-capture" id="qx1_hrv_capture"></div>
+                     </div>
+                 </div>
+     
+                 <div class="qx1-actions-row">
+                     <button class="qx1-btn qx1-btn-save" id="qx1_btn_save">存入</button>
+                     <button class="qx1-btn qx1-btn-del-event" id="qx1_btn_del_event">删除当前此生活事件</button>
+                     <button class="qx1-btn qx1-btn-exit" id="qx1_btn_exit">退出</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx1 实时治愈主图 浮层 ============ -->
+         <div class="qx1-heal-modal" id="qx1_heal_modal">
+             <div class="qx1-heal-modal-inner">
+                 <div class="qx1-heal-modal-header">
+                     <div class="qx1-heal-modal-title">情绪宝 HRV 采集 · 实时治愈主图</div>
+                     <div class="qx1-heal-modal-timer" id="qx1_heal_modal_timer">0 / 120 秒</div>
+                     <button class="qx1-heal-modal-close" id="qx1_heal_modal_close">关闭</button>
+                 </div>
+                 <div class="qx1-heal-modal-progress">
+                     <div class="qx1-heal-modal-progress-fill" id="qx1_heal_modal_progress"></div>
+                 </div>
+                 <div class="qx1-heal-modal-canvas-wrap">
+                     <div class="qx1-heal-modal-canvas" id="qx1_heal_canvas">
+                         <span class="qx1-heal-modal-placeholder">等待采集开始…</span>
+                     </div>
+                 </div>
+                 <div class="qx1-heal-modal-wave-row">
+                     <div class="qx1-heal-wave-video-wrap">
+                         <video id="qx1_heal_wave_video" class="qx1-heal-wave-video"
+                                autoplay playsinline muted></video>
+                     </div>
+                     <div class="qx1-heal-modal-wave">
+                         <svg viewBox="0 0 400 40" preserveAspectRatio="none" class="qx1-heal-modal-wave-svg">
+                             <polyline id="qx1_heal_modal_wave_line"
+                                       fill="none" stroke="#2ecc71" stroke-width="1.2"
+                                       points=""></polyline>
+                         </svg>
+                     </div>
+                 </div>
+                 <div class="qx1-heal-modal-hintbar">
+                     <div class="qx1-heal-modal-hint" id="qx1_heal_modal_hint">等待采集开始…</div>
+                     <div class="qx-hrv-dots">
+                         <span class="qx-hrv-dot" id="qx1_dot_a"></span>
+                         <span class="qx-hrv-dot" id="qx1_dot_b"></span>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx2 情绪调节 ============ -->
+         <div class="qx-function-layer" id="qx2_layer">
+             <div class="qx2-container" id="qx2_container">
+     
+                 <div class="qx2-top-bar">
+                     <div class="qx2-emotion-slot qx2-emotion-slot-before" id="qx2_slot_before">
+                         <div class="qx2-slot-label">
+                             听前情绪 <span class="qx2-slot-name" id="qx2_face_before_name">--</span>
+                         </div>
+                         <div class="qx2-wheel-box" id="qx2_wheel_before"></div>
+                     </div>
+     
+                     <div class="qx2-flow-bar" id="qx2_flow_bar">
+                         <div class="qx2-flow-step" data-step="1"><span class="qx2-flow-name">听前</span></div>
+                         <div class="qx2-flow-step" data-step="2"><span class="qx2-flow-name">调整</span></div>
+                         <div class="qx2-flow-step" data-step="3"><span class="qx2-flow-name">评价</span></div>
+                         <div class="qx2-flow-step" data-step="4"><span class="qx2-flow-name">分析</span></div>
+                     </div>
+     
+                     <div class="qx2-emotion-slot qx2-emotion-slot-after" id="qx2_slot_after">
+                         <div class="qx2-slot-label">
+                             听后情绪 <span class="qx2-slot-name" id="qx2_face_after_name">--</span>
+                         </div>
+                         <div class="qx2-wheel-box" id="qx2_wheel_after"></div>
+                     </div>
+                 </div>
+     
+                 <div class="qx2-music-row">
+                     <div class="qx2-camera-hint" id="qx2_camera_hint">
+                         请把干净的手指放在摄像头上，准备安静地听音乐
+                     </div>
+                     <div class="qx2-trend-mini" id="qx2_trend_mini">
+                         <div class="qx2-trend-video-wrap">
+                             <video id="qx2_trend_video" class="qx2-trend-video"
+                                    autoplay playsinline muted></video>
+                         </div>
+                     </div>
+                     <div class="qx-hrv-dots qx-hrv-dots-qx2">
+                         <span class="qx-hrv-dot" id="qx2_dot_a"></span>
+                         <span class="qx-hrv-dot" id="qx2_dot_b"></span>
+                     </div>
+                     <button class="qx2-btn-collection" id="qx2_btn_collection">选组曲</button>
+                     <button class="qx2-btn-start" id="qx2_btn_start">开始</button>
+                 </div>
+     
+                 <div class="qx2-mid-row">
+     
+                     <div class="qx2-analysis-area" id="qx2_analysis_area">
+                         <div class="qx2-analysis-title">分析</div>
+                         <div class="qx2-analysis-body" id="qx2_analysis_body">
+                             <div class="qx2-analysis-placeholder">进第 4 步，自动给出分析</div>
+                         </div>
+                     </div>
+     
+                     <div class="qx2-heal-area">
+                         <div class="qx2-heal-title">实时治愈主图</div>
+                         <div class="qx2-heal-tabs" id="qx2_heal_tabs"></div>
+                         <div class="qx2-heal-canvas-wrap">
+                             <div class="qx2-heal-canvas" id="qx2_heal_canvas">
+                                 <span class="qx2-heal-placeholder">待定</span>
+                             </div>
+                         </div>
+                     </div>
+     
+                     <div class="qx2-feedback-area">
+                         <div class="qx2-feedback-title">主观评价</div>
+                         <div class="qx2-feedback-options" id="qx2_feedback_options">
+                             <label class="qx2-feedback-item">
+                                 <input type="radio" name="qx2_feedback" value="better">
+                                 <span>更好</span>
+                             </label>
+                             <label class="qx2-feedback-item">
+                                 <input type="radio" name="qx2_feedback" value="same">
+                                 <span>一样</span>
+                             </label>
+                             <label class="qx2-feedback-item">
+                                 <input type="radio" name="qx2_feedback" value="worse">
+                                 <span>更差</span>
+                             </label>
+                         </div>
+                     </div>
+     
+                 </div>
+     
+                 <div class="qx2-actions-row">
+                     <button class="qx2-btn qx2-btn-restart" id="qx2_btn_restart">重新调整</button>
+                     <button class="qx2-btn qx2-btn-collect" id="qx2_btn_collect">收藏组曲</button>
+                     <button class="qx2-btn qx2-btn-exit" id="qx2_btn_exit">退出调整</button>
+                 </div>
+     
+             </div>
+     
+             <div class="qx2-collect-modal" id="qx2_collect_modal">
+                 <div class="qx2-collect-modal-inner">
+                     <div class="qx2-collect-modal-title">选择收藏组曲</div>
+                     <div class="qx2-collect-modal-list" id="qx2_collect_modal_list"></div>
+                     <button class="qx2-collect-modal-close" id="qx2_collect_modal_close">关闭</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx3 报告分析 ============ -->
+         <div class="qx-function-layer" id="qx3_layer">
+             <div class="qx3-container" id="qx3_container">
+     
+                 <div class="qx3-top-bar">
+                     <div class="qx3-title" id="qx3_title">情绪分析报告</div>
+                     <div class="qx3-range-switch" id="qx3_range_switch">
+                         <button class="qx3-range-btn active" data-range="week">近一周</button>
+                         <button class="qx3-range-btn" data-range="month">近一月</button>
+                         <button class="qx3-range-btn" data-range="halfyear">近半年</button>
+                         <button class="qx3-range-btn" data-range="year">近一年</button>
+                     </div>
+                     <div class="qx3-status" id="qx3_status"></div>
+                 </div>
+     
+                 <div class="qx3-demo-bar" id="qx3_demo_bar" style="display:none;"></div>
+     
+                 <div class="qx3-body" id="qx3_body">
+     
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span>情绪基线</span>
+                             <span class="qx3-card-sub" id="qx3_emotion_sub"></span>
+                         </div>
+                         <div class="qx3-chart-host" id="qx3_emotion_chart"></div>
+                         <div class="qx3-legend">
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#E60000"></i>焦躁</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#FF4500"></i>热烈</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#FF69B4"></i>欢快</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#00C853"></i>轻快</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#4CAF50"></i>明朗</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#1B5E20"></i>平静</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#616161"></i>压抑</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#0D47A1"></i>忧伤</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#000000"></i>悲伤</span>
+                             <span class="qx3-legend-item"><i class="qx3-line-dash"></i>基线</span>
+                         </div>
+                     </div>
+     
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span>生活事件综合</span>
+                             <span class="qx3-card-sub" id="qx3_event_sub"></span>
+                         </div>
+                         <div class="qx3-chart-host" id="qx3_event_chart"></div>
+                         <div class="qx3-legend">
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#E53935"></i>好事</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#212121"></i>坏事</span>
+                             <span class="qx3-legend-item" id="qx3_event_totals"></span>
+                         </div>
+                     </div>
+     
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span>HRV 基线</span>
+                             <span class="qx3-card-sub" id="qx3_hrv_sub"></span>
+                         </div>
+                         <div class="qx3-chart-host" id="qx3_hrv_chart"></div>
+                         <div class="qx3-legend">
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#2C7BE5"></i>RMSSD</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#E53935"></i>平均心率</span>
+                             <span class="qx3-legend-item"><i class="qx3-line-dash"></i>基线</span>
+                         </div>
+                     </div>
+     
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span>总评语</span>
+                             <span class="qx3-card-sub" id="qx3_summary_sub"></span>
+                         </div>
+                         <div class="qx3-summary-body" id="qx3_summary_body">
+                             <div class="qx3-summary-placeholder">正在生成…</div>
+                         </div>
+                     </div>
+     
+                 </div>
+     
+                 <div class="qx3-actions-row">
+                     <button class="qx3-btn qx3-btn-exit" id="qx3_btn_exit">退出</button>
+                 </div>
+     
+             </div>
+         </div>
+     
+         <!-- ============ qx4 知识问答 ============ -->
+         <div class="qx-function-layer" id="qx4_layer">
+             <div class="qx4-container" id="qx4_container">
+                 <div class="qx4-title-bar">
+                     <div class="qx4-title" id="qx4_title">知识问答</div>
+                     <div class="qx4-hint"  id="qx4_hint"></div>
+                     <div class="qx4-user"  id="qx4_user"></div>
+                 </div>
+     
+                 <div class="qx4-tree-wrap">
+                     <div class="qx4-tree" id="qx4_tree"></div>
+                 </div>
+     
+                 <div class="qx4-actions-row">
+                     <button class="qx4-btn qx4-btn-pick" id="qx4_btn_pick">选择</button>
+                     <button class="qx4-btn qx4-btn-exit" id="qx4_btn_exit">退出</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx5 趣味评测 ============ -->
+         <div class="qx-function-layer" id="qx5_layer">
+             <div class="qx5-container" id="qx5_container">
+     
+                 <div class="qx5-list-view" id="qx5_list_view">
+     
+                     <div class="qx5-header">
+                         <div class="qx5-header-left">
+                             <div class="qx5-title" id="qx5_title">趣味评测</div>
+                             <div class="qx5-subtitle" id="qx5_subtitle">玩一玩，看看你的大脑怎么工作</div>
+                         </div>
+                         <button class="qx5-profile-pill" id="qx5_profile_bar" style="display:none;">
+                             <span class="qx5-profile-pill-icon">🎯</span>
+                             <span class="qx5-profile-pill-text" id="qx5_profile_bar_sub">0 / 60</span>
+                             <span class="qx5-profile-pill-arrow">›</span>
+                         </button>
+                     </div>
+     
+                     <div class="qx5-game-grid" id="qx5_game_grid"></div>
+                     <div class="qx5-actions-row">
+                         <button class="qx5-btn qx5-btn-exit" id="qx5_btn_exit">退出</button>
+                     </div>
+                 </div>
+     
+                 <div class="qx5-play-view" id="qx5_play_view" style="display:none;">
+                     <div class="qx5-play-header">
+                         <div class="qx5-play-title" id="qx5_play_title"></div>
+                         <button class="qx5-btn qx5-btn-small" id="qx5_btn_quit">退出游戏</button>
+                     </div>
+                     <div class="qx5-play-host" id="qx5_play_host"></div>
+                 </div>
+     
+                 <div class="qx5-profile-modal" id="qx5_profile_modal" style="display:none;">
+                     <div class="qx5-profile-modal-inner">
+                         <div class="qx5-profile-modal-header">
+                             <div class="qx5-profile-modal-title">我的认知画像</div>
+                             <button class="qx5-profile-modal-close" id="qx5_profile_modal_close">✕</button>
+                         </div>
+                         <div class="qx5-profile-modal-body">
+                             <div class="qx5-profile-radar-wrap" id="qx5_profile_radar"></div>
+                             <div class="qx5-profile-list" id="qx5_profile_list"></div>
+                         </div>
+                     </div>
+                 </div>
+     
+             </div>
+         </div>
+     
+         <!-- ============ qx6 设置 ============ -->
+         <div class="qx-function-layer" id="qx6_layer">
+             <div class="qx6-container" id="qx6_container">
+     
+                 <!-- 主菜单列表 -->
+                 <div class="qx6-list-view" id="qx6_list_view">
+                     <div class="qx6-header">
+                         <button class="qx6-back-main" id="qx6_back_main" type="button">‹ 主屏</button>
+                         <div class="qx6-title">设置</div>
+                     </div>
+                     <div class="qx6-menu" id="qx6_menu"></div>
+                 </div>
+     
+                 <!-- 二级页面 -->
+                 <div class="qx6-panel-view" id="qx6_panel_view" style="display:none;">
+                     <div class="qx6-panel-header">
+                         <button class="qx6-panel-back" id="qx6_panel_back" type="button">‹ 返回</button>
+                         <div class="qx6-panel-title" id="qx6_panel_title"></div>
+                     </div>
+                     <div class="qx6-panel-body" id="qx6_panel_body"></div>
+                 </div>
+     
+             </div>
+         </div>
+     
+         <div class="toast-bar" id="toast_bar"></div>
+     
+         <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+         <script src="js/qx0_main.js"></script>
+         <script src="js/qx_emotion_wheel.js"></script>
+         <script src="js/qx_thermometer.js"></script>
+         <script src="js/qx_mood_mirror.js"></script>
+         <script src="js/qx_life_event_chart.js"></script>
+         <script src="js/qx_hrv_capture.js"></script>
+         <script src="js/qx_help_card.js"></script>
+         <script src="js/qx1_perceive.js"></script>
+         <script src="js/qx2_heal_chart.js"></script>
+         <script src="js/qx2_regulate.js"></script>
+         <script src="js/qx3_report.js"></script>
+         <script src="js/qx4_qa.js"></script>
+         <script src="js/qx5_engine.js"></script>
+         <script src="js/qx5_games.js"></script>
+         <script src="js/qx5_games_extra.js"></script>
+         <script src="js/qx5_games_extra2.js"></script>
+         <script src="js/qx5_games_extra3.js"></script>
+         <script src="js/qx5_games_extra4.js"></script>
+         <script src="js/qx5_profile.js"></script>
+         <script src="js/qx5_main.js"></script>
+         <script src="js/qx6_settings.js"></script>
+     </body>
+     </html>

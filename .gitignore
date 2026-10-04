@@ -1,0 +1,6 @@
+music/
+*.backup
+.DS_Store
+test_supabase.html
+test_login.html
+Caddyfile

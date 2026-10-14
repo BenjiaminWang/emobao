@@ -10,7 +10,7 @@
    (function () {
     'use strict';
 
-    const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co';
+    const SUPABASE_URL = 'https://api.emobao.com';
     const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
 
     const MUSIC_LEVELS = [

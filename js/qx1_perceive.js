@@ -1,13 +1,14 @@
 /* ================================================================
    情绪宝 - qx1 情绪感知
-   v21：
-   - 加入情绪温度计（qxMoodMirror 传 thermometerSide: 'right'）
-   - 其余同 v20
+   v24：
+   - 从 Setting（localStorage / mQxb.Sensor）读采样源
+   - Polar 未连接时降级摄像头并提示
+   - 采集区按钮位置、提示文字、波形图由 qx_hrv_capture.js 统一
    ================================================================ */
    (function () {
     'use strict';
 
-    const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co';
+    const SUPABASE_URL = 'https://api.emobao.com';
     const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
 
     const FETCH_TIMEOUT_MS = 12000;
@@ -76,6 +77,21 @@
     function getUserId() { return window.mQxb && window.mQxb.user_id; }
     function getUserType() { return (window.mQxb && parseInt(window.mQxb.user_id_Type)) || 1; }
     function getLang() { return (window.mQxb && window.mQxb.Language) || 1; }
+
+    /* ============ 读 Setting 里的采样源 ============ */
+    function getHrvSourceFromSetting() {
+        if (typeof window.qx6GetHrvSource === 'function') {
+            try { return window.qx6GetHrvSource(); } catch (e) {}
+        }
+        try {
+            const v = localStorage.getItem('emobao_hrv_source');
+            if (v === 'polar' || v === 'camera') return v;
+        } catch (e) {}
+        if (window.mQxb && window.mQxb.Sensor && window.mQxb.Sensor.hrvSource) {
+            return window.mQxb.Sensor.hrvSource;
+        }
+        return 'camera';
+    }
 
     /* ============ 网络工具 ============ */
     async function fetchWithTimeout(url, options, timeoutMs) {
@@ -835,8 +851,18 @@
         modal.classList.add('show');
         const timer = document.getElementById('qx1_heal_modal_timer');
         if (timer) timer.innerText = '0 / 120 秒';
+
+        /* 按 source 区分提示 */
+        const src = qxHrvCapture.getSource ? qxHrvCapture.getSource() : 'camera';
         const hint = document.getElementById('qx1_heal_modal_hint');
-        if (hint) hint.innerText = '把干净的手指放到摄像头上';
+        if (hint) {
+            if (src === 'polar') {
+                hint.innerText = t('Polar H10 采集中…', 'Polar H10 capturing…');
+            } else {
+                hint.innerText = t('把干净的手指放到摄像头上', 'Put a clean finger on the camera');
+            }
+        }
+
         const pf = document.getElementById('qx1_heal_modal_progress');
         if (pf) pf.style.width = '0%';
         if (window.qxHealChart) {
@@ -850,6 +876,62 @@
         if (window.qxHealChart) {
             try { qxHealChart.reset(); } catch (e) {}
         }
+    }
+
+    /* ============ 采集启动（Polar 未连时走摄像头） ============ */
+    function startHrvCapture() {
+        if (!window.qxHrvCapture) return;
+
+        let src = getHrvSourceFromSetting();
+        const polarReady = !!(window.qxPolarH10
+                          && typeof window.qxPolarH10.isConnected === 'function'
+                          && window.qxPolarH10.isConnected());
+        console.log('[qx1] Setting 采样源 =', src, '| Polar 已连接 =', polarReady);
+
+        if (src === 'polar' && !polarReady) {
+            console.warn('[qx1] Polar 未连接，降级为摄像头 PPG');
+            toast(t('Polar H10 未连接，本次改用摄像头 PPG',
+                    'Polar H10 not connected. Using camera PPG this time.'), 'warning');
+            src = 'camera';
+        }
+
+        qxHrvCapture.start('qx1_hrv_capture', {
+            source: src,
+            duration: 120,
+            onProgress: (rt) => {
+                if (!rt) return;
+                if (window.qxHealChart) {
+                    try { qxHealChart.push(rt); } catch (e) {}
+                }
+            },
+            onAbort: (info) => {
+                if (!info) return;
+                if (info.reason === 'no_finger') {
+                    state.hrvResult = null;
+                    state.hrvSaved = false;
+                    toast(t('手指离开，本次采集作废，请重新开始', 'Finger removed. Capture aborted, please restart.'), 'warning');
+                } else if (info.reason === 'unsupported') {
+                    toast(info.message || t('本机不支持蓝牙心率带', 'Bluetooth not supported'), 'error');
+                } else if (info.reason === 'LOW_RR') {
+                    toast(t('Polar 有效数据不足，请重测', 'Not enough Polar data, retry'), 'warning');
+                }
+            },
+            onComplete: (result) => {
+                if (result) {
+                    state.hrvResult = result;
+                    state.hrvSaved = false;
+                    markDirty();
+                    const srcLabel = (result.source === 'polar') ? 'Polar' : t('摄像头', 'Camera');
+                    toast(t(`HRV 采集完成（${srcLabel}），请点"存入"`,
+                            `HRV done (${srcLabel}), please save`), 'success');
+                } else {
+                    toast(t('HRV 数据不足，请重试', 'HRV data insufficient'), 'warning');
+                }
+                if (window.qxHealChart) {
+                    try { qxHealChart.finish(); } catch (e) {}
+                }
+            }
+        });
     }
 
     /* ============ 初始化 ============ */
@@ -872,7 +954,7 @@
         window.addEventListener('resize', onResizeDebounced);
         window.addEventListener('orientationchange', onResizeDebounced);
 
-        /* 1. 先渲染 UI（不等待网络） */
+        /* 1. 先渲染 UI */
         qxMoodMirror.create('qx1_emotion_wheel', {
             mode: '今日情绪',
             initialCode: 0,
@@ -885,36 +967,10 @@
             }
         });
 
-        qxHrvCapture.start('qx1_hrv_capture', {
-            duration: 120,
-            onProgress: (rt) => {
-                if (!rt) return;
-                if (window.qxHealChart) {
-                    try { qxHealChart.push(rt); } catch (e) {}
-                }
-            },
-            onAbort: (info) => {
-                if (info && info.reason === 'no_finger') {
-                    state.hrvResult = null;
-                    state.hrvSaved = false;
-                    toast(t('手指离开，本次采集作废，请重新开始', 'Finger removed. Capture aborted, please restart.'), 'warning');
-                }
-            },
-            onComplete: (result) => {
-                if (result) {
-                    state.hrvResult = result;
-                    state.hrvSaved = false;
-                    markDirty();
-                    toast(t('HRV 采集完成，请点“存入”', 'HRV done, please save'), 'success');
-                } else {
-                    toast(t('HRV 数据不足，请重试', 'HRV data insufficient'), 'warning');
-                }
-                if (window.qxHealChart) {
-                    try { qxHealChart.finish(); } catch (e) {}
-                }
-            }
-        });
+        /* 2. 启动采集 */
+        startHrvCapture();
 
+        /* 3. 监听 ▶ 按钮，打开浮层 */
         const hrvRoot = document.getElementById('qx1_hrv_capture');
         if (hrvRoot) {
             hrvRoot.addEventListener('click', (ev) => {
@@ -956,10 +1012,10 @@
         delBtn.onclick = onDeleteCurrentEvent;
         exitBtn.onclick = onExit;
 
-        /* 2. 异步加载类别（不阻塞） */
+        /* 4. 异步加载类别 */
         loadCategories();
 
-        /* 3. 加载当日记录（失败静默降级） */
+        /* 5. 加载当日记录 */
         if (state.isGuest) {
             renderEventList();
         } else {
@@ -1008,7 +1064,6 @@
                 showEventDetail();
                 updateHeartIcon();
             } catch (e) {
-                /* 静默降级：当作今天还没有记录 */
                 console.warn('[qx1] 加载当日记录失败，按空记录处理', e);
                 state.emotionCode = null;
                 state.savedEmotionCode = null;

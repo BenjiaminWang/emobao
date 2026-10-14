@@ -1,12 +1,13 @@
 /* ================================================================
-   style.css  V59
-   日期：2026-09-30
-   改动：
-   - 合并 qx6 全部样式（主菜单 / 二级页 / 账户 / 口令 / 用户管理 /
-     用户总体情况 / 兑换码 / 音乐库 / 组曲规则 / 系统退出）
-   - 删除重复段（用户管理 CSS 曾出现两次）
-   - 音乐库 CSS 更新为完整版（含详情展开、文件信息、补时按钮）
-   - qx1~qx5 保持 V58
+   style.css  V61
+   日期：2026-10-13
+   改动（V60 → V61）：
+   - .qx-hrv-btn 注释澄清：主按钮 20px / 紧凑 18px（规则未变）
+   - 删除冗余的 .qx6-menu-section-danger .qx6-menu-rows 背景声明
+   - 删除孤儿规则 #qx2_hrv_wave_hidden（该 ID 在 index.html 中不存在）
+   - .qx1-impact-chart 补 canvas 显示规则（消除行内间隙）
+   - .qx6-cam-row-current 高亮加深（#EBF3FE → #DCE9FF + 左侧蓝条）
+   - 移除历史版本号注释（v15 等），只保留功能说明
    ================================================================ */
 
    :root {
@@ -219,6 +220,7 @@ body.function-active .qx0-content { display: none; }
 .qx1-impact-area { flex: 1; min-width: 0; background: #fff; border-radius: 6px; padding: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; position: relative; }
 .qx1-impact-body { flex: 1; min-height: 0; display: flex; gap: 6px; overflow: hidden; }
 .qx1-impact-chart { flex: 1; min-width: 0; border: 1px dashed #CCC; border-radius: 4px; background: #FAFAFA; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.qx1-impact-chart canvas { display: block; max-width: 100%; max-height: 100%; }
 .qx1-impact-summary { width: 88px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 4px; font-size: 12px; font-weight: bold; }
 .qx1-sum-good { color: #E53935; text-align: center; line-height: 1.4; }
 .qx1-sum-bad { color: #212121; text-align: center; line-height: 1.4; }
@@ -372,11 +374,12 @@ body.function-active .qx0-content { display: none; }
     flex: 0 0 auto;
     flex-shrink: 0;
 }
-.qx-hrv-btn { width: 14px; height: 14px; padding: 0; border: none; border-radius: 50%; font-size: 7px; line-height: 1; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+/* 主按钮 20px；紧凑布局 18px（由 .qx-hrv-btns-compact 覆盖） */
+.qx-hrv-btn { width: 20px; height: 20px; padding: 0; border: none; border-radius: 50%; font-size: 10px; line-height: 1; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .qx-hrv-btn-start { background: #2ECC71; }
 .qx-hrv-btn-stop { background: #E74C3C; }
 .qx-hrv-btn:disabled { background: #B0BEC5; cursor: not-allowed; }
-.qx-hrv-btns-compact .qx-hrv-btn { width: 12px; height: 12px; font-size: 6px; }
+.qx-hrv-btns-compact .qx-hrv-btn { width: 18px; height: 18px; font-size: 9px; }
 
 /* 浮层：波形条左侧小口 */
 .qx1-heal-modal-wave-row {
@@ -436,21 +439,10 @@ body.function-active .qx0-content { display: none; }
     transition: background 0.2s ease;
 }
 
-/* qx2 隐藏采集容器 */
-#qx2_hrv_wave_hidden .qx-hrv-wrap,
-#qx2_hrv_wave_hidden .qx-hrv-video-wrap {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    overflow: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
 /* ============ qx1 HRV 采集浮层 ============ */
 .qx1-heal-modal {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.55);
     z-index: 9500;
     display: none;
@@ -484,13 +476,13 @@ body.function-active .qx0-content { display: none; }
 .qx1-heal-modal-title { font-size: 14px; font-weight: bold; color: #2C7BE5; }
 .qx1-heal-modal-timer { font-size: 13px; font-weight: bold; color: #333; margin-left: auto; margin-right: 8px; }
 .qx1-heal-modal-close {
-    padding: 5px 12px;
+    padding: 10px 18px;
     border: 1px solid #E1E8F0;
     border-radius: 6px;
     background: #fff;
     color: #333;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
 }
 .qx1-heal-modal-close:hover { border-color: #2C7BE5; color: #2C7BE5; }
@@ -556,7 +548,7 @@ body.function-active .qx0-content { display: none; }
 .qx1-chart-modal-desc { margin-top: 6px; font-size: 12px; color: #5A6B87; text-align: center; }
 .qx1-chart-modal-empty { text-align: center; color: #96A3B8; padding: 40px 0; }
 
-/* v15：帮助按钮 ⤢ */
+/* 帮助按钮 ⤢ */
 .qx1-chart-modal-help {
     margin-left: auto;
     width: 30px;
@@ -604,10 +596,13 @@ body.function-active .qx0-content { display: none; }
     background: transparent;
     box-shadow: none;
     overflow: visible;
+    padding: 8px;
+    box-sizing: border-box;
 }
 .qx-mm-frame-img {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -693,21 +688,31 @@ body.function-active .qx0-content { display: none; }
 .qx-mm-yellow-dot {
     position: absolute;
     left: 50%;
-    bottom: -6px;
+    bottom: -10px;
     transform: translateX(-50%);
-    width: 14px;
-    height: 14px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #FFD600;
     border: 1.5px solid #B8860B;
-    box-shadow: 0 0 4px rgba(255, 214, 0, 0.75);
+    box-shadow: 0 0 6px rgba(255, 214, 0, 0.85);
     cursor: pointer;
     z-index: 10;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+.qx-mm-yellow-dot::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
 .qx-mm-yellow-dot:hover {
     transform: translateX(-50%) scale(1.15);
-    box-shadow: 0 0 8px rgba(255, 214, 0, 1);
+    box-shadow: 0 0 10px rgba(255, 214, 0, 1);
 }
 .qx-mm-container.qx-mm-picking .qx-mm-face-box { display: none !important; }
 .qx-mm-container.qx-mm-picking .qx-mm-sleep-box { display: none !important; }
@@ -810,7 +815,7 @@ body.function-active .qx0-content { display: none; }
 .qx2-toast-success { background: rgba(46,204,113,0.95); }
 .qx2-toast-warning { background: rgba(241,196,15,0.95); color: #333; }
 .qx2-toast-error   { background: rgba(231,76,60,0.95); }
-.qx2-collect-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); display: none; align-items: center; justify-content: center; z-index: 9200; }
+.qx2-collect-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.45); display: none; align-items: center; justify-content: center; z-index: 9200; }
 .qx2-collect-modal.show { display: flex; }
 .qx2-collect-modal-inner { width: 90%; max-width: 520px; max-height: 70vh; background: #fff; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25); }
 .qx2-collect-modal-title { font-size: 14px; font-weight: bold; color: #333; text-align: center; padding-bottom: 10px; border-bottom: 1px solid #E1E8F0; flex-shrink: 0; }
@@ -892,7 +897,7 @@ body.function-active .qx0-content { display: none; }
 /* ============ 通用弧形卡片（qx_card_frame.png 当边框） ============ */
 .qx-card-overlay {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.55);
     z-index: 9800;
     display: none;
@@ -1198,7 +1203,7 @@ body.function-active .qx0-content { display: none; }
 .qx4-btn-exit { background: #5A6B87; box-shadow: 0 3px 0 #3A4A63; }
 .qx4-btn-exit:hover { background: #4A5A77; }
 .qx4-btn-exit:active { box-shadow: 0 0 0 #3A4A63; }
-/* ============ qx4 命中高亮 ============ */
+
 .qx4-tree-item.hit {
     background: #FFF7D6;
     font-weight: bold;
@@ -1217,6 +1222,7 @@ body.function-active .qx0-content { display: none; }
     font-size: 10px;
     margin-left: 4px;
 }
+
 /* ============ qx4 标题栏：中间提示居中 ============ */
 .qx4-title-bar {
     position: relative;
@@ -1496,6 +1502,7 @@ body.function-active .qx0-content { display: none; }
     color: #B9770E;
     border: 1px solid #F39C12;
 }
+
 /* ============ 情绪温度计（qx_mood_mirror 内挂载） ============ */
 .qx-mm-thermometer {
     position: absolute;
@@ -1520,6 +1527,7 @@ body.function-active .qx0-content { display: none; }
     height: 100%;
     overflow: visible;
 }
+
 /* ============ qx5 趣味评测 ============ */
 .qx5-container {
     display: flex;
@@ -1894,6 +1902,7 @@ body.function-active .qx0-content { display: none; }
 }
 .qx5-stroop-btn:hover { background: #F8FBFF; }
 .qx5-stroop-btn:active { transform: scale(0.97); }
+
 /* ============ qx5 第 2 批游戏样式 ============ */
 
 /* 翻牌配对 */
@@ -2028,6 +2037,7 @@ body.function-active .qx0-content { display: none; }
     transition: transform 0.1s;
 }
 .qx5-spot-cell:hover { transform: scale(1.05); }
+
 /* ============ qx5 树形折叠列表 ============ */
 .qx5-tree {
     flex: 1;
@@ -2096,7 +2106,7 @@ body.function-active .qx0-content { display: none; }
 /* ============ qx5 认知画像全屏浮层 ============ */
 .qx5-profile-modal {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0,0,0,0.5);
     z-index: 9600;
     display: none;
@@ -2331,7 +2341,7 @@ body.function-active .qx0-content { display: none; }
     line-height: 1;
 }
 
-.qx6-menu-section-danger .qx6-menu-rows { background: #fff; }
+/* 危险区：只改文字颜色与 hover，不再重复背景声明 */
 .qx6-menu-section-danger .qx6-menu-label { color: #E74C3C; font-weight: 600; }
 .qx6-menu-section-danger .qx6-menu-arrow { display: none; }
 .qx6-menu-section-danger .qx6-menu-row:hover { background: #FDEDEC; }
@@ -2756,7 +2766,7 @@ body.function-active .qx0-content { display: none; }
 /* 用户编辑弹窗 */
 .qx6-mu-modal {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     z-index: 9700;
     display: flex;
@@ -2906,7 +2916,7 @@ body.function-active .qx0-content { display: none; }
 }
 .qx6-ml-modal {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0,0,0,0.5);
     z-index: 9700;
     display: flex;
@@ -2977,4 +2987,130 @@ body.function-active .qx0-content { display: none; }
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* ============ Polar 模式：隐藏左侧摄像头方块 ============ */
+body.polar-mode .qx-hrv-video-wrap {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    flex: 0 0 0 !important;
+}
+body.polar-mode .qx1-heal-wave-video-wrap {
+    display: none !important;
+}
+
+/* ================================================================
+   qx6-3 设备管理 · HRV 采样摄像头列表
+   ================================================================ */
+.qx6-cam-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.qx6-cam-row {
+    background: #FAFAFA;
+    border: 1.5px solid #E1E8F0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: border-color 0.15s, background 0.15s;
+}
+/* 当前选中项：加深背景 + 左侧蓝条，提升可读性 */
+.qx6-cam-row-current {
+    background: #DCE9FF;
+    border-color: #2C7BE5;
+    border-left: 3px solid #2C7BE5;
+}
+.qx6-cam-row-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+.qx6-cam-row-tag {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+.qx6-cam-row-label {
+    flex: 1;
+    min-width: 0;
+    color: #1A2B4A;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qx6-cam-row-badge {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    background: #2C7BE5;
+    color: #fff;
+    font-size: 11px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+.qx6-cam-row-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.qx6-cam-row-score {
+    flex: 1;
+    min-width: 0;
+    font-size: 11px;
+    color: #5A6B87;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qx6-cam-row-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 6px;
+}
+.qx6-cam-row-actions .qx6-btn {
+    padding: 4px 10px;
+    font-size: 11px;
+    height: auto;
+    width: auto;
+    box-shadow: none !important;
+}
+
+/* ============ qx6 HRV 摄像头方向选择 ============ */
+.qx6-cam-facing-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #1A2B4A;
+    margin-bottom: 8px;
+}
+
+/* ============ qx6 摄像头方向按钮：不可用状态 ============ */
+.qx6-lang-btn-disabled,
+.qx6-lang-btn:disabled {
+    background: #F0F0F0 !important;
+    color: #B0B0B0 !important;
+    border-color: #E0E0E0 !important;
+    cursor: not-allowed !important;
+    opacity: 1 !important;
+}
+
+.qx6-cam-probe-result {
+    font-size: 12px;
+    color: #5A6B87;
+    padding: 6px 10px;
+    background: #F8FBFF;
+    border-radius: 4px;
+    line-height: 1.6;
+}
+.qx6-cam-infeasible {
+    font-size: 13px;
+    color: #C0392B;
+    padding: 10px 12px;
+    background: #FDEDEC;
+    border: 1px solid #E74C3C;
+    border-radius: 6px;
+    line-height: 1.6;
 }

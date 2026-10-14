@@ -1,9 +1,12 @@
 <!-- ================================================================
-     index.html   v17
-     日期：2026-09-30
-     改动：
-     - qx6 标题栏加"‹ 主屏"返回按钮
-     - 其余同 v16
+     index.html   v19
+     日期：2026-10-13
+     改动（v18 → v19）：
+     - 删除 Bootstrap CSS / FontAwesome CSS / Bootstrap JS 三个 CDN 引用
+       （离线可用、去除第三方脚本、加快首屏）
+     - 去掉 qx_hrv_capture.js 和 qx6_3_device.js 后面的 ?v=3
+       （不再用查询串做缓存绕过）
+     - 其余结构、顺序、ID 与 v18 完全一致
      ================================================================ -->
      <!DOCTYPE html>
      <html lang="zh-CN">
@@ -13,8 +16,6 @@
          <title>情绪宝 · 身心互动</title>
          <link rel="icon" href="data:,">
          <link rel="stylesheet" href="style.css">
-         <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-         <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
      </head>
      <body class="main-page">
      
@@ -113,45 +114,6 @@
                      <button class="qx1-btn qx1-btn-save" id="qx1_btn_save">存入</button>
                      <button class="qx1-btn qx1-btn-del-event" id="qx1_btn_del_event">删除当前此生活事件</button>
                      <button class="qx1-btn qx1-btn-exit" id="qx1_btn_exit">退出</button>
-                 </div>
-             </div>
-         </div>
-     
-         <!-- ============ qx1 实时治愈主图 浮层 ============ -->
-         <div class="qx1-heal-modal" id="qx1_heal_modal">
-             <div class="qx1-heal-modal-inner">
-                 <div class="qx1-heal-modal-header">
-                     <div class="qx1-heal-modal-title">情绪宝 HRV 采集 · 实时治愈主图</div>
-                     <div class="qx1-heal-modal-timer" id="qx1_heal_modal_timer">0 / 120 秒</div>
-                     <button class="qx1-heal-modal-close" id="qx1_heal_modal_close">关闭</button>
-                 </div>
-                 <div class="qx1-heal-modal-progress">
-                     <div class="qx1-heal-modal-progress-fill" id="qx1_heal_modal_progress"></div>
-                 </div>
-                 <div class="qx1-heal-modal-canvas-wrap">
-                     <div class="qx1-heal-modal-canvas" id="qx1_heal_canvas">
-                         <span class="qx1-heal-modal-placeholder">等待采集开始…</span>
-                     </div>
-                 </div>
-                 <div class="qx1-heal-modal-wave-row">
-                     <div class="qx1-heal-wave-video-wrap">
-                         <video id="qx1_heal_wave_video" class="qx1-heal-wave-video"
-                                autoplay playsinline muted></video>
-                     </div>
-                     <div class="qx1-heal-modal-wave">
-                         <svg viewBox="0 0 400 40" preserveAspectRatio="none" class="qx1-heal-modal-wave-svg">
-                             <polyline id="qx1_heal_modal_wave_line"
-                                       fill="none" stroke="#2ecc71" stroke-width="1.2"
-                                       points=""></polyline>
-                         </svg>
-                     </div>
-                 </div>
-                 <div class="qx1-heal-modal-hintbar">
-                     <div class="qx1-heal-modal-hint" id="qx1_heal_modal_hint">等待采集开始…</div>
-                     <div class="qx-hrv-dots">
-                         <span class="qx-hrv-dot" id="qx1_dot_a"></span>
-                         <span class="qx-hrv-dot" id="qx1_dot_b"></span>
-                     </div>
                  </div>
              </div>
          </div>
@@ -434,14 +396,58 @@
              </div>
          </div>
      
+         <!-- ============ qx1 实时治愈主图 浮层（body 直接子元素） ============ -->
+         <div class="qx1-heal-modal" id="qx1_heal_modal">
+             <div class="qx1-heal-modal-inner">
+                 <div class="qx1-heal-modal-header">
+                     <div class="qx1-heal-modal-title">情绪宝 HRV 采集 · 实时治愈主图</div>
+                     <div class="qx1-heal-modal-timer" id="qx1_heal_modal_timer">0 / 120 秒</div>
+                     <button class="qx1-heal-modal-close" id="qx1_heal_modal_close">关闭</button>
+                 </div>
+                 <div class="qx1-heal-modal-progress">
+                     <div class="qx1-heal-modal-progress-fill" id="qx1_heal_modal_progress"></div>
+                 </div>
+                 <div class="qx1-heal-modal-canvas-wrap">
+                     <div class="qx1-heal-modal-canvas" id="qx1_heal_canvas">
+                         <span class="qx1-heal-modal-placeholder">等待采集开始…</span>
+                     </div>
+                 </div>
+                 <div class="qx1-heal-modal-wave-row">
+                     <div class="qx1-heal-wave-video-wrap">
+                         <video id="qx1_heal_wave_video" class="qx1-heal-wave-video"
+                                autoplay playsinline muted></video>
+                     </div>
+                     <div class="qx1-heal-modal-wave">
+                         <svg viewBox="0 0 400 40" preserveAspectRatio="none" class="qx1-heal-modal-wave-svg">
+                             <polyline id="qx1_heal_modal_wave_line"
+                                       fill="none" stroke="#2ecc71" stroke-width="1.2"
+                                       points=""></polyline>
+                         </svg>
+                     </div>
+                 </div>
+                 <div class="qx1-heal-modal-hintbar">
+                     <div class="qx1-heal-modal-hint" id="qx1_heal_modal_hint">等待采集开始…</div>
+                     <div class="qx-hrv-dots">
+                         <span class="qx-hrv-dot" id="qx1_dot_a"></span>
+                         <span class="qx-hrv-dot" id="qx1_dot_b"></span>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     
          <div class="toast-bar" id="toast_bar"></div>
      
-         <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+         <!-- 唯一真相：身份字典（必须在 qx0_main.js 之前） -->
+         <script src="js/qx_type_label.js"></script>
+     
          <script src="js/qx0_main.js"></script>
+     
          <script src="js/qx_emotion_wheel.js"></script>
          <script src="js/qx_thermometer.js"></script>
          <script src="js/qx_mood_mirror.js"></script>
          <script src="js/qx_life_event_chart.js"></script>
+         <!-- Polar H10 必须在 qx_hrv_capture.js 之前 -->
+         <script src="js/qx_polar_h10.js"></script>
          <script src="js/qx_hrv_capture.js"></script>
          <script src="js/qx_help_card.js"></script>
          <script src="js/qx1_perceive.js"></script>
@@ -457,6 +463,22 @@
          <script src="js/qx5_games_extra4.js"></script>
          <script src="js/qx5_profile.js"></script>
          <script src="js/qx5_main.js"></script>
-         <script src="js/qx6_settings.js"></script>
+     
+         <!-- ============ qx6 设置（拆分后：15 个子模块） ============ -->
+         <script src="js/qx6/qx6_utils.js"></script>
+         <script src="js/qx6/qx6_registry.js"></script>
+         <script src="js/qx6/qx6_1_account.js"></script>
+         <script src="js/qx6/qx6_2_password.js"></script>
+         <script src="js/qx6/qx6_3_device.js"></script>
+         <script src="js/qx6/qx6_4_stats_users.js"></script>
+         <script src="js/qx6/qx6_5_redeem.js"></script>
+         <script src="js/qx6/qx6_6_manage_users.js"></script>
+         <script src="js/qx6/qx6_7_qa_engine.js"></script>
+         <script src="js/qx6/qx6_8_music_lib.js"></script>
+         <script src="js/qx6/qx6_9_music_workbench.js"></script>
+         <script src="js/qx6/qx6_10_rule_edit.js"></script>
+         <script src="js/qx6/qx6_11_finance.js"></script>
+         <script src="js/qx6/qx6_12_sys_exit.js"></script>
+         <script src="js/qx6/qx6_settings.js"></script>
      </body>
      </html>

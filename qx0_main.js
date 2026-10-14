@@ -8,7 +8,7 @@
    const MQXB_VERSION = 1;
    const EXPIRY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
    
-   const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co';
+   const SUPABASE_URL = 'https://api.emobao.com';
    const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
    
    /* ================================================================

@@ -4,3 +4,4 @@ music/
 test_supabase.html
 test_login.html
 Caddyfile
+.wrangler/

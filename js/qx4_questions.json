@@ -1,1682 +1,1668 @@
 [
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 1,
-      "questiontext_cn": "哈佛85年研究揭秘：决定你健康长寿的第一心理因素，不是乐观，也不是感恩",
-      "questiontext_en": "Harvard's 85-Year Study Reveals: The Top Psychological Factor for Health and Longevity Is Neither Optimism nor Gratitude",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 1,
-        "answer_cn": "哈佛大学那项持续了85年的追踪研究，结论出乎很多人意料：亲密关系的质量，比胆固醇水平更能预测你晚年的健康和幸福。温暖的人际关系像一层缓冲垫，把压力对心血管的伤害降到最低。它的效应强过社会阶层，也强过基因。换句话说，你身边有没有一个“随时可以打电话的人”，比你体检报告上的箭头更重要。",
-        "answer_en": "Harvard's 85-year longitudinal study reached a conclusion that surprises many: the quality of close relationships predicts late-life health and happiness better than cholesterol levels. Warm interpersonal relationships act as a buffer, minimizing the cardiovascular damage caused by stress. Their effect is stronger than social class and stronger than genes. In other words, whether you have someone you can call at any time matters more than the arrows on your medical report."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 2,
-      "questiontext_cn": "乐观能让你多活几年？答案是：7到11年，而且有生物学证据",
-      "questiontext_en": "How Many Years Can Optimism Add to Your Life? The Answer: 7 to 11 Years, with Biological Evidence",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 2,
-        "answer_cn": "多项元分析显示，最乐观的女性平均寿命延长14.9%，男性延长10.9%——大约多活7到11年。这不是玄学。乐观者的皮质醇节律更稳定，白细胞介素-6等炎症因子水平更低，端粒也更长。乐观不是盲目的“一切都会好”，而是一种“坏事来了我也能应付”的底层信念，而身体似乎听得懂这种信念。",
-        "answer_en": "Multiple meta-analyses show that the most optimistic women live 14.9% longer on average, and men 10.9% longer—roughly 7 to 11 additional years. This is not mysticism. Optimists have more stable cortisol rhythms, lower levels of inflammatory factors such as interleukin-6, and longer telomeres. Optimism is not a blind belief that \"everything will be fine,\" but a deep-seated conviction that \"even when bad things happen, I can handle them\"—and the body seems to understand this conviction."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 3,
-      "questiontext_cn": "“人生意义感”能救命：重大手术后并发症降低三分之一",
-      "questiontext_en": "\"A Sense of Life Meaning\" Can Save Lives: Major Post-Surgery Complications Reduced by One-Third",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 3,
-        "answer_cn": "研究显示，拥有清晰人生意义感的人，术后30天严重并发症风险降低33%，1年全因死亡率降低28%。机制在于：意义感增强迷走神经张力，抑制全身炎症反应综合征。当你觉得“活着有奔头”，身体似乎也在配合你“继续撑下去”。",
-        "answer_en": "Research shows that people with a clear sense of life meaning have a 33% lower risk of severe complications 30 days after surgery and a 28% lower one-year all-cause mortality rate. The mechanism: a sense of meaning enhances vagal tone and suppresses systemic inflammatory response syndrome. When you feel that life is worth living, the body seems to cooperate in helping you \"keep holding on.\""
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 4,
-      "questiontext_cn": "利他行为：帮助别人比取悦自己更能延长寿命",
-      "questiontext_en": "Altruistic Behavior: Helping Others Extends Life More Than Pleasing Yourself",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 4,
-        "answer_cn": "纵向研究发现，规律从事志愿服务和帮助他人的人，全因死亡率降低22%到24%；而单纯享乐型活动（比如吃大餐、购物）只降低7%。利他行为能激活迷走神经背核，释放催产素，并显著降低C反应蛋白。帮别人，身体给你的回报比帮自己更丰厚。",
-        "answer_en": "Longitudinal studies find that people who regularly volunteer and help others have a 22% to 24% lower all-cause mortality rate, while purely hedonic activities (such as indulging in feasts or shopping) reduce it by only 7%. Altruistic behavior activates the dorsal motor nucleus of the vagus, releases oxytocin, and significantly lowers C-reactive protein. When you help others, the body rewards you more generously than when you help yourself."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 5,
-      "questiontext_cn": "8周正念冥想，端粒酶活性提升30%：细胞衰老能被“踩刹车”",
-      "questiontext_en": "8 Weeks of Mindfulness Meditation Increases Telomerase Activity by 30%: Cellular Aging Can Be \"Braked\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 5,
-        "answer_cn": "虽然尚未证实积极情绪能“逆转”已经缩短的端粒，但正念冥想和感恩练习能显著提升端粒酶活性——一项8周正念干预显示，端粒酶活性较对照组提高30%，相当于细胞衰老减缓数年的生物学年龄。你不需要“返老还童”，你只需要“老得慢一点”。",
-        "answer_en": "Although it has not been proven that positive emotions can \"reverse\" already shortened telomeres, mindfulness meditation and gratitude practices can significantly boost telomerase activity—an 8-week mindfulness intervention showed a 30% increase in telomerase activity compared with the control group, equivalent to slowing cellular aging by several years of biological age. You don't need to \"grow young again\"; you just need to \"age a little more slowly.\""
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 6,
-      "questiontext_cn": "感恩日记为什么能降压？8到12周见效，效果可测量",
-      "questiontext_en": "Why Can a Gratitude Journal Lower Blood Pressure? Effects Appear in 8 to 12 Weeks and Are Measurable",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 6,
-        "answer_cn": "一项覆盖18项研究的分析发现，包含正念、感恩和乐观练习的干预项目，在8到12周内就能降低收缩压、减少hs-CRP等炎症标志物。其中一个12周项目使收缩压下降了7.6个点。感恩日记的机制不复杂：它把注意力从“我缺什么”转向“我有什么”，切换了自主神经系统的档位。",
-        "answer_en": "An analysis covering 18 studies found that intervention programs including mindfulness, gratitude, and optimism practices can lower systolic blood pressure and reduce inflammatory markers such as hs-CRP within 8 to 12 weeks. One 12-week program reduced systolic blood pressure by 7.6 points. The mechanism of a gratitude journal is not complicated: it shifts attention from \"what I lack\" to \"what I have,\" switching the gear of the autonomic nervous system."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 7,
-      "questiontext_cn": "经常大笑，血管会变“年轻”",
-      "questiontext_en": "Frequent Laughter Makes Blood Vessels \"Younger\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 7,
-        "answer_cn": "大笑时血管内皮释放一氧化氮，血管扩张，血压短暂下降。长期来看，经常大笑的人血管功能更好，血压更稳定。这不是段子，是生理学。笑是免费的血管体操。",
-        "answer_en": "During hearty laughter, the vascular endothelium releases nitric oxide, blood vessels dilate, and blood pressure briefly drops. In the long run, people who laugh often have better vascular function and more stable blood pressure. This is not a joke—it is physiology. Laughter is free vascular exercise."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 8,
-      "questiontext_cn": "心流状态：全神贯注时，你的颈动脉更“薄”",
-      "questiontext_en": "Flow State: When You Are Fully Absorbed, Your Carotid Artery Is \"Thinner\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 8,
-        "answer_cn": "高频体验“心流”（全神投入、忘记时间）的人，10年内职位晋升概率高2.1倍，颈动脉内膜中层厚度更薄。推测心流状态降低了交感神经的慢性激活，减少了血压变异性对血管的损伤。专注本身就是一种心血管保护行为。",
-        "answer_en": "People who frequently experience \"flow\" (total absorption, losing track of time) are 2.1 times more likely to be promoted within 10 years and have thinner carotid intima-media thickness. It is speculated that the flow state reduces chronic sympathetic activation and lessens the damage to blood vessels caused by blood pressure variability. Focus itself is a cardiovascular protective behavior."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 9,
-      "questiontext_cn": "敬畏感（仰望星空）能降低炎症因子",
-      "questiontext_en": "Awe (Gazing at the Starry Sky) Can Lower Inflammatory Factors",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 9,
-        "answer_cn": "当你站在山顶看日出，或者仰望满天繁星时，体内炎症因子水平会下降。敬畏感让人“缩小自我”，减少反刍思维，激活副交感神经。偶尔觉得自己渺小，对身体是件好事。",
-        "answer_en": "When you stand on a mountaintop watching the sunrise, or gaze up at a sky full of stars, levels of inflammatory factors in your body decline. Awe makes people \"shrink the self,\" reduces rumination, and activates the parasympathetic nervous system. Occasionally feeling small is good for your body."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 10,
-      "questiontext_cn": "乐观者的心血管风险更低，即使调整了血脂和BMI",
-      "questiontext_en": "Optimists Have Lower Cardiovascular Risk, Even After Adjusting for Blood Lipids and BMI",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 10,
-        "answer_cn": "积极情绪频发者，高频心率变异性持续偏高，抑制去甲肾上腺素过度释放，减少斑块破裂概率。即使调整了BMI和血脂，主要不良心血管事件风险仍降低15%到20%。心态好，血管真的知道。",
-        "answer_en": "People who frequently experience positive emotions maintain higher high-frequency heart rate variability, which suppresses excessive norepinephrine release and reduces the probability of plaque rupture. Even after adjusting for BMI and blood lipids, the risk of major adverse cardiovascular events is still reduced by 15% to 20%. With a good mindset, your blood vessels really do know."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 11,
-      "questiontext_cn": "夫妻关系和睦，端粒缩短速度慢40%",
-      "questiontext_en": "A Harmonious Marriage Slows Telomere Shortening by 40%",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 11,
-        "answer_cn": "对照研究显示，婚姻满意度高、经常表达亲密的夫妇，5年内外周血白细胞端粒缩短速率比冲突组慢40%，而且妻子受益更大。推测与频繁催产素释放和低水平精氨酸加压素有关。好的婚姻是端粒的“减速带”。",
-        "answer_en": "Controlled studies show that couples with high marital satisfaction and frequent expressions of intimacy have a 40% slower rate of telomere shortening in peripheral blood leukocytes over 5 years compared with conflicted couples, and wives benefit even more. This is speculated to be related to frequent oxytocin release and lower levels of arginine vasopressin. A good marriage is a \"speed bump\" for telomeres."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 12,
-      "questiontext_cn": "社交愉悦感对免疫细胞活性有多重要？",
-      "questiontext_en": "How Important Is Social Pleasure to Immune Cell Activity?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 12,
-        "answer_cn": "孤独感与炎症水平升高相关，而社交愉悦感则与自然杀伤细胞活性正相关。一次愉快的聚会、一段深度的对话，都在“喂养”你的免疫系统。孤独是慢性毒药，连接是慢性补药。",
-        "answer_en": "Loneliness is associated with elevated inflammation levels, while social pleasure is positively correlated with natural killer cell activity. A pleasant gathering or a deep conversation is \"feeding\" your immune system. Loneliness is a chronic poison; connection is a chronic tonic."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 13,
-      "questiontext_cn": "培养希望感，能延缓认知衰退",
-      "questiontext_en": "Cultivating Hope Can Delay Cognitive Decline",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 13,
-        "answer_cn": "希望感——相信未来有好事情会发生——与老年人认知功能衰退速度减慢相关。机制可能在于希望感促进健康行为、减少压力激素的慢性暴露。有盼头的人，大脑老得慢。",
-        "answer_en": "A sense of hope—believing that good things will happen in the future—is associated with a slower rate of cognitive decline in older adults. The mechanism may lie in hope promoting healthy behaviors and reducing chronic exposure to stress hormones. People with something to look forward to age more slowly in the brain."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 14,
-      "questiontext_cn": "知足感如何改善深睡？",
-      "questiontext_en": "How Does Contentment Improve Deep Sleep?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 14,
-        "answer_cn": "知足感高的人，入睡更快，深睡时长更长。知足减少的是“睡前反刍”——那些躺在床上反复回放白天尴尬事的思维循环。知足不是不思进取，是睡前把大脑调到“飞行模式”。",
-        "answer_en": "People with a high sense of contentment fall asleep faster and have longer deep sleep. What contentment reduces is \"pre-sleep rumination\"—the mental loop of replaying the day's embarrassing moments while lying in bed. Contentment is not a lack of ambition; it is switching the brain to \"airplane mode\" before sleep."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 15,
-      "questiontext_cn": "宽恕他人，免疫系统会给你“即时奖励”",
-      "questiontext_en": "Forgiving Others Gives Your Immune System an \"Instant Reward\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 15,
-        "answer_cn": "当你真正宽恕一个人时，皮质醇下降，免疫球蛋白A上升。宽恕不是为对方开脱，是把自己的身体从“持续戒备”中解放出来。不原谅，最累的是自己的身体。",
-        "answer_en": "When you truly forgive someone, cortisol drops and immunoglobulin A rises. Forgiveness is not about excusing the other person; it is about freeing your own body from \"constant alert.\" When you don't forgive, the one who suffers most is your own body."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 16,
-      "questiontext_cn": "PERMA模型干预8周，炎症因子水平显著下降",
-      "questiontext_en": "8 Weeks of PERMA Model Intervention Significantly Lowers Inflammatory Factors",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 16,
-        "answer_cn": "积极心理学PERMA模型（积极情绪、投入、关系、意义、成就）的完整干预，8周后受试者外周血单核细胞中NF-κB通路活性下调，促炎因子TNF-α和IL-1β水平显著降低，与地塞米松的抗炎效果有部分重合通路。幸福不只是感觉，是可测量的分子变化。",
-        "answer_en": "After 8 weeks of complete intervention with the positive psychology PERMA model (positive emotion, engagement, relationships, meaning, accomplishment), subjects showed downregulated NF-κB pathway activity in peripheral blood mononuclear cells and significantly reduced levels of pro-inflammatory factors TNF-α and IL-1β, with partial overlap in pathways with the anti-inflammatory effects of dexamethasone. Happiness is not just a feeling; it is a measurable molecular change."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 17,
-      "questiontext_cn": "儿童期的积极情绪体验，能改变成年后的基因表达",
-      "questiontext_en": "Positive Emotional Experiences in Childhood Can Change Gene Expression in Adulthood",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 17,
-        "answer_cn": "早期正向刺激可促进组蛋白乙酰化，上调前额叶BDNF表达，并在成年后持续增强杏仁核与前额叶的功能连接效率。这种表观标记甚至可以持续数十年。童年被爱够的孩子，身体记了一辈子。",
-        "answer_en": "Early positive stimulation can promote histone acetylation, upregulate prefrontal BDNF expression, and persistently enhance the functional connectivity efficiency between the amygdala and prefrontal cortex in adulthood. Such epigenetic marks can even last for decades. Children who were loved enough in childhood have bodies that remember it for a lifetime."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 18,
-      "questiontext_cn": "利他行为对死亡率的影响，强于单纯自我取乐",
-      "questiontext_en": "Altruistic Behavior Has a Stronger Effect on Mortality Than Pure Self-Pleasure",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 18,
-        "answer_cn": "规律利他者全因死亡率降低22%到24%，单纯享乐型活动仅降低7%。原因在于利他能激活迷走神经背核，释放催产素，降低C反应蛋白。帮别人，身体给的“回扣”比帮自己更多。",
-        "answer_en": "Regular altruists have a 22% to 24% lower all-cause mortality rate, while purely hedonic activities reduce it by only 7%. The reason is that altruism activates the dorsal motor nucleus of the vagus, releases oxytocin, and lowers C-reactive protein. When you help others, the body gives you a bigger \"kickback\" than when you help yourself."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 19,
-      "questiontext_cn": "感恩特质与副交感神经活性的关联，受COMT基因调节",
-      "questiontext_en": "The Link Between Gratitude Traits and Parasympathetic Activity Is Modulated by the COMT Gene",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 19,
-        "answer_cn": "携带COMT Val/Val基因型（多巴胺代谢快）的人，感恩干预后心率变异性提升更显著。同样的感恩练习，不同基因的人“收益”不同——但所有人都能受益，只是幅度有差异。",
-        "answer_en": "People carrying the COMT Val/Val genotype (fast dopamine metabolism) show more significant improvements in heart rate variability after gratitude intervention. The same gratitude practice yields different \"returns\" for people with different genes—but everyone can benefit, only the magnitude differs."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 20,
-      "questiontext_cn": "积极情绪频发者，MACE风险降低15%到20%",
-      "questiontext_en": "Frequent Positive Emotions Reduce MACE Risk by 15% to 20%",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 20,
-        "answer_cn": "积极情绪通过自主神经平衡直接降低主要不良心血管事件风险。高频心率变异性持续偏高，抑制去甲肾上腺素过度释放，减少斑块破裂概率。每天找点乐子，心脏给你点赞。",
-        "answer_en": "Positive emotions directly reduce the risk of major adverse cardiovascular events through autonomic balance. Persistently higher high-frequency heart rate variability suppresses excessive norepinephrine release and reduces the probability of plaque rupture. Find a little joy every day, and your heart will give you a thumbs-up."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C1",
-      "questionno": 21,
-      "questiontext_cn": "情绪健康是事业成功的“基石”，不是“副产品”",
-      "questiontext_en": "Emotional Health Is the \"Cornerstone\" of Career Success, Not a \"By-Product\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 21,
-        "answer_cn": "20岁时积极情绪得分高的人，40岁时收入、职业满意度和婚姻稳定性均显著更高，且此效应独立于父母社会经济地位。情绪能力是人力资本的核心成分，不是成功之后的装饰品。",
-        "answer_en": "People with high positive emotion scores at age 20 have significantly higher income, career satisfaction, and marital stability at age 40, and this effect is independent of parents' socioeconomic status. Emotional ability is a core component of human capital, not a decoration after success."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学与健康促进"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 1,
-      "questiontext_cn": "情绪到底是什么？生理反应还是心理现象？",
-      "questiontext_en": "What Exactly Is Emotion? A Physiological Response or a Psychological Phenomenon?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 22,
-        "answer_cn": "答案是：都是，而且分不开。 情绪既是大脑对刺激的评估（心理），也是身体为应对这个评估做出的全套动员（生理）。杏仁核对情绪性刺激的加工甚至存在“快速通道”——在你有意识之前，身体已经启动了反应。你不是“先想清楚再生气”，你是“先生气了再想”。",
-        "answer_en": "The answer is: both, and they cannot be separated. Emotion is both the brain's appraisal of a stimulus (psychological) and the body's full mobilization in response to that appraisal (physiological). The amygdala even has a \"fast track\" for processing emotional stimuli—before you are consciously aware, the body has already initiated a response. You don't \"get angry after thinking it through\"; you \"think after getting angry first.\""
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 2,
-      "questiontext_cn": "“喜极而泣”为什么是健康的？",
-      "questiontext_en": "Why Is \"Tears of Joy\" Healthy?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 23,
-        "answer_cn": "强烈情绪（无论是喜是悲）激活下丘脑-垂体-肾上腺轴，身体需要“泄洪”。哭泣是一种生理释放阀：眼泪中确实含有应激激素，哭出来=排出去。憋着不哭，应激激素就留在体内继续巡逻。",
-        "answer_en": "Strong emotions (whether joy or sorrow) activate the hypothalamic-pituitary-adrenal axis, and the body needs to \"release the flood.\" Crying is a physiological release valve: tears do contain stress hormones, so crying them out equals expelling them. If you hold back tears, stress hormones remain in the body and continue to patrol."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 3,
-      "questiontext_cn": "中医“七情内伤”：喜怒忧思悲恐惊，每一种都对应一个器官",
-      "questiontext_en": "TCM's \"Seven Emotions Causing Internal Damage\": Joy, Anger, Worry, Thought, Sorrow, Fear, and Shock—Each Corresponds to an Organ",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 24,
-        "answer_cn": "喜伤心、怒伤肝、思伤脾、悲忧伤肺、恐伤肾。古人没有分子生物学，但他们观察到了一种规律：情绪不是飘在空中的，它落在具体的器官上。",
-        "answer_en": "Joy harms the heart, anger harms the liver, thought harms the spleen, sorrow and worry harm the lungs, and fear harms the kidneys. The ancients did not have molecular biology, but they observed a pattern: emotions do not float in the air; they land on specific organs."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 4,
-      "questiontext_cn": "情绪如何通过“神经-内分泌-免疫网络”影响全身？",
-      "questiontext_en": "How Do Emotions Affect the Whole Body Through the \"Neuro-Endocrine-Immune Network\"?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 25,
-        "answer_cn": "路径清晰：大脑感知威胁→下丘脑启动→垂体发指令→肾上腺释放皮质醇→免疫细胞调整活动。这条通路叫HPA轴。情绪不是“心理问题”，是全身性的生理事件。",
-        "answer_en": "The pathway is clear: the brain perceives a threat → the hypothalamus initiates → the pituitary sends instructions → the adrenal glands release cortisol → immune cells adjust their activity. This pathway is called the HPA axis. Emotion is not a \"psychological problem\"; it is a whole-body physiological event."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 5,
-      "questiontext_cn": "长期压抑情绪，为什么自然杀伤细胞会“罢工”？",
-      "questiontext_en": "Why Do Natural Killer Cells \"Go on Strike\" When Emotions Are Suppressed Long-Term?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 26,
-        "answer_cn": "自然杀伤细胞是免疫系统的“巡逻警”。慢性压力下，皮质醇持续偏高，自然杀伤细胞的活性被抑制。压抑情绪=让免疫系统的警察长期加班，最后他们累了。",
-        "answer_en": "Natural killer cells are the \"patrol officers\" of the immune system. Under chronic stress, cortisol remains persistently high, and natural killer cell activity is suppressed. Suppressing emotions equals making the immune system's police work overtime for a long time—eventually, they get tired."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 6,
-      "questiontext_cn": "情绪波动时，皮质醇到底怎么变？",
-      "questiontext_en": "How Exactly Does Cortisol Change During Emotional Fluctuations?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 27,
-        "answer_cn": "急性压力下皮质醇飙升，帮身体动员能量。但长期情绪波动会导致皮质醇节律紊乱——早晨应该高的时候不高，晚上应该低的时候不低。结果是：白天没精神，晚上睡不着。",
-        "answer_en": "Under acute stress, cortisol surges to help the body mobilize energy. But long-term emotional fluctuations can disrupt the cortisol rhythm—it is not high when it should be high in the morning, and not low when it should be low at night. The result: no energy during the day, no sleep at night."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 7,
-      "questiontext_cn": "迷走神经张力：情绪调节能力的“硬件指标”",
-      "questiontext_en": "Vagal Tone: The \"Hardware Indicator\" of Emotional Regulation Capacity",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 28,
-        "answer_cn": "迷走神经张力高的人，情绪恢复快，不容易被激怒，心率变异性也高。迷走神经是身体的“刹车系统”，张力越好，刹车越灵。",
-        "answer_en": "People with high vagal tone recover emotionally faster, are less easily irritated, and have higher heart rate variability. The vagus nerve is the body's \"braking system\"; the better the tone, the more responsive the brakes."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 8,
-      "questiontext_cn": "情绪记忆为什么比普通记忆更难消除？",
-      "questiontext_en": "Why Are Emotional Memories Harder to Erase Than Ordinary Memories?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 29,
-        "answer_cn": "杏仁核在情绪记忆的编码阶段就深度参与，它给记忆贴上“重要！危险！记住！”的标签。普通记忆像便利贴，情绪记忆像刻在石碑上。你的大脑不让你忘记丢脸的事，是为了“保护”你——只是方式有点烦人。",
-        "answer_en": "The amygdala is deeply involved in the encoding stage of emotional memory, tagging it with \"Important! Dangerous! Remember!\" Ordinary memories are like sticky notes; emotional memories are like carvings on stone tablets. Your brain prevents you from forgetting embarrassing events in order to \"protect\" you—it's just that the method is a bit annoying."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 9,
-      "questiontext_cn": "肠道菌群通过“肠-脑轴”与情绪中枢对话",
-      "questiontext_en": "Gut Microbiota Communicate with Emotional Centers Through the \"Gut-Brain Axis\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 30,
-        "answer_cn": "肠道里的细菌能产生血清素、多巴胺的前体，通过迷走神经向大脑“汇报”。你的肠道菌群在参与决定你今天心情好不好。",
-        "answer_en": "Bacteria in the gut can produce precursors of serotonin and dopamine and \"report\" to the brain through the vagus nerve. Your gut microbiota is participating in determining whether you are in a good mood today."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 10,
-      "questiontext_cn": "情绪能直接改变基因表达吗？",
-      "questiontext_en": "Can Emotions Directly Change Gene Expression?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 31,
-        "answer_cn": "能。这就是表观遗传学。慢性压力可以改变糖皮质激素受体基因的甲基化水平，让HPA轴变得更敏感或更迟钝。你的经历在基因上“写了批注”。",
-        "answer_en": "Yes. This is epigenetics. Chronic stress can change the methylation level of the glucocorticoid receptor gene, making the HPA axis more sensitive or more sluggish. Your experiences have \"written annotations\" on your genes."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 11,
-      "questiontext_cn": "为什么情绪激动时，旧伤会隐隐作痛？",
-      "questiontext_en": "Why Do Old Wounds Ache Faintly When Emotions Run High?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 32,
-        "answer_cn": "情绪激活了身体的应激系统，交感神经兴奋，局部血管收缩，炎症因子在旧伤部位聚集。旧伤是身体的“记忆点”，情绪一喊，它们就答应。",
-        "answer_en": "Emotions activate the body's stress system, the sympathetic nerves become excited, local blood vessels constrict, and inflammatory factors gather at the site of old wounds. Old wounds are the body's \"memory points\"; when emotions call out, they answer."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 12,
-      "questiontext_cn": "心率变异性如何反映情绪健康？",
-      "questiontext_en": "How Does Heart Rate Variability Reflect Emotional Health?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 33,
-        "answer_cn": "心率变异性高=身体在“战斗”和“休息”之间切换自如。心率变异性低=自主神经系统僵住了。心率变异性是情绪韧性的生理读数。",
-        "answer_en": "High heart rate variability means the body switches freely between \"fight\" and \"rest.\" Low heart rate variability means the autonomic nervous system is stuck. Heart rate variability is the physiological readout of emotional resilience."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C2",
-      "questionno": 13,
-      "questiontext_cn": "情绪与健康：单向还是双向？",
-      "questiontext_en": "Emotion and Health: One-Way or Two-Way?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 34,
-        "answer_cn": "双向，而且是一个循环。 负面情绪伤身，身体不好又加重负面情绪。打破循环的任何一个点都有价值。",
-        "answer_en": "Two-way, and it is a loop. Negative emotions harm the body, and poor health worsens negative emotions. Breaking the loop at any point is valuable."
-      },
-      "scoringrule": {},
-      "dimension": "基础认知与心身关联"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 1,
-      "questiontext_cn": "运动分泌的内啡肽，能替代抗抑郁药吗？",
-      "questiontext_en": "Can Endorphins Released by Exercise Replace Antidepressants?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 35,
-        "answer_cn": "不能替代，但能协同。规律运动对轻中度抑郁的效果与药物相当，且没有副作用。对重度抑郁，运动是辅助。运动是情绪的“日常维护”，药物是“紧急维修”。",
-        "answer_en": "It cannot replace them, but it can work synergistically. Regular exercise is comparable to medication for mild to moderate depression, with no side effects. For severe depression, exercise is adjunctive. Exercise is \"routine maintenance\" for emotions; medication is \"emergency repair.\""
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 2,
-      "questiontext_cn": "高糖高脂饮食为什么让人情绪更差？",
-      "questiontext_en": "Why Does a High-Sugar, High-Fat Diet Make Emotions Worse?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 36,
-        "answer_cn": "血糖过山车→皮质醇和肾上腺素补偿性释放→焦虑和易怒。高脂饮食改变肠道菌群→肠脑轴信号变差。你吃的每一口“快乐食品”，可能都在为下一轮情绪崩溃充值。",
-        "answer_en": "Blood sugar roller coaster → compensatory release of cortisol and adrenaline → anxiety and irritability. A high-fat diet alters gut microbiota → worse gut-brain axis signaling. Every bite of \"comfort food\" you eat may be topping up the account for your next emotional crash."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 3,
-      "questiontext_cn": "熬夜后第二天，为什么特别容易炸毛？",
-      "questiontext_en": "Why Are You So Easily Set Off the Day After Staying Up Late?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 37,
-        "answer_cn": "睡眠剥夺使前额叶（理性脑）功能下降，杏仁核（情绪脑）反应性升高。睡不好=理性下班，情绪上班。",
-        "answer_en": "Sleep deprivation reduces prefrontal cortex (the rational brain) function and increases amygdala (the emotional brain) reactivity. Poor sleep means rationality clocks out and emotion clocks in."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 4,
-      "questiontext_cn": "晒太阳为什么对情绪这么关键？",
-      "questiontext_en": "Why Is Sunlight So Crucial for Mood?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 38,
-        "answer_cn": "紫外线促进皮肤合成血清素前体，调节昼夜节律。阳光是免费的抗抑郁药，只是需要你走出门去取。",
-        "answer_en": "Ultraviolet light promotes the synthesis of serotonin precursors in the skin and regulates circadian rhythms. Sunlight is a free antidepressant—you just need to step outside to collect it."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 5,
-      "questiontext_cn": "咖啡因和焦虑：剂量决定关系",
-      "questiontext_en": "Caffeine and Anxiety: Dose Determines the Relationship",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 39,
-        "answer_cn": "适量咖啡因提神，过量则激活交感神经，诱发心悸、手抖、焦虑。对已经焦虑的人，咖啡因可能“火上浇油”。咖啡是双刃剑，焦虑体质的人要小心使用。",
-        "answer_en": "Moderate caffeine boosts alertness, but excessive amounts activate the sympathetic nervous system, triggering palpitations, tremors, and anxiety. For people who are already anxious, caffeine may \"pour oil on the fire.\" Coffee is a double-edged sword; those with an anxious constitution should use it carefully."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 6,
-      "questiontext_cn": "长期素食者要注意维生素B12",
-      "questiontext_en": "Long-Term Vegetarians Need to Watch Vitamin B12",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 40,
-        "answer_cn": "B12缺乏与抑郁、疲劳、认知下降相关。素食者需要主动补充。不吃肉不是问题，不补B12才是问题。",
-        "answer_en": "B12 deficiency is associated with depression, fatigue, and cognitive decline. Vegetarians need to supplement proactively. Not eating meat is not the problem; not supplementing B12 is the problem."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 7,
-      "questiontext_cn": "手机成瘾的“信息焦虑”如何伤害大脑？",
-      "questiontext_en": "How Does the \"Information Anxiety\" of Phone Addiction Harm the Brain?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 41,
-        "answer_cn": "持续的多任务切换消耗前额叶资源，降低深度思考能力，同时制造“永远在线”的慢性应激。刷手机不是休息，是另一种形式的加班。",
-        "answer_en": "Constant multitasking switches consume prefrontal resources, reduce deep thinking capacity, and create chronic stress from being \"always online.\" Scrolling on your phone is not rest; it is another form of overtime."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 8,
-      "questiontext_cn": "音乐疗愈的科学依据：听觉通路直通边缘系统",
-      "questiontext_en": "The Scientific Basis of Music Therapy: The Auditory Pathway Goes Straight to the Limbic System",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 42,
-        "answer_cn": "音乐不经过“理性审查”就能激活杏仁核、海马体和伏隔核。这就是为什么一首歌能在三秒内让你哭或笑。",
-        "answer_en": "Music can activate the amygdala, hippocampus, and nucleus accumbens without going through \"rational review.\" This is why a song can make you cry or laugh within three seconds."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 9,
-      "questiontext_cn": "薰衣草芳香疗法的依据是什么？",
-      "questiontext_en": "What Is the Basis for Lavender Aromatherapy?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 43,
-        "answer_cn": "薰衣草中的芳樟醇通过嗅觉通路影响边缘系统，降低交感神经张力。气味是最原始的情绪调节器。",
-        "answer_en": "Linalool in lavender affects the limbic system through the olfactory pathway and reduces sympathetic tone. Scent is the most primitive emotion regulator."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 10,
-      "questiontext_cn": "冥想和深呼吸为什么能降低乳酸水平？",
-      "questiontext_en": "Why Can Meditation and Deep Breathing Lower Lactate Levels?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 44,
-        "answer_cn": "深呼吸激活副交感神经，减少无氧代谢，乳酸自然下降。慢呼吸=告诉身体“没有老虎在追你”。",
-        "answer_en": "Deep breathing activates the parasympathetic nervous system, reduces anaerobic metabolism, and lactate naturally declines. Slow breathing = telling the body \"no tiger is chasing you.\""
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 11,
-      "questiontext_cn": "周末补觉的“社交时差”对情绪节律的破坏",
-      "questiontext_en": "The Damage of \"Social Jet Lag\" from Weekend Catch-Up Sleep to Emotional Rhythms",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 45,
-        "answer_cn": "工作日和周末睡眠时间差异过大，相当于每周飞一次跨时区航班。昼夜节律紊乱→情绪波动。周末补觉可以，但别补成“倒时差”。",
-        "answer_en": "A large difference in sleep timing between weekdays and weekends is like taking a cross-time-zone flight every week. Circadian rhythm disruption → emotional fluctuations. Weekend catch-up sleep is fine, but don't turn it into \"jet lag.\""
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 12,
-      "questiontext_cn": "喝温水、揉肚子缓解紧张性胃痉挛，有道理吗？",
-      "questiontext_en": "Does Drinking Warm Water and Rubbing the Belly to Relieve Tension-Induced Stomach Cramps Make Sense?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 46,
-        "answer_cn": "有。温热刺激和腹部按摩激活副交感神经和迷走神经的腹部分支。胃是情绪的“第二张脸”，温柔对待它。",
-        "answer_en": "Yes. Warm stimulation and abdominal massage activate the parasympathetic nervous system and the abdominal branches of the vagus nerve. The stomach is the \"second face\" of emotions; treat it gently."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 13,
-      "questiontext_cn": "高强度间歇训练对焦虑的缓解能持续多久？",
-      "questiontext_en": "How Long Does the Anxiety Relief from High-Intensity Interval Training Last?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 47,
-        "answer_cn": "研究显示，一次高强度间歇训练后的抗焦虑效果可持续数小时。规律训练则产生累积效应。出一身汗，换几小时清静。",
-        "answer_en": "Research shows that the anti-anxiety effect after a single session of high-intensity interval training can last for several hours. Regular training produces cumulative effects. Work up a sweat, and buy yourself a few hours of peace."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C3",
-      "questionno": 14,
-      "questiontext_cn": "轻断食会影响情绪稳定性吗？",
-      "questiontext_en": "Does Intermittent Fasting Affect Emotional Stability?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 48,
-        "answer_cn": "因人而异。对一些人，断食期间血糖稳定，情绪更清晰；对另一些人，低血糖诱发易怒。断食是工具，不是信仰，听身体的。",
-        "answer_en": "It varies from person to person. For some, blood sugar remains stable during fasting and mood becomes clearer; for others, low blood sugar triggers irritability. Fasting is a tool, not a religion—listen to your body."
-      },
-      "scoringrule": {},
-      "dimension": "生活方式与情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 1,
-      "questiontext_cn": "长期社交隔离对大脑的损伤，相当于每天抽几支烟？",
-      "questiontext_en": "The Brain Damage from Long-Term Social Isolation Is Equivalent to Smoking How Many Cigarettes a Day?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 49,
-        "answer_cn": "流行病学研究把长期孤独的危害量化为每天抽15支烟。这不是比喻，是死亡率数据的对比。孤独是合法的慢性自杀。",
-        "answer_en": "Epidemiological studies quantify the harm of long-term loneliness as equivalent to smoking 15 cigarettes a day. This is not a metaphor; it is a comparison of mortality data. Loneliness is a legal form of chronic self-destruction."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 2,
-      "questiontext_cn": "职场PUA导致的慢性压力，如何“攻击”心脏？",
-      "questiontext_en": "How Does Chronic Stress from Workplace PUA \"Attack\" the Heart?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 50,
-        "answer_cn": "持续的心理压迫→皮质醇和儿茶酚胺长期偏高→血压波动、内皮损伤、心率变异性降低。被PUA的人，心脏在替他们受罪。",
-        "answer_en": "Persistent psychological oppression → long-term elevation of cortisol and catecholamines → blood pressure fluctuations, endothelial damage, and reduced heart rate variability. For people being PUA'd, their hearts suffer on their behalf."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 3,
-      "questiontext_cn": "婚姻不和睦，为什么增加男性前列腺疾病风险？",
-      "questiontext_en": "Why Does Marital Discord Increase Men's Risk of Prostate Disease?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 51,
-        "answer_cn": "慢性婚姻冲突→交感神经持续激活→盆底肌肉紧张→前列腺局部血流和炎症环境改变。吵架伤的不只是感情。",
-        "answer_en": "Chronic marital conflict → persistent sympathetic activation → pelvic floor muscle tension → changes in local prostate blood flow and inflammatory environment. Arguing damages more than just feelings."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 4,
-      "questiontext_cn": "亲子关系紧张对儿童大脑的器质性影响",
-      "questiontext_en": "The Organic Effects of Strained Parent-Child Relationships on Children's Brains",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 52,
-        "answer_cn": "长期高压的亲子互动改变儿童HPA轴设定点，影响前额叶发育和杏仁核反应性。孩子的“不听话”，有时是大脑在高压下的生存策略。",
-        "answer_en": "Long-term high-pressure parent-child interactions alter children's HPA axis set point, affecting prefrontal development and amygdala reactivity. A child's \"disobedience\" is sometimes the brain's survival strategy under high pressure."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 5,
-      "questiontext_cn": "朋友少与老年痴呆风险：有明确关联",
-      "questiontext_en": "Few Friends and Dementia Risk: A Clear Association",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 53,
-        "answer_cn": "社会隔离是痴呆的独立危险因素。社交刺激维持认知储备，孤独则加速衰退。朋友是大脑的“健身房”。",
-        "answer_en": "Social isolation is an independent risk factor for dementia. Social stimulation maintains cognitive reserve, while loneliness accelerates decline. Friends are the brain's \"gym.\""
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 6,
-      "questiontext_cn": "被排斥的“社会疼痛”和物理疼痛，共享脑区",
-      "questiontext_en": "The \"Social Pain\" of Exclusion and Physical Pain Share Brain Regions",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 54,
-        "answer_cn": "社会排斥激活的前扣带皮层和物理疼痛是同一区域。心碎不是修辞，是神经现实。",
-        "answer_en": "The anterior cingulate cortex activated by social exclusion is the same region involved in physical pain. Heartbreak is not a figure of speech; it is a neural reality."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 7,
-      "questiontext_cn": "护理者压力如何“致癌”？",
-      "questiontext_en": "How Does Caregiver Stress \"Cause Cancer\"?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 55,
-        "answer_cn": "长期照护压力→慢性炎症、免疫监视下降、端粒缩短。照顾别人的人，自己也需要被照顾。",
-        "answer_en": "Long-term caregiving stress → chronic inflammation, reduced immune surveillance, and telomere shortening. Those who care for others also need to be cared for."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 8,
-      "questiontext_cn": "网络暴力对青少年内分泌的冲击",
-      "questiontext_en": "The Impact of Cyberbullying on Adolescents' Endocrine System",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 56,
-        "answer_cn": "网络暴力是不可逃避的、公开的、持续的羞辱。青少年皮质醇反应被反复触发，HPA轴可能走向钝化或过度唤醒。屏幕后面的恶意，是真实的内分泌毒药。",
-        "answer_en": "Cyberbullying is inescapable, public, and persistent humiliation. Adolescents' cortisol responses are repeatedly triggered, and the HPA axis may become blunted or over-aroused. Malice behind the screen is a real endocrine poison."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 9,
-      "questiontext_cn": "良好的社会支持如何“缓冲”端粒磨损？",
-      "questiontext_en": "How Does Good Social Support \"Buffer\" Telomere Wear?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 57,
-        "answer_cn": "社会支持高的人，面对压力时皮质醇反应更温和，端粒缩短更慢。一个可以倾诉的人，可能是端粒的“保护神”。",
-        "answer_en": "People with high social support have a gentler cortisol response to stress and slower telomere shortening. Someone you can confide in may be the \"guardian angel\" of your telomeres."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C4",
-      "questionno": 10,
-      "questiontext_cn": "社交时差对情绪节律的破坏，比你想的更严重",
-      "questiontext_en": "Social Jet Lag Disrupts Emotional Rhythms More Seriously Than You Think",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 58,
-        "answer_cn": "周末晚睡晚起打乱昼夜节律，周一“社会时差”导致情绪低落和认知下降。你的身体不知道今天是周几，它只知道光照和睡眠。",
-        "answer_en": "Staying up late and waking late on weekends disrupts circadian rhythms, and Monday \"social jet lag\" leads to low mood and cognitive decline. Your body does not know what day of the week it is; it only knows light and sleep."
-      },
-      "scoringrule": {},
-      "dimension": "人际关系与社会情绪健康"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 1,
-      "questiontext_cn": "抑郁症的躯体症状：不只是“心情不好”",
-      "questiontext_en": "The Physical Symptoms of Depression: Not Just \"Feeling Down\"",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 59,
-        "answer_cn": "睡眠障碍、食欲改变、慢性疼痛、消化问题、性欲下降、疲劳——抑郁是全身性疾病，只是诊断标准盯着情绪。身体在替你说“我撑不住了”。",
-        "answer_en": "Sleep disturbances, appetite changes, chronic pain, digestive problems, decreased libido, fatigue—depression is a systemic disease; the diagnostic criteria just focus on mood. The body is saying \"I can't hold on anymore\" on your behalf."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 2,
-      "questiontext_cn": "广泛性焦虑为什么伴随心悸和手抖？",
-      "questiontext_en": "Why Does Generalized Anxiety Come with Palpitations and Tremors?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 60,
-        "answer_cn": "交感神经过度激活→心率加快、血管收缩、肌肉紧张。焦虑不是“想太多”，是自主神经系统在“假警报”。",
-        "answer_en": "Overactivation of the sympathetic nervous system → increased heart rate, vasoconstriction, muscle tension. Anxiety is not \"overthinking\"; it is the autonomic nervous system sounding a \"false alarm.\""
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 3,
-      "questiontext_cn": "躯体形式障碍：检查无异常，疼痛却真实存在",
-      "questiontext_en": "Somatoform Disorder: Tests Show Nothing Abnormal, Yet the Pain Is Real",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 61,
-        "answer_cn": "疼痛信号是真实的神经活动，只是来源不是“病灶”，而是中枢敏化和自主神经功能紊乱。“查不出来”不等于“不存在”。",
-        "answer_en": "Pain signals are real neural activity; the source is not a \"lesion\" but central sensitization and autonomic dysfunction. \"Nothing found on tests\" does not mean \"it doesn't exist.\""
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 4,
-      "questiontext_cn": "创伤后应激障碍如何改变海马体结构？",
-      "questiontext_en": "How Does PTSD Change the Structure of the Hippocampus?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 62,
-        "answer_cn": "慢性应激→皮质醇毒性→海马体神经发生减少、树突萎缩。海马体负责区分“过去”和“现在”，受损后创伤记忆不断“入侵”当下。创伤不只在心里，它刻在脑结构里。",
-        "answer_en": "Chronic stress → cortisol toxicity → reduced hippocampal neurogenesis and dendritic atrophy. The hippocampus is responsible for distinguishing \"past\" from \"present\"; when damaged, traumatic memories keep \"invading\" the present. Trauma is not only in the mind; it is carved into brain structure."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 5,
-      "questiontext_cn": "惊恐发作和心脏病发作：如何鉴别？",
-      "questiontext_en": "Panic Attacks vs. Heart Attacks: How to Tell Them Apart?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 63,
-        "answer_cn": "惊恐发作：胸闷+手麻+恐惧感，心电图正常。心脏病：胸闷+压榨感+放射痛+出汗，心电图异常。但很多惊恐发作患者最终去了急诊——这是正确的选择。",
-        "answer_en": "Panic attack: chest tightness + numbness in hands + fear, with a normal ECG. Heart attack: chest tightness + crushing sensation + radiating pain + sweating, with an abnormal ECG. But many panic attack patients end up in the emergency room—which is the correct choice."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 6,
-      "questiontext_cn": "季节性情感障碍与血清素",
-      "questiontext_en": "Seasonal Affective Disorder and Serotonin",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 64,
-        "answer_cn": "秋冬光照减少→血清素合成下降→抑郁。季节性情感障碍是“生物学的乡愁”，对光的乡愁。",
-        "answer_en": "Reduced light in autumn and winter → decreased serotonin synthesis → depression. Seasonal affective disorder is a \"biological homesickness\"—a homesickness for light."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 7,
-      "questiontext_cn": "强迫行为能短暂缓解焦虑，但长期损害健康",
-      "questiontext_en": "Compulsive Behavior Relieves Anxiety Briefly but Harms Health Long-Term",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 65,
-        "answer_cn": "强迫行为是“负强化”——做了就舒服一会儿，但强化了“不做会出事”的信念。缓解是真实的，代价也是真实的。",
-        "answer_en": "Compulsive behavior is \"negative reinforcement\"—doing it brings temporary relief, but it reinforces the belief that \"not doing it will cause disaster.\" The relief is real, and so is the cost."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 8,
-      "questiontext_cn": "双相躁狂期为什么“不知疲倦”？",
-      "questiontext_en": "Why Do People in Bipolar Manic Episodes Feel \"Tireless\"?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 66,
-        "answer_cn": "躁狂期多巴胺和去甲肾上腺素过度活跃，睡眠需求下降，精力暴增。躁狂不是“状态好”，是引擎在红线区运转。",
-        "answer_en": "During manic episodes, dopamine and norepinephrine are overactive, sleep need decreases, and energy surges. Mania is not \"being in a good state\"; it is the engine running in the red zone."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 9,
-      "questiontext_cn": "疑病症反复就医：免疫系统是保护还是消耗？",
-      "questiontext_en": "Repeated Medical Visits for Hypochondria: Is the Immune System Protecting or Being Depleted?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 67,
-        "answer_cn": "反复检查→暂时安心→焦虑回来→再检查。焦虑持续激活，免疫系统被慢性应激消耗。反复求证不是保护，是另一种消耗。",
-        "answer_en": "Repeated tests → temporary reassurance → anxiety returns → more tests. Anxiety remains persistently activated, and the immune system is depleted by chronic stress. Repeated reassurance-seeking is not protection; it is another form of depletion."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 10,
-      "questiontext_cn": "进食障碍如何导致电解质紊乱？",
-      "questiontext_en": "How Do Eating Disorders Cause Electrolyte Imbalance?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 68,
-        "answer_cn": "催吐→胃酸丢失→低钾低氯性碱中毒。暴食→血糖剧烈波动。进食障碍是死亡率最高的精神疾病之一，电解质紊乱是主要原因。",
-        "answer_en": "Self-induced vomiting → loss of stomach acid → hypokalemic hypochloremic alkalosis. Binge eating → severe blood sugar fluctuations. Eating disorders are among the mental illnesses with the highest mortality rates, and electrolyte imbalance is the main cause."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 11,
-      "questiontext_cn": "睡眠障碍：原因还是结果？",
-      "questiontext_en": "Sleep Disorders: Cause or Result?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 69,
-        "answer_cn": "两者都是，形成恶性循环。 失眠加重情绪问题，情绪问题恶化失眠。打破循环需要同时干预。",
-        "answer_en": "Both, forming a vicious cycle. Insomnia worsens emotional problems, and emotional problems worsen insomnia. Breaking the cycle requires intervening in both at the same time."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 12,
-      "questiontext_cn": "慢性疲劳综合征与情绪耗竭",
-      "questiontext_en": "Chronic Fatigue Syndrome and Emotional Exhaustion",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 70,
-        "answer_cn": "线粒体功能下降、HPA轴钝化、免疫激活——慢性疲劳和情绪耗竭共享生理通路。累到“起不来”，可能是身体在强制关机。",
-        "answer_en": "Decreased mitochondrial function, blunted HPA axis, immune activation—chronic fatigue and emotional exhaustion share physiological pathways. Being too tired to \"get up\" may be the body forcing a shutdown."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 13,
-      "questiontext_cn": "焦虑症患者为什么常有耳鸣或脑鸣？",
-      "questiontext_en": "Why Do Anxiety Patients Often Have Tinnitus or Head Noises?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 71,
-        "answer_cn": "焦虑→交感神经兴奋→内耳血管收缩→耳鸣。肌肉紧张→颈部和下颌→压迫相关神经。耳鸣是焦虑的“听觉版本”。",
-        "answer_en": "Anxiety → sympathetic excitation → constriction of inner ear blood vessels → tinnitus. Muscle tension → neck and jaw → compression of related nerves. Tinnitus is the \"auditory version\" of anxiety."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C5",
-      "questionno": 14,
-      "questiontext_cn": "述情障碍：无法识别情绪的人，身体更遭罪",
-      "questiontext_en": "Alexithymia: People Who Cannot Identify Emotions Suffer More Physically",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 72,
-        "answer_cn": "说不出“我生气”，身体就用高血压、胃痛、头痛来“说”。情绪需要词汇，没有词汇的情绪会变成症状。",
-        "answer_en": "If you cannot say \"I am angry,\" the body will \"speak\" through high blood pressure, stomach pain, and headaches. Emotions need words; emotions without words become symptoms."
-      },
-      "scoringrule": {},
-      "dimension": "情绪障碍与躯体化症状"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 1,
-      "questiontext_cn": "愤怒时血压飙升，血管内皮经历了什么？",
-      "questiontext_en": "When Blood Pressure Surges During Anger, What Happens to the Vascular Endothelium?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 73,
-        "answer_cn": "血压冲击→内皮细胞剪切力增大→一氧化氮释放紊乱→微损伤积累。每一次暴怒，都在血管内壁上“刮”了一下。",
-        "answer_en": "Blood pressure surge → increased shear stress on endothelial cells → disrupted nitric oxide release → accumulation of micro-damage. Every outburst of rage \"scrapes\" the inner wall of your blood vessels."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 2,
-      "questiontext_cn": "长期焦虑为什么引发功能性消化不良？",
-      "questiontext_en": "Why Does Long-Term Anxiety Trigger Functional Dyspepsia?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 74,
-        "answer_cn": "焦虑→交感兴奋→胃肠血流减少、蠕动紊乱、内脏高敏感。焦虑的胃不是“装病”，是真的在难受。",
-        "answer_en": "Anxiety → sympathetic excitation → reduced gastrointestinal blood flow, disordered motility, and visceral hypersensitivity. An anxious stomach is not \"faking it\"; it is genuinely uncomfortable."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 3,
-      "questiontext_cn": "悲伤的眼泪里有没有应激激素？",
-      "questiontext_en": "Do Tears of Sadness Contain Stress Hormones?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 75,
-        "answer_cn": "有。情绪性眼泪中促肾上腺皮质激素和催乳素水平高于反射性眼泪。哭出来，是把应激激素“排”出去。",
-        "answer_en": "Yes. Emotional tears contain higher levels of adrenocorticotropic hormone and prolactin than reflex tears. Crying is a way of \"expelling\" stress hormones."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 4,
-      "questiontext_cn": "恐惧导致尿频的机制",
-      "questiontext_en": "The Mechanism Behind Fear-Induced Frequent Urination",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 76,
-        "answer_cn": "恐惧→交感兴奋→膀胱逼尿肌收缩、括约肌松弛。这是“战斗或逃跑”的副产物——身体在做最坏打算：如果跑不掉，至少要轻装上阵。",
-        "answer_en": "Fear → sympathetic excitation → contraction of the detrusor muscle and relaxation of the sphincter. This is a by-product of \"fight or flight\"—the body is preparing for the worst: if you cannot escape, at least travel light."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 5,
-      "questiontext_cn": "长期抑郁与骨质疏松",
-      "questiontext_en": "Long-Term Depression and Osteoporosis",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 77,
-        "answer_cn": "抑郁→皮质醇偏高→抑制成骨细胞、促进破骨细胞。抑郁患者也常缺乏运动和日照。骨头也在听你的情绪。",
-        "answer_en": "Depression → elevated cortisol → inhibition of osteoblasts and promotion of osteoclasts. Depressed patients also often lack exercise and sunlight. Your bones are listening to your emotions too."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 6,
-      "questiontext_cn": "嫉妒与偏头痛",
-      "questiontext_en": "Jealousy and Migraines",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 78,
-        "answer_cn": "嫉妒→交感激活+肌肉紧张+血管收缩→偏头痛触发。嫉妒的痛，是真实的痛。",
-        "answer_en": "Jealousy → sympathetic activation + muscle tension + vasoconstriction → migraine trigger. The pain of jealousy is real pain."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 7,
-      "questiontext_cn": "过度思虑为什么伤脾、影响食欲？",
-      "questiontext_en": "Why Does Excessive Worry Harm the Spleen and Affect Appetite?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 79,
-        "answer_cn": "思虑→交感兴奋→消化系统血流减少、蠕动减慢。“思伤脾”有自主神经基础。想太多，胃先罢工。",
-        "answer_en": "Worry → sympathetic excitation → reduced digestive system blood flow and slowed motility. \"Worry harms the spleen\" has an autonomic basis. Overthink, and the stomach goes on strike first."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 8,
-      "questiontext_cn": "羞耻感与皮肤潮红、荨麻疹",
-      "questiontext_en": "Shame, Facial Flushing, and Hives",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 80,
-        "answer_cn": "羞耻→交感激活→面部血管扩张（潮红）+肥大细胞脱颗粒（荨麻疹）。羞耻是“皮肤可见的情绪”。",
-        "answer_en": "Shame → sympathetic activation → facial vasodilation (flushing) + mast cell degranulation (hives). Shame is an emotion \"visible on the skin.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 9,
-      "questiontext_cn": "敌意情绪是冠心病的独立危险因素吗？",
-      "questiontext_en": "Is Hostility an Independent Risk Factor for Coronary Heart Disease?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 81,
-        "answer_cn": "是。敌意和愤怒与冠心病风险独立相关，不依赖于吸烟、饮食等传统因素。对世界充满敌意的人，心脏也在承受敌意。",
-        "answer_en": "Yes. Hostility and anger are independently associated with coronary heart disease risk, regardless of traditional factors such as smoking and diet. For people full of hostility toward the world, their hearts bear that hostility too."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 10,
-      "questiontext_cn": "惊恐发作的胸闷窒息感从何而来？",
-      "questiontext_en": "Where Does the Chest Tightness and Suffocation of a Panic Attack Come From?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 82,
-        "answer_cn": "过度换气→二氧化碳降低→呼吸性碱中毒→血管收缩→胸闷、手麻、头晕。不是缺氧，是“氧太多但用不了”。",
-        "answer_en": "Hyperventilation → decreased carbon dioxide → respiratory alkalosis → vasoconstriction → chest tightness, numb hands, dizziness. It is not lack of oxygen; it is \"too much oxygen but unable to use it.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 11,
-      "questiontext_cn": "情绪性哮喘与过敏性哮喘的区别",
-      "questiontext_en": "The Difference Between Emotional Asthma and Allergic Asthma",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 83,
-        "answer_cn": "情绪性哮喘由自主神经触发，过敏性哮喘由免疫触发。但两者常共存——情绪加重过敏反应。情绪不是过敏原，但可以是“放大器”。",
-        "answer_en": "Emotional asthma is triggered by the autonomic nervous system, while allergic asthma is triggered by the immune system. But the two often coexist—emotions worsen allergic reactions. Emotions are not allergens, but they can be \"amplifiers.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 12,
-      "questiontext_cn": "长期压抑悲伤与慢性咽炎",
-      "questiontext_en": "Long-Term Suppressed Sadness and Chronic Pharyngitis",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 84,
-        "answer_cn": "悲伤压抑→喉部肌肉紧张+交感兴奋→咽部黏膜血流减少、干燥感。说不出的悲伤，卡在喉咙里。",
-        "answer_en": "Suppressed sadness → tension in the throat muscles + sympathetic excitation → reduced blood flow to the pharyngeal mucosa and a dry sensation. The sadness that cannot be spoken gets stuck in the throat."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 13,
-      "questiontext_cn": "焦虑性肌肉紧张与颈肩疼痛",
-      "questiontext_en": "Anxiety-Related Muscle Tension and Neck-Shoulder Pain",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 85,
-        "answer_cn": "焦虑→斜方肌和肩胛提肌持续收缩→缺血→疼痛。肩膀疼不一定是“坐姿不好”，可能是“心里绷着”。",
-        "answer_en": "Anxiety → sustained contraction of the trapezius and levator scapulae muscles → ischemia → pain. Shoulder pain is not necessarily from \"bad posture\"; it may be from \"mental tension.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 14,
-      "questiontext_cn": "情绪应激与肠易激综合征",
-      "questiontext_en": "Emotional Stress and Irritable Bowel Syndrome",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 86,
-        "answer_cn": "应激→肠脑轴紊乱→内脏高敏感+蠕动异常。肠易激是肠道的“情绪表达障碍”。",
-        "answer_en": "Stress → disrupted gut-brain axis → visceral hypersensitivity + abnormal motility. IBS is the gut's \"emotional expression disorder.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 15,
-      "questiontext_cn": "长期绝望感与端粒长度",
-      "questiontext_en": "Long-Term Hopelessness and Telomere Length",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 87,
-        "answer_cn": "绝望感加速端粒缩短，端粒缩短又加剧衰老感，形成循环。绝望不只是“想法”，是细胞层面的加速折旧。",
-        "answer_en": "Hopelessness accelerates telomere shortening, and shortened telomeres in turn intensify the sense of aging, forming a loop. Hopelessness is not just a \"thought\"; it is accelerated depreciation at the cellular level."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 16,
-      "questiontext_cn": "懊悔自责与肝胆功能",
-      "questiontext_en": "Regret, Self-Blame, and Liver-Gallbladder Function",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 88,
-        "answer_cn": "自责→交感兴奋→肝胆血流减少，胆汁分泌紊乱。懊悔是“对过去的持续攻击”，身体分不清过去和现在。",
-        "answer_en": "Self-blame → sympathetic excitation → reduced liver and gallbladder blood flow, disordered bile secretion. Regret is a \"continuous attack on the past,\" and the body cannot tell past from present."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 17,
-      "questiontext_cn": "情绪波动大与甲状腺结节",
-      "questiontext_en": "Severe Emotional Fluctuations and Thyroid Nodules",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 89,
-        "answer_cn": "慢性应激影响下丘脑-垂体-甲状腺轴，甲状腺激素分泌波动。甲状腺是情绪的“靶器官”之一。",
-        "answer_en": "Chronic stress affects the hypothalamic-pituitary-thyroid axis, causing fluctuations in thyroid hormone secretion. The thyroid is one of the \"target organs\" of emotion."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 18,
-      "questiontext_cn": "紧张时手心出汗与交感神经",
-      "questiontext_en": "Sweaty Palms When Nervous and the Sympathetic Nervous System",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 90,
-        "answer_cn": "交感胆碱能纤维激活汗腺。手心出汗是身体在说“我准备好了——虽然我不知道准备好了什么”。",
-        "answer_en": "Sympathetic cholinergic fibers activate sweat glands. Sweaty palms are the body saying, \"I'm ready—even though I don't know what I'm ready for.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 19,
-      "questiontext_cn": "孤独感与炎症水平",
-      "questiontext_en": "Loneliness and Inflammation Levels",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 91,
-        "answer_cn": "孤独→HPA轴和交感激活→IL-6、CRP升高。孤独是“低度炎症的慢性来源”。",
-        "answer_en": "Loneliness → activation of the HPA axis and sympathetic system → elevated IL-6 and CRP. Loneliness is a \"chronic source of low-grade inflammation.\""
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C6",
-      "questionno": 20,
-      "questiontext_cn": "情绪压抑与乳腺增生、子宫肌瘤",
-      "questiontext_en": "Emotional Suppression, Breast Hyperplasia, and Uterine Fibroids",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 92,
-        "answer_cn": "情绪压抑→雌激素代谢紊乱+免疫监视下降→激素依赖性组织增生。情绪压抑的“激素回声”落在靶器官上。",
-        "answer_en": "Emotional suppression → disrupted estrogen metabolism + reduced immune surveillance → hormone-dependent tissue proliferation. The \"hormonal echo\" of suppressed emotions lands on target organs."
-      },
-      "scoringrule": {},
-      "dimension": "负面情绪与器官影响"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 1,
-      "questiontext_cn": "孕期焦虑如何影响胎儿心率？",
-      "questiontext_en": "How Does Anxiety During Pregnancy Affect Fetal Heart Rate?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 93,
-        "answer_cn": "母体皮质醇通过胎盘→胎儿HPA轴受影响→胎儿心率变异性改变。妈妈的情绪，是胎儿的第一堂“情绪课”。",
-        "answer_en": "Maternal cortisol passes through the placenta → the fetal HPA axis is affected → fetal heart rate variability changes. A mother's emotions are the fetus's first \"emotion lesson.\""
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 2,
-      "questiontext_cn": "产后抑郁不处理，对婴儿免疫的影响",
-      "questiontext_en": "The Impact of Untreated Postpartum Depression on Infant Immunity",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 94,
-        "answer_cn": "产后抑郁→母婴互动质量下降→婴儿应激反应性升高→免疫发育受影响。产后抑郁不只影响妈妈，也影响宝宝的免疫“编程”。",
-        "answer_en": "Postpartum depression → reduced quality of mother-infant interaction → increased infant stress reactivity → affected immune development. Postpartum depression affects not only the mother but also the baby's immune \"programming.\""
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 3,
-      "questiontext_cn": "更年期情绪烦躁与骨质疏松的相互影响",
-      "questiontext_en": "The Mutual Influence of Menopausal Mood Irritability and Osteoporosis",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 95,
-        "answer_cn": "雌激素下降→情绪波动+骨吸收加速。情绪波动→皮质醇升高→进一步抑骨。更年期的骨头和情绪，是一对难兄难弟。",
-        "answer_en": "Declining estrogen → mood swings + accelerated bone resorption. Mood swings → elevated cortisol → further bone suppression. In menopause, bones and emotions are a pair of hapless brothers in misfortune."
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 4,
-      "questiontext_cn": "儿童期情绪虐待如何重塑疼痛感知",
-      "questiontext_en": "How Childhood Emotional Abuse Reshapes Pain Perception",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 96,
-        "answer_cn": "早期虐待→HPA轴设定点改变+中枢敏化→成年后疼痛阈值降低。被伤害过的身体，学会了“过度警惕”。",
-        "answer_en": "Early abuse → altered HPA axis set point + central sensitization → lower pain threshold in adulthood. A body that has been hurt learns to be \"hypervigilant.\""
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 5,
-      "questiontext_cn": "老年人丧偶后的“心碎综合征”",
-      "questiontext_en": "\"Broken Heart Syndrome\" After Widowhood in Older Adults",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 97,
-        "answer_cn": "极度悲伤→儿茶酚胺风暴→心尖球囊样改变。心碎综合征是“真实的心脏病”，由情绪触发。",
-        "answer_en": "Extreme grief → catecholamine storm → apical ballooning. Broken heart syndrome is a \"real heart disease\" triggered by emotion."
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 6,
-      "questiontext_cn": "青春期情绪起伏与激素紊乱的区分",
-      "questiontext_en": "Distinguishing Adolescent Mood Swings from Hormonal Disorders",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 98,
-        "answer_cn": "青春期情绪波动是“正常发育现象”，激素相关情绪障碍有更明确的周期性和严重度。区分“成长的烦恼”和“需要干预的问题”很重要。",
-        "answer_en": "Adolescent mood swings are a \"normal developmental phenomenon,\" while hormone-related mood disorders have clearer periodicity and severity. It is important to distinguish \"growing pains\" from \"problems that need intervention.\""
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 7,
-      "questiontext_cn": "男性“易怒型抑郁”为什么常被误诊？",
-      "questiontext_en": "Why Is Male \"Irritable Depression\" Often Misdiagnosed?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 99,
-        "answer_cn": "男性抑郁常表现为易怒、酗酒、工作狂，而非典型悲伤。他可能不是“脾气差”，是抑郁在“穿男装”。",
-        "answer_en": "Male depression often manifests as irritability, alcohol abuse, and workaholism rather than typical sadness. He may not be \"bad-tempered\"; it is depression \"wearing men's clothing.\""
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 8,
-      "questiontext_cn": "职场高压人群为什么易患胃溃疡和脱发？",
-      "questiontext_en": "Why Are High-Stress Professionals Prone to Gastric Ulcers and Hair Loss?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 100,
-        "answer_cn": "高压→交感兴奋→胃黏膜缺血+皮质醇→免疫紊乱→毛囊进入休止期。高压的“毛发和胃黏膜”是第一批受害者。",
-        "answer_en": "High stress → sympathetic excitation → gastric mucosal ischemia + cortisol → immune dysregulation → hair follicles enter the resting phase. Under high stress, \"hair and gastric mucosa\" are the first victims."
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C7",
-      "questionno": 9,
-      "questiontext_cn": "职场高压人群为什么易患胃溃疡和脱发？",
-      "questiontext_en": "Why Are High-Stress Professionals Prone to Gastric Ulcers and Hair Loss?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 101,
-        "answer_cn": "高压→交感兴奋→胃黏膜缺血+皮质醇→免疫紊乱→毛囊进入休止期。高压的“毛发和胃黏膜”是第一批受害者。",
-        "answer_en": "High stress → sympathetic excitation → gastric mucosal ischemia + cortisol → immune dysregulation → hair follicles enter the resting phase. Under high stress, \"hair and gastric mucosa\" are the first victims."
-      },
-      "scoringrule": {},
-      "dimension": "特殊人群与生命阶段"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 1,
-      "questiontext_cn": "认知行为疗法能改善免疫指标吗？",
-      "questiontext_en": "Can Cognitive Behavioral Therapy Improve Immune Indicators?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 102,
-        "answer_cn": "能。CBT不仅改善情绪，还能降低炎症标志物、增强免疫功能。改变想法，身体会“收到通知”。",
-        "answer_en": "Yes. CBT not only improves mood but also lowers inflammatory markers and enhances immune function. Change your thoughts, and your body will \"get the notice.\""
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 2,
-      "questiontext_cn": "抗抑郁药起效慢，是因为在“修复脑细胞”吗？",
-      "questiontext_en": "Do Antidepressants Work Slowly Because They Are \"Repairing Brain Cells\"?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 103,
-        "answer_cn": "部分正确。抗抑郁药起效需要数周，涉及BDNF上调、神经可塑性恢复、HPA轴调节。药不是“立刻开心”，是“给大脑创造条件慢慢修复”。",
-        "answer_en": "Partly correct. Antidepressants take weeks to work, involving BDNF upregulation, restoration of neuroplasticity, and HPA axis regulation. The drug does not \"make you happy immediately\"; it \"creates conditions for the brain to repair itself slowly.\""
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 3,
-      "questiontext_cn": "针刺哪些穴位能同时调节情绪和胃肠？",
-      "questiontext_en": "Which Acupuncture Points Can Regulate Both Emotion and Gastrointestinal Function?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 104,
-        "answer_cn": "内关、足三里、太冲——传统中医的“情绪-消化”共治穴位。现代研究显示这些穴位刺激可调节自主神经。针扎对地方，情绪和胃一起松。",
-        "answer_en": "Neiguan, Zusanli, and Taichong—the traditional Chinese medicine points for treating both \"emotion and digestion.\" Modern research shows that stimulating these points can regulate the autonomic nervous system. When the needle hits the right spot, emotions and stomach relax together."
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 4,
-      "questiontext_cn": "情绪日记对血压和血糖的平复作用",
-      "questiontext_en": "The Calming Effect of an Emotion Diary on Blood Pressure and Blood Sugar",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 105,
-        "answer_cn": "记录情绪→觉察→调节→交感张力下降。研究显示情绪日记可改善血压和血糖波动。写下来，就是把情绪从“体内”移到“纸上”。",
-        "answer_en": "Recording emotions → awareness → regulation → decreased sympathetic tone. Research shows that an emotion diary can improve blood pressure and blood sugar fluctuations. Writing it down moves emotions from \"inside the body\" to \"on paper.\""
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 5,
-      "questiontext_cn": "生物反馈训练：让人“看见”并控制压力",
-      "questiontext_en": "Biofeedback Training: Helping People \"See\" and Control Stress",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 106,
-        "answer_cn": "通过心率变异性、皮温、肌电等指标的实时反馈，学会自主调节。看到，就能控制。",
-        "answer_en": "Through real-time feedback on indicators such as heart rate variability, skin temperature, and muscle electricity, people learn to self-regulate. If you can see it, you can control it."
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 6,
-      "questiontext_cn": "瑜伽交替鼻孔呼吸如何平衡自主神经？",
-      "questiontext_en": "How Does Yoga Alternate Nostril Breathing Balance the Autonomic Nervous System?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 107,
-        "answer_cn": "交替刺激左右鼻孔→调节自主神经张力→心率变异性提升。呼吸是唯一可以“手动”调节自主神经的入口。",
-        "answer_en": "Alternately stimulating the left and right nostrils → regulating autonomic tone → increased heart rate variability. Breathing is the only entry point through which you can \"manually\" regulate the autonomic nervous system."
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C8",
-      "questionno": 7,
-      "questiontext_cn": "躯体症状明显时，该挂心理科还是内科？",
-      "questiontext_en": "When Physical Symptoms Are Prominent, Should You See a Psychiatrist or an Internist?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 108,
-        "answer_cn": "先内科排查，再心理科干预。 但两者不是“二选一”——很多情况下需要同时进行。内科查“有没有病”，心理科查“情绪在哪儿作祟”。",
-        "answer_en": "First rule out organic causes in internal medicine, then intervene in mental health. But the two are not an \"either-or\"—in many cases they need to be done simultaneously. Internal medicine checks \"whether there is disease\"; mental health checks \"where emotions are causing trouble.\""
-      },
-      "scoringrule": {},
-      "dimension": "干预、治疗与自我调适"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 1,
-      "questiontext_cn": "情绪韧性有遗传性吗？",
-      "questiontext_en": "Is Emotional Resilience Hereditary?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 109,
-        "answer_cn": "遗传度约30%到50%，涉及5-HTTLPR、BDNF、FKBP5等基因。但后天环境通过表观遗传显著改变表达。基因不是命运，是“倾向”。",
-        "answer_en": "Heritability is about 30% to 50%, involving genes such as 5-HTTLPR, BDNF, and FKBP5. But the postnatal environment significantly changes expression through epigenetics. Genes are not destiny; they are \"tendencies.\""
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 2,
-      "questiontext_cn": "父母抑郁如何“跨代”影响子代免疫？",
-      "questiontext_en": "How Does Parental Depression \"Cross Generations\" to Affect Offspring Immunity?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 110,
-        "answer_cn": "父母孕前或孕期应激→精子/卵子或胎盘中糖皮质激素受体基因甲基化改变→子代HPA轴更敏感、炎症基线偏高。父母经历的，可能“写”进孩子的基因调控里。",
-        "answer_en": "Parental stress before or during pregnancy → altered methylation of the glucocorticoid receptor gene in sperm/eggs or the placenta → offspring have a more sensitive HPA axis and higher baseline inflammation. What parents experience may be \"written\" into their children's gene regulation."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 3,
-      "questiontext_cn": "童年积极情绪体验能改变基因表达吗？",
-      "questiontext_en": "Can Positive Emotional Experiences in Childhood Change Gene Expression?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 111,
-        "answer_cn": "能。早期正向刺激促进组蛋白乙酰化，上调前额叶BDNF，增强杏仁核-前额叶连接效率。被爱过的童年，在基因上留了“批注”。",
-        "answer_en": "Yes. Early positive stimulation promotes histone acetylation, upregulates prefrontal BDNF, and enhances amygdala-prefrontal connectivity efficiency. A childhood that was loved leaves \"annotations\" on the genes."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 4,
-      "questiontext_cn": "利他行为降低死亡率的效果，强于自我取乐",
-      "questiontext_en": "Altruistic Behavior Reduces Mortality More Strongly Than Self-Pleasure",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 112,
-        "answer_cn": "规律利他者全因死亡率降低22%到24%，享乐型活动仅7%。利他激活迷走神经背核，释放催产素，降低C反应蛋白。帮别人，身体给你的回报更丰厚。",
-        "answer_en": "Regular altruists have a 22% to 24% lower all-cause mortality rate, while hedonic activities reduce it by only 7%. Altruism activates the dorsal motor nucleus of the vagus, releases oxytocin, and lowers C-reactive protein. When you help others, the body rewards you more generously."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 5,
-      "questiontext_cn": "积极情绪能“逆转”端粒缩短吗？",
-      "questiontext_en": "Can Positive Emotions \"Reverse\" Telomere Shortening?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 113,
-        "answer_cn": "尚不能逆转长度，但正念冥想和感恩练习显著提升端粒酶活性。一项8周干预中，端粒酶活性提高30%。不能返老还童，但能老得慢一点。",
-        "answer_en": "It cannot yet reverse length, but mindfulness meditation and gratitude practices significantly increase telomerase activity. In an 8-week intervention, telomerase activity increased by 30%. You cannot grow young again, but you can age a little more slowly."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 6,
-      "questiontext_cn": "家族跨代创伤会在子代留下皮质醇模式吗？",
-      "questiontext_en": "Does Intergenerational Family Trauma Leave a Cortisol Pattern in Offspring?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 114,
-        "answer_cn": "会。子代即使未经历创伤，唾液皮质醇晨峰和应激反应曲线常与父母相似。这是跨代表观遗传的压力印记。",
-        "answer_en": "Yes. Even if the offspring did not experience trauma, their salivary cortisol morning peak and stress response curve are often similar to their parents'. This is an intergenerational epigenetic stress imprint."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 7,
-      "questiontext_cn": "感恩与副交感神经的关联，受基因型调节吗？",
-      "questiontext_en": "Is the Link Between Gratitude and the Parasympathetic Nervous System Modulated by Genotype?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 115,
-        "answer_cn": "携带COMT Val/Val基因型的人，感恩干预后心率变异性提升更显著。基因调节效益幅度，但不关闭效益窗口。",
-        "answer_en": "People carrying the COMT Val/Val genotype show more significant improvements in heart rate variability after gratitude intervention. Genes modulate the magnitude of the benefit but do not close the window of benefit."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 8,
-      "questiontext_cn": "积极情绪通过自主神经降低心血管事件风险吗？",
-      "questiontext_en": "Do Positive Emotions Reduce Cardiovascular Event Risk Through the Autonomic Nervous System?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 116,
-        "answer_cn": "是的。高频心率变异性持续偏高，抑制去甲肾上腺素过度释放，MACE风险降低15%到20%。",
-        "answer_en": "Yes. Persistently higher high-frequency heart rate variability suppresses excessive norepinephrine release, reducing MACE risk by 15% to 20%."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 9,
-      "questiontext_cn": "情绪健康是事业成功的“基石”还是“副产品”？",
-      "questiontext_en": "Is Emotional Health the \"Cornerstone\" of Career Success or a \"By-Product\"?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 117,
-        "answer_cn": "基石。 20岁积极情绪高的人，40岁时收入、职业满意度、婚姻稳定性均更高，独立于父母社会经济地位。",
-        "answer_en": "Cornerstone. People with high positive emotion at age 20 have higher income, career satisfaction, and marital stability at age 40, independent of parents' socioeconomic status."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 10,
-      "questiontext_cn": "PERMA干预能在分子层面验证抗炎效果吗？",
-      "questiontext_en": "Can PERMA Intervention Verify Anti-Inflammatory Effects at the Molecular Level?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 118,
-        "answer_cn": "能。8周后NF-κB通路活性下调，TNF-α和IL-1β降低，与地塞米松抗炎效果有部分重合通路。",
-        "answer_en": "Yes. After 8 weeks, NF-κB pathway activity is downregulated, and TNF-α and IL-1β are reduced, with partial overlap in pathways with the anti-inflammatory effects of dexamethasone."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 11,
-      "questiontext_cn": "长期孤独有“类遗传”的加速衰老效应吗？",
-      "questiontext_en": "Does Long-Term Loneliness Have a \"Quasi-Genetic\" Accelerated Aging Effect?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 119,
-        "answer_cn": "神经影像显示孤独者灰质萎缩加快，表观年龄加速2到3年。孤独的“衰老加速”可能通过应激影响生殖细胞表观组轻微传递。",
-        "answer_en": "Neuroimaging shows that lonely individuals have accelerated gray matter atrophy and an epigenetic age acceleration of 2 to 3 years. The \"aging acceleration\" of loneliness may be slightly transmitted through stress effects on the germ cell epigenome."
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    },
-    {
-      "categorycode": "QX4_C9",
-      "questionno": 12,
-      "questiontext_cn": "积极的家族情绪文化能累积成“健康红利”吗？",
-      "questiontext_en": "Can a Positive Family Emotional Culture Accumulate into a \"Health Dividend\"?",
-      "optiontype": null,
-      "optionconfig": {
-        "global_no": 120,
-        "answer_cn": "能。三世代追踪显示，祖辈积极情绪表达频率高的家庭，孙辈代谢综合征患病率降低35%。这不是教养的“软传承”，是跨代的生物学“硬积累”。",
-        "answer_en": "Yes. Three-generation tracking shows that families with high frequencies of positive emotional expression in grandparents have a 35% lower prevalence of metabolic syndrome in grandchildren. This is not a \"soft inheritance\" of upbringing but a cross-generational biological \"hard accumulation.\""
-      },
-      "scoringrule": {},
-      "dimension": "积极心理学前沿：从分子到家族"
-    }
-  ]
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 1,
+    "questiontext_cn": "哈佛85年研究揭秘：决定你健康长寿的第一心理因素，不是乐观，也不是感恩",
+    "questiontext_en": "Harvard's 85-Year Study Reveals: The Top Psychological Factor for Health and Longevity Is Neither Optimism nor Gratitude",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 1,
+      "answer_cn": "哈佛大学那项持续了85年的追踪研究，结论出乎很多人意料：亲密关系的质量，比胆固醇水平更能预测你晚年的健康和幸福。温暖的人际关系像一层缓冲垫，把压力对心血管的伤害降到最低。它的效应强过社会阶层，也强过基因。换句话说，你身边有没有一个“随时可以打电话的人”，比你体检报告上的箭头更重要。",
+      "answer_en": "Harvard's 85-year longitudinal study reached a conclusion that surprises many: the quality of close relationships predicts late-life health and happiness better than cholesterol levels. Warm interpersonal relationships act as a buffer, minimizing the cardiovascular damage caused by stress. Their effect is stronger than social class and stronger than genes. In other words, whether you have someone you can call at any time matters more than the arrows on your medical report."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 2,
+    "questiontext_cn": "乐观能让你多活几年？答案是：7到11年，而且有生物学证据",
+    "questiontext_en": "How Many Years Can Optimism Add to Your Life? The Answer: 7 to 11 Years, with Biological Evidence",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 2,
+      "answer_cn": "多项元分析显示，最乐观的女性平均寿命延长14.9%，男性延长10.9%——大约多活7到11年。这不是玄学。乐观者的皮质醇节律更稳定，白细胞介素-6等炎症因子水平更低，端粒也更长。乐观不是盲目的“一切都会好”，而是一种“坏事来了我也能应付”的底层信念，而身体似乎听得懂这种信念。",
+      "answer_en": "Multiple meta-analyses show that the most optimistic women live 14.9% longer on average, and men 10.9% longer—roughly 7 to 11 additional years. This is not mysticism. Optimists have more stable cortisol rhythms, lower levels of inflammatory factors such as interleukin-6, and longer telomeres. Optimism is not a blind belief that \"everything will be fine,\" but a deep-seated conviction that \"even when bad things happen, I can handle them\"—and the body seems to understand this conviction."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 3,
+    "questiontext_cn": "“人生意义感”能救命：重大手术后并发症降低三分之一",
+    "questiontext_en": "\"A Sense of Life Meaning\" Can Save Lives: Major Post-Surgery Complications Reduced by One-Third",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 3,
+      "answer_cn": "研究显示，拥有清晰人生意义感的人，术后30天严重并发症风险降低33%，1年全因死亡率降低28%。机制在于：意义感增强迷走神经张力，抑制全身炎症反应综合征。当你觉得“活着有奔头”，身体似乎也在配合你“继续撑下去”。",
+      "answer_en": "Research shows that people with a clear sense of life meaning have a 33% lower risk of severe complications 30 days after surgery and a 28% lower one-year all-cause mortality rate. The mechanism: a sense of meaning enhances vagal tone and suppresses systemic inflammatory response syndrome. When you feel that life is worth living, the body seems to cooperate in helping you \"keep holding on.\""
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 4,
+    "questiontext_cn": "利他行为：帮助别人比取悦自己更能延长寿命",
+    "questiontext_en": "Altruistic Behavior: Helping Others Extends Life More Than Pleasing Yourself",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 4,
+      "answer_cn": "纵向研究发现，规律从事志愿服务和帮助他人的人，全因死亡率降低22%到24%；而单纯享乐型活动（比如吃大餐、购物）只降低7%。利他行为能激活迷走神经背核，释放催产素，并显著降低C反应蛋白。帮别人，身体给你的回报比帮自己更丰厚。",
+      "answer_en": "Longitudinal studies find that people who regularly volunteer and help others have a 22% to 24% lower all-cause mortality rate, while purely hedonic activities (such as indulging in feasts or shopping) reduce it by only 7%. Altruistic behavior activates the dorsal motor nucleus of the vagus, releases oxytocin, and significantly lowers C-reactive protein. When you help others, the body rewards you more generously than when you help yourself."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 5,
+    "questiontext_cn": "8周正念冥想，端粒酶活性提升30%：细胞衰老能被“踩刹车”",
+    "questiontext_en": "8 Weeks of Mindfulness Meditation Increases Telomerase Activity by 30%: Cellular Aging Can Be \"Braked\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 5,
+      "answer_cn": "虽然尚未证实积极情绪能“逆转”已经缩短的端粒，但正念冥想和感恩练习能显著提升端粒酶活性——一项8周正念干预显示，端粒酶活性较对照组提高30%，相当于细胞衰老减缓数年的生物学年龄。你不需要“返老还童”，你只需要“老得慢一点”。",
+      "answer_en": "Although it has not been proven that positive emotions can \"reverse\" already shortened telomeres, mindfulness meditation and gratitude practices can significantly boost telomerase activity—an 8-week mindfulness intervention showed a 30% increase in telomerase activity compared with the control group, equivalent to slowing cellular aging by several years of biological age. You don't need to \"grow young again\"; you just need to \"age a little more slowly.\""
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 6,
+    "questiontext_cn": "感恩日记为什么能降压？8到12周见效，效果可测量",
+    "questiontext_en": "Why Can a Gratitude Journal Lower Blood Pressure? Effects Appear in 8 to 12 Weeks and Are Measurable",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 6,
+      "answer_cn": "一项覆盖18项研究的分析发现，包含正念、感恩和乐观练习的干预项目，在8到12周内就能降低收缩压、减少hs-CRP等炎症标志物。其中一个12周项目使收缩压下降了7.6个点。感恩日记的机制不复杂：它把注意力从“我缺什么”转向“我有什么”，切换了自主神经系统的档位。",
+      "answer_en": "An analysis covering 18 studies found that intervention programs including mindfulness, gratitude, and optimism practices can lower systolic blood pressure and reduce inflammatory markers such as hs-CRP within 8 to 12 weeks. One 12-week program reduced systolic blood pressure by 7.6 points. The mechanism of a gratitude journal is not complicated: it shifts attention from \"what I lack\" to \"what I have,\" switching the gear of the autonomic nervous system."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 7,
+    "questiontext_cn": "经常大笑，血管会变“年轻”",
+    "questiontext_en": "Frequent Laughter Makes Blood Vessels \"Younger\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 7,
+      "answer_cn": "大笑时血管内皮释放一氧化氮，血管扩张，血压短暂下降。长期来看，经常大笑的人血管功能更好，血压更稳定。这不是段子，是生理学。笑是免费的血管体操。",
+      "answer_en": "During hearty laughter, the vascular endothelium releases nitric oxide, blood vessels dilate, and blood pressure briefly drops. In the long run, people who laugh often have better vascular function and more stable blood pressure. This is not a joke—it is physiology. Laughter is free vascular exercise."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 8,
+    "questiontext_cn": "心流状态：全神贯注时，你的颈动脉更“薄”",
+    "questiontext_en": "Flow State: When You Are Fully Absorbed, Your Carotid Artery Is \"Thinner\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 8,
+      "answer_cn": "高频体验“心流”（全神投入、忘记时间）的人，10年内职位晋升概率高2.1倍，颈动脉内膜中层厚度更薄。推测心流状态降低了交感神经的慢性激活，减少了血压变异性对血管的损伤。专注本身就是一种心血管保护行为。",
+      "answer_en": "People who frequently experience \"flow\" (total absorption, losing track of time) are 2.1 times more likely to be promoted within 10 years and have thinner carotid intima-media thickness. It is speculated that the flow state reduces chronic sympathetic activation and lessens the damage to blood vessels caused by blood pressure variability. Focus itself is a cardiovascular protective behavior."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 9,
+    "questiontext_cn": "敬畏感（仰望星空）能降低炎症因子",
+    "questiontext_en": "Awe (Gazing at the Starry Sky) Can Lower Inflammatory Factors",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 9,
+      "answer_cn": "当你站在山顶看日出，或者仰望满天繁星时，体内炎症因子水平会下降。敬畏感让人“缩小自我”，减少反刍思维，激活副交感神经。偶尔觉得自己渺小，对身体是件好事。",
+      "answer_en": "When you stand on a mountaintop watching the sunrise, or gaze up at a sky full of stars, levels of inflammatory factors in your body decline. Awe makes people \"shrink the self,\" reduces rumination, and activates the parasympathetic nervous system. Occasionally feeling small is good for your body."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 10,
+    "questiontext_cn": "乐观者的心血管风险更低，即使调整了血脂和BMI",
+    "questiontext_en": "Optimists Have Lower Cardiovascular Risk, Even After Adjusting for Blood Lipids and BMI",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 10,
+      "answer_cn": "积极情绪频发者，高频心率变异性持续偏高，抑制去甲肾上腺素过度释放，减少斑块破裂概率。即使调整了BMI和血脂，主要不良心血管事件风险仍降低15%到20%。心态好，血管真的知道。",
+      "answer_en": "People who frequently experience positive emotions maintain higher high-frequency heart rate variability, which suppresses excessive norepinephrine release and reduces the probability of plaque rupture. Even after adjusting for BMI and blood lipids, the risk of major adverse cardiovascular events is still reduced by 15% to 20%. With a good mindset, your blood vessels really do know."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 11,
+    "questiontext_cn": "夫妻关系和睦，端粒缩短速度慢40%",
+    "questiontext_en": "A Harmonious Marriage Slows Telomere Shortening by 40%",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 11,
+      "answer_cn": "对照研究显示，婚姻满意度高、经常表达亲密的夫妇，5年内外周血白细胞端粒缩短速率比冲突组慢40%，而且妻子受益更大。推测与频繁催产素释放和低水平精氨酸加压素有关。好的婚姻是端粒的“减速带”。",
+      "answer_en": "Controlled studies show that couples with high marital satisfaction and frequent expressions of intimacy have a 40% slower rate of telomere shortening in peripheral blood leukocytes over 5 years compared with conflicted couples, and wives benefit even more. This is speculated to be related to frequent oxytocin release and lower levels of arginine vasopressin. A good marriage is a \"speed bump\" for telomeres."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 12,
+    "questiontext_cn": "社交愉悦感对免疫细胞活性有多重要？",
+    "questiontext_en": "How Important Is Social Pleasure to Immune Cell Activity?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 12,
+      "answer_cn": "孤独感与炎症水平升高相关，而社交愉悦感则与自然杀伤细胞活性正相关。一次愉快的聚会、一段深度的对话，都在“喂养”你的免疫系统。孤独是慢性毒药，连接是慢性补药。",
+      "answer_en": "Loneliness is associated with elevated inflammation levels, while social pleasure is positively correlated with natural killer cell activity. A pleasant gathering or a deep conversation is \"feeding\" your immune system. Loneliness is a chronic poison; connection is a chronic tonic."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 13,
+    "questiontext_cn": "培养希望感，能延缓认知衰退",
+    "questiontext_en": "Cultivating Hope Can Delay Cognitive Decline",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 13,
+      "answer_cn": "希望感——相信未来有好事情会发生——与老年人认知功能衰退速度减慢相关。机制可能在于希望感促进健康行为、减少压力激素的慢性暴露。有盼头的人，大脑老得慢。",
+      "answer_en": "A sense of hope—believing that good things will happen in the future—is associated with a slower rate of cognitive decline in older adults. The mechanism may lie in hope promoting healthy behaviors and reducing chronic exposure to stress hormones. People with something to look forward to age more slowly in the brain."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 14,
+    "questiontext_cn": "知足感如何改善深睡？",
+    "questiontext_en": "How Does Contentment Improve Deep Sleep?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 14,
+      "answer_cn": "知足感高的人，入睡更快，深睡时长更长。知足减少的是“睡前反刍”——那些躺在床上反复回放白天尴尬事的思维循环。知足不是不思进取，是睡前把大脑调到“飞行模式”。",
+      "answer_en": "People with a high sense of contentment fall asleep faster and have longer deep sleep. What contentment reduces is \"pre-sleep rumination\"—the mental loop of replaying the day's embarrassing moments while lying in bed. Contentment is not a lack of ambition; it is switching the brain to \"airplane mode\" before sleep."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 15,
+    "questiontext_cn": "宽恕他人，免疫系统会给你“即时奖励”",
+    "questiontext_en": "Forgiving Others Gives Your Immune System an \"Instant Reward\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 15,
+      "answer_cn": "当你真正宽恕一个人时，皮质醇下降，免疫球蛋白A上升。宽恕不是为对方开脱，是把自己的身体从“持续戒备”中解放出来。不原谅，最累的是自己的身体。",
+      "answer_en": "When you truly forgive someone, cortisol drops and immunoglobulin A rises. Forgiveness is not about excusing the other person; it is about freeing your own body from \"constant alert.\" When you don't forgive, the one who suffers most is your own body."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 16,
+    "questiontext_cn": "PERMA模型干预8周，炎症因子水平显著下降",
+    "questiontext_en": "8 Weeks of PERMA Model Intervention Significantly Lowers Inflammatory Factors",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 16,
+      "answer_cn": "积极心理学PERMA模型（积极情绪、投入、关系、意义、成就）的完整干预，8周后受试者外周血单核细胞中NF-κB通路活性下调，促炎因子TNF-α和IL-1β水平显著降低，与地塞米松的抗炎效果有部分重合通路。幸福不只是感觉，是可测量的分子变化。",
+      "answer_en": "After 8 weeks of complete intervention with the positive psychology PERMA model (positive emotion, engagement, relationships, meaning, accomplishment), subjects showed downregulated NF-κB pathway activity in peripheral blood mononuclear cells and significantly reduced levels of pro-inflammatory factors TNF-α and IL-1β, with partial overlap in pathways with the anti-inflammatory effects of dexamethasone. Happiness is not just a feeling; it is a measurable molecular change."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 17,
+    "questiontext_cn": "儿童期的积极情绪体验，能改变成年后的基因表达",
+    "questiontext_en": "Positive Emotional Experiences in Childhood Can Change Gene Expression in Adulthood",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 17,
+      "answer_cn": "早期正向刺激可促进组蛋白乙酰化，上调前额叶BDNF表达，并在成年后持续增强杏仁核与前额叶的功能连接效率。这种表观标记甚至可以持续数十年。童年被爱够的孩子，身体记了一辈子。",
+      "answer_en": "Early positive stimulation can promote histone acetylation, upregulate prefrontal BDNF expression, and persistently enhance the functional connectivity efficiency between the amygdala and prefrontal cortex in adulthood. Such epigenetic marks can even last for decades. Children who were loved enough in childhood have bodies that remember it for a lifetime."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 18,
+    "questiontext_cn": "利他行为对死亡率的影响，强于单纯自我取乐",
+    "questiontext_en": "Altruistic Behavior Has a Stronger Effect on Mortality Than Pure Self-Pleasure",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 18,
+      "answer_cn": "规律利他者全因死亡率降低22%到24%，单纯享乐型活动仅降低7%。原因在于利他能激活迷走神经背核，释放催产素，降低C反应蛋白。帮别人，身体给的“回扣”比帮自己更多。",
+      "answer_en": "Regular altruists have a 22% to 24% lower all-cause mortality rate, while purely hedonic activities reduce it by only 7%. The reason is that altruism activates the dorsal motor nucleus of the vagus, releases oxytocin, and lowers C-reactive protein. When you help others, the body gives you a bigger \"kickback\" than when you help yourself."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 19,
+    "questiontext_cn": "感恩特质与副交感神经活性的关联，受COMT基因调节",
+    "questiontext_en": "The Link Between Gratitude Traits and Parasympathetic Activity Is Modulated by the COMT Gene",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 19,
+      "answer_cn": "携带COMT Val/Val基因型（多巴胺代谢快）的人，感恩干预后心率变异性提升更显著。同样的感恩练习，不同基因的人“收益”不同——但所有人都能受益，只是幅度有差异。",
+      "answer_en": "People carrying the COMT Val/Val genotype (fast dopamine metabolism) show more significant improvements in heart rate variability after gratitude intervention. The same gratitude practice yields different \"returns\" for people with different genes—but everyone can benefit, only the magnitude differs."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 20,
+    "questiontext_cn": "积极情绪频发者，MACE风险降低15%到20%",
+    "questiontext_en": "Frequent Positive Emotions Reduce MACE Risk by 15% to 20%",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 20,
+      "answer_cn": "积极情绪通过自主神经平衡直接降低主要不良心血管事件风险。高频心率变异性持续偏高，抑制去甲肾上腺素过度释放，减少斑块破裂概率。每天找点乐子，心脏给你点赞。",
+      "answer_en": "Positive emotions directly reduce the risk of major adverse cardiovascular events through autonomic balance. Persistently higher high-frequency heart rate variability suppresses excessive norepinephrine release and reduces the probability of plaque rupture. Find a little joy every day, and your heart will give you a thumbs-up."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C1",
+    "questionno": 21,
+    "questiontext_cn": "情绪健康是事业成功的“基石”，不是“副产品”",
+    "questiontext_en": "Emotional Health Is the \"Cornerstone\" of Career Success, Not a \"By-Product\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 21,
+      "answer_cn": "20岁时积极情绪得分高的人，40岁时收入、职业满意度和婚姻稳定性均显著更高，且此效应独立于父母社会经济地位。情绪能力是人力资本的核心成分，不是成功之后的装饰品。",
+      "answer_en": "People with high positive emotion scores at age 20 have significantly higher income, career satisfaction, and marital stability at age 40, and this effect is independent of parents' socioeconomic status. Emotional ability is a core component of human capital, not a decoration after success."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学与健康促进"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 1,
+    "questiontext_cn": "情绪到底是什么？生理反应还是心理现象？",
+    "questiontext_en": "What Exactly Is Emotion? A Physiological Response or a Psychological Phenomenon?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 22,
+      "answer_cn": "答案是：都是，而且分不开。 情绪既是大脑对刺激的评估（心理），也是身体为应对这个评估做出的全套动员（生理）。杏仁核对情绪性刺激的加工甚至存在“快速通道”——在你有意识之前，身体已经启动了反应。你不是“先想清楚再生气”，你是“先生气了再想”。",
+      "answer_en": "The answer is: both, and they cannot be separated. Emotion is both the brain's appraisal of a stimulus (psychological) and the body's full mobilization in response to that appraisal (physiological). The amygdala even has a \"fast track\" for processing emotional stimuli—before you are consciously aware, the body has already initiated a response. You don't \"get angry after thinking it through\"; you \"think after getting angry first.\""
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 2,
+    "questiontext_cn": "“喜极而泣”为什么是健康的？",
+    "questiontext_en": "Why Is \"Tears of Joy\" Healthy?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 23,
+      "answer_cn": "强烈情绪（无论是喜是悲）激活下丘脑-垂体-肾上腺轴，身体需要“泄洪”。哭泣是一种生理释放阀：眼泪中确实含有应激激素，哭出来=排出去。憋着不哭，应激激素就留在体内继续巡逻。",
+      "answer_en": "Strong emotions (whether joy or sorrow) activate the hypothalamic-pituitary-adrenal axis, and the body needs to \"release the flood.\" Crying is a physiological release valve: tears do contain stress hormones, so crying them out equals expelling them. If you hold back tears, stress hormones remain in the body and continue to patrol."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 3,
+    "questiontext_cn": "中医“七情内伤”：喜怒忧思悲恐惊，每一种都对应一个器官",
+    "questiontext_en": "TCM's \"Seven Emotions Causing Internal Damage\": Joy, Anger, Worry, Thought, Sorrow, Fear, and Shock—Each Corresponds to an Organ",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 24,
+      "answer_cn": "喜伤心、怒伤肝、思伤脾、悲忧伤肺、恐伤肾。古人没有分子生物学，但他们观察到了一种规律：情绪不是飘在空中的，它落在具体的器官上。",
+      "answer_en": "Joy harms the heart, anger harms the liver, thought harms the spleen, sorrow and worry harm the lungs, and fear harms the kidneys. The ancients did not have molecular biology, but they observed a pattern: emotions do not float in the air; they land on specific organs."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 4,
+    "questiontext_cn": "情绪如何通过“神经-内分泌-免疫网络”影响全身？",
+    "questiontext_en": "How Do Emotions Affect the Whole Body Through the \"Neuro-Endocrine-Immune Network\"?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 25,
+      "answer_cn": "路径清晰：大脑感知威胁→下丘脑启动→垂体发指令→肾上腺释放皮质醇→免疫细胞调整活动。这条通路叫HPA轴。情绪不是“心理问题”，是全身性的生理事件。",
+      "answer_en": "The pathway is clear: the brain perceives a threat → the hypothalamus initiates → the pituitary sends instructions → the adrenal glands release cortisol → immune cells adjust their activity. This pathway is called the HPA axis. Emotion is not a \"psychological problem\"; it is a whole-body physiological event."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 5,
+    "questiontext_cn": "长期压抑情绪，为什么自然杀伤细胞会“罢工”？",
+    "questiontext_en": "Why Do Natural Killer Cells \"Go on Strike\" When Emotions Are Suppressed Long-Term?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 26,
+      "answer_cn": "自然杀伤细胞是免疫系统的“巡逻警”。慢性压力下，皮质醇持续偏高，自然杀伤细胞的活性被抑制。压抑情绪=让免疫系统的警察长期加班，最后他们累了。",
+      "answer_en": "Natural killer cells are the \"patrol officers\" of the immune system. Under chronic stress, cortisol remains persistently high, and natural killer cell activity is suppressed. Suppressing emotions equals making the immune system's police work overtime for a long time—eventually, they get tired."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 6,
+    "questiontext_cn": "情绪波动时，皮质醇到底怎么变？",
+    "questiontext_en": "How Exactly Does Cortisol Change During Emotional Fluctuations?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 27,
+      "answer_cn": "急性压力下皮质醇飙升，帮身体动员能量。但长期情绪波动会导致皮质醇节律紊乱——早晨应该高的时候不高，晚上应该低的时候不低。结果是：白天没精神，晚上睡不着。",
+      "answer_en": "Under acute stress, cortisol surges to help the body mobilize energy. But long-term emotional fluctuations can disrupt the cortisol rhythm—it is not high when it should be high in the morning, and not low when it should be low at night. The result: no energy during the day, no sleep at night."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 7,
+    "questiontext_cn": "迷走神经张力：情绪调节能力的“硬件指标”",
+    "questiontext_en": "Vagal Tone: The \"Hardware Indicator\" of Emotional Regulation Capacity",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 28,
+      "answer_cn": "迷走神经张力高的人，情绪恢复快，不容易被激怒，心率变异性也高。迷走神经是身体的“刹车系统”，张力越好，刹车越灵。",
+      "answer_en": "People with high vagal tone recover emotionally faster, are less easily irritated, and have higher heart rate variability. The vagus nerve is the body's \"braking system\"; the better the tone, the more responsive the brakes."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 8,
+    "questiontext_cn": "情绪记忆为什么比普通记忆更难消除？",
+    "questiontext_en": "Why Are Emotional Memories Harder to Erase Than Ordinary Memories?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 29,
+      "answer_cn": "杏仁核在情绪记忆的编码阶段就深度参与，它给记忆贴上“重要！危险！记住！”的标签。普通记忆像便利贴，情绪记忆像刻在石碑上。你的大脑不让你忘记丢脸的事，是为了“保护”你——只是方式有点烦人。",
+      "answer_en": "The amygdala is deeply involved in the encoding stage of emotional memory, tagging it with \"Important! Dangerous! Remember!\" Ordinary memories are like sticky notes; emotional memories are like carvings on stone tablets. Your brain prevents you from forgetting embarrassing events in order to \"protect\" you—it's just that the method is a bit annoying."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 9,
+    "questiontext_cn": "肠道菌群通过“肠-脑轴”与情绪中枢对话",
+    "questiontext_en": "Gut Microbiota Communicate with Emotional Centers Through the \"Gut-Brain Axis\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 30,
+      "answer_cn": "肠道里的细菌能产生血清素、多巴胺的前体，通过迷走神经向大脑“汇报”。你的肠道菌群在参与决定你今天心情好不好。",
+      "answer_en": "Bacteria in the gut can produce precursors of serotonin and dopamine and \"report\" to the brain through the vagus nerve. Your gut microbiota is participating in determining whether you are in a good mood today."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 10,
+    "questiontext_cn": "情绪能直接改变基因表达吗？",
+    "questiontext_en": "Can Emotions Directly Change Gene Expression?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 31,
+      "answer_cn": "能。这就是表观遗传学。慢性压力可以改变糖皮质激素受体基因的甲基化水平，让HPA轴变得更敏感或更迟钝。你的经历在基因上“写了批注”。",
+      "answer_en": "Yes. This is epigenetics. Chronic stress can change the methylation level of the glucocorticoid receptor gene, making the HPA axis more sensitive or more sluggish. Your experiences have \"written annotations\" on your genes."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 11,
+    "questiontext_cn": "为什么情绪激动时，旧伤会隐隐作痛？",
+    "questiontext_en": "Why Do Old Wounds Ache Faintly When Emotions Run High?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 32,
+      "answer_cn": "情绪激活了身体的应激系统，交感神经兴奋，局部血管收缩，炎症因子在旧伤部位聚集。旧伤是身体的“记忆点”，情绪一喊，它们就答应。",
+      "answer_en": "Emotions activate the body's stress system, the sympathetic nerves become excited, local blood vessels constrict, and inflammatory factors gather at the site of old wounds. Old wounds are the body's \"memory points\"; when emotions call out, they answer."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 12,
+    "questiontext_cn": "心率变异性如何反映情绪健康？",
+    "questiontext_en": "How Does Heart Rate Variability Reflect Emotional Health?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 33,
+      "answer_cn": "心率变异性高=身体在“战斗”和“休息”之间切换自如。心率变异性低=自主神经系统僵住了。心率变异性是情绪韧性的生理读数。",
+      "answer_en": "High heart rate variability means the body switches freely between \"fight\" and \"rest.\" Low heart rate variability means the autonomic nervous system is stuck. Heart rate variability is the physiological readout of emotional resilience."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C2",
+    "questionno": 13,
+    "questiontext_cn": "情绪与健康：单向还是双向？",
+    "questiontext_en": "Emotion and Health: One-Way or Two-Way?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 34,
+      "answer_cn": "双向，而且是一个循环。 负面情绪伤身，身体不好又加重负面情绪。打破循环的任何一个点都有价值。",
+      "answer_en": "Two-way, and it is a loop. Negative emotions harm the body, and poor health worsens negative emotions. Breaking the loop at any point is valuable."
+    },
+    "scoringrule": {},
+    "dimension": "基础认知与心身关联"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 1,
+    "questiontext_cn": "运动分泌的内啡肽，能替代抗抑郁药吗？",
+    "questiontext_en": "Can Endorphins Released by Exercise Replace Antidepressants?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 35,
+      "answer_cn": "不能替代，但能协同。规律运动对轻中度抑郁的效果与药物相当，且没有副作用。对重度抑郁，运动是辅助。运动是情绪的“日常维护”，药物是“紧急维修”。",
+      "answer_en": "It cannot replace them, but it can work synergistically. Regular exercise is comparable to medication for mild to moderate depression, with no side effects. For severe depression, exercise is adjunctive. Exercise is \"routine maintenance\" for emotions; medication is \"emergency repair.\""
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 2,
+    "questiontext_cn": "高糖高脂饮食为什么让人情绪更差？",
+    "questiontext_en": "Why Does a High-Sugar, High-Fat Diet Make Emotions Worse?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 36,
+      "answer_cn": "血糖过山车→皮质醇和肾上腺素补偿性释放→焦虑和易怒。高脂饮食改变肠道菌群→肠脑轴信号变差。你吃的每一口“快乐食品”，可能都在为下一轮情绪崩溃充值。",
+      "answer_en": "Blood sugar roller coaster → compensatory release of cortisol and adrenaline → anxiety and irritability. A high-fat diet alters gut microbiota → worse gut-brain axis signaling. Every bite of \"comfort food\" you eat may be topping up the account for your next emotional crash."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 3,
+    "questiontext_cn": "熬夜后第二天，为什么特别容易炸毛？",
+    "questiontext_en": "Why Are You So Easily Set Off the Day After Staying Up Late?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 37,
+      "answer_cn": "睡眠剥夺使前额叶（理性脑）功能下降，杏仁核（情绪脑）反应性升高。睡不好=理性下班，情绪上班。",
+      "answer_en": "Sleep deprivation reduces prefrontal cortex (the rational brain) function and increases amygdala (the emotional brain) reactivity. Poor sleep means rationality clocks out and emotion clocks in."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 4,
+    "questiontext_cn": "晒太阳为什么对情绪这么关键？",
+    "questiontext_en": "Why Is Sunlight So Crucial for Mood?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 38,
+      "answer_cn": "紫外线促进皮肤合成血清素前体，调节昼夜节律。阳光是免费的抗抑郁药，只是需要你走出门去取。",
+      "answer_en": "Ultraviolet light promotes the synthesis of serotonin precursors in the skin and regulates circadian rhythms. Sunlight is a free antidepressant—you just need to step outside to collect it."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 5,
+    "questiontext_cn": "咖啡因和焦虑：剂量决定关系",
+    "questiontext_en": "Caffeine and Anxiety: Dose Determines the Relationship",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 39,
+      "answer_cn": "适量咖啡因提神，过量则激活交感神经，诱发心悸、手抖、焦虑。对已经焦虑的人，咖啡因可能“火上浇油”。咖啡是双刃剑，焦虑体质的人要小心使用。",
+      "answer_en": "Moderate caffeine boosts alertness, but excessive amounts activate the sympathetic nervous system, triggering palpitations, tremors, and anxiety. For people who are already anxious, caffeine may \"pour oil on the fire.\" Coffee is a double-edged sword; those with an anxious constitution should use it carefully."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 6,
+    "questiontext_cn": "长期素食者要注意维生素B12",
+    "questiontext_en": "Long-Term Vegetarians Need to Watch Vitamin B12",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 40,
+      "answer_cn": "B12缺乏与抑郁、疲劳、认知下降相关。素食者需要主动补充。不吃肉不是问题，不补B12才是问题。",
+      "answer_en": "B12 deficiency is associated with depression, fatigue, and cognitive decline. Vegetarians need to supplement proactively. Not eating meat is not the problem; not supplementing B12 is the problem."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 7,
+    "questiontext_cn": "手机成瘾的“信息焦虑”如何伤害大脑？",
+    "questiontext_en": "How Does the \"Information Anxiety\" of Phone Addiction Harm the Brain?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 41,
+      "answer_cn": "持续的多任务切换消耗前额叶资源，降低深度思考能力，同时制造“永远在线”的慢性应激。刷手机不是休息，是另一种形式的加班。",
+      "answer_en": "Constant multitasking switches consume prefrontal resources, reduce deep thinking capacity, and create chronic stress from being \"always online.\" Scrolling on your phone is not rest; it is another form of overtime."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 8,
+    "questiontext_cn": "音乐疗愈的科学依据：听觉通路直通边缘系统",
+    "questiontext_en": "The Scientific Basis of Music Therapy: The Auditory Pathway Goes Straight to the Limbic System",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 42,
+      "answer_cn": "音乐不经过“理性审查”就能激活杏仁核、海马体和伏隔核。这就是为什么一首歌能在三秒内让你哭或笑。",
+      "answer_en": "Music can activate the amygdala, hippocampus, and nucleus accumbens without going through \"rational review.\" This is why a song can make you cry or laugh within three seconds."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 9,
+    "questiontext_cn": "薰衣草芳香疗法的依据是什么？",
+    "questiontext_en": "What Is the Basis for Lavender Aromatherapy?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 43,
+      "answer_cn": "薰衣草中的芳樟醇通过嗅觉通路影响边缘系统，降低交感神经张力。气味是最原始的情绪调节器。",
+      "answer_en": "Linalool in lavender affects the limbic system through the olfactory pathway and reduces sympathetic tone. Scent is the most primitive emotion regulator."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 10,
+    "questiontext_cn": "冥想和深呼吸为什么能降低乳酸水平？",
+    "questiontext_en": "Why Can Meditation and Deep Breathing Lower Lactate Levels?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 44,
+      "answer_cn": "深呼吸激活副交感神经，减少无氧代谢，乳酸自然下降。慢呼吸=告诉身体“没有老虎在追你”。",
+      "answer_en": "Deep breathing activates the parasympathetic nervous system, reduces anaerobic metabolism, and lactate naturally declines. Slow breathing = telling the body \"no tiger is chasing you.\""
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 11,
+    "questiontext_cn": "周末补觉的“社交时差”对情绪节律的破坏",
+    "questiontext_en": "The Damage of \"Social Jet Lag\" from Weekend Catch-Up Sleep to Emotional Rhythms",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 45,
+      "answer_cn": "工作日和周末睡眠时间差异过大，相当于每周飞一次跨时区航班。昼夜节律紊乱→情绪波动。周末补觉可以，但别补成“倒时差”。",
+      "answer_en": "A large difference in sleep timing between weekdays and weekends is like taking a cross-time-zone flight every week. Circadian rhythm disruption → emotional fluctuations. Weekend catch-up sleep is fine, but don't turn it into \"jet lag.\""
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 12,
+    "questiontext_cn": "喝温水、揉肚子缓解紧张性胃痉挛，有道理吗？",
+    "questiontext_en": "Does Drinking Warm Water and Rubbing the Belly to Relieve Tension-Induced Stomach Cramps Make Sense?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 46,
+      "answer_cn": "有。温热刺激和腹部按摩激活副交感神经和迷走神经的腹部分支。胃是情绪的“第二张脸”，温柔对待它。",
+      "answer_en": "Yes. Warm stimulation and abdominal massage activate the parasympathetic nervous system and the abdominal branches of the vagus nerve. The stomach is the \"second face\" of emotions; treat it gently."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 13,
+    "questiontext_cn": "高强度间歇训练对焦虑的缓解能持续多久？",
+    "questiontext_en": "How Long Does the Anxiety Relief from High-Intensity Interval Training Last?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 47,
+      "answer_cn": "研究显示，一次高强度间歇训练后的抗焦虑效果可持续数小时。规律训练则产生累积效应。出一身汗，换几小时清静。",
+      "answer_en": "Research shows that the anti-anxiety effect after a single session of high-intensity interval training can last for several hours. Regular training produces cumulative effects. Work up a sweat, and buy yourself a few hours of peace."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C3",
+    "questionno": 14,
+    "questiontext_cn": "轻断食会影响情绪稳定性吗？",
+    "questiontext_en": "Does Intermittent Fasting Affect Emotional Stability?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 48,
+      "answer_cn": "因人而异。对一些人，断食期间血糖稳定，情绪更清晰；对另一些人，低血糖诱发易怒。断食是工具，不是信仰，听身体的。",
+      "answer_en": "It varies from person to person. For some, blood sugar remains stable during fasting and mood becomes clearer; for others, low blood sugar triggers irritability. Fasting is a tool, not a religion—listen to your body."
+    },
+    "scoringrule": {},
+    "dimension": "生活方式与情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 1,
+    "questiontext_cn": "长期社交隔离对大脑的损伤，相当于每天抽几支烟？",
+    "questiontext_en": "The Brain Damage from Long-Term Social Isolation Is Equivalent to Smoking How Many Cigarettes a Day?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 49,
+      "answer_cn": "流行病学研究把长期孤独的危害量化为每天抽15支烟。这不是比喻，是死亡率数据的对比。孤独是合法的慢性自杀。",
+      "answer_en": "Epidemiological studies quantify the harm of long-term loneliness as equivalent to smoking 15 cigarettes a day. This is not a metaphor; it is a comparison of mortality data. Loneliness is a legal form of chronic self-destruction."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 2,
+    "questiontext_cn": "职场PUA导致的慢性压力，如何“攻击”心脏？",
+    "questiontext_en": "How Does Chronic Stress from Workplace PUA \"Attack\" the Heart?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 50,
+      "answer_cn": "持续的心理压迫→皮质醇和儿茶酚胺长期偏高→血压波动、内皮损伤、心率变异性降低。被PUA的人，心脏在替他们受罪。",
+      "answer_en": "Persistent psychological oppression → long-term elevation of cortisol and catecholamines → blood pressure fluctuations, endothelial damage, and reduced heart rate variability. For people being PUA'd, their hearts suffer on their behalf."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 3,
+    "questiontext_cn": "婚姻不和睦，为什么增加男性前列腺疾病风险？",
+    "questiontext_en": "Why Does Marital Discord Increase Men's Risk of Prostate Disease?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 51,
+      "answer_cn": "慢性婚姻冲突→交感神经持续激活→盆底肌肉紧张→前列腺局部血流和炎症环境改变。吵架伤的不只是感情。",
+      "answer_en": "Chronic marital conflict → persistent sympathetic activation → pelvic floor muscle tension → changes in local prostate blood flow and inflammatory environment. Arguing damages more than just feelings."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 4,
+    "questiontext_cn": "亲子关系紧张对儿童大脑的器质性影响",
+    "questiontext_en": "The Organic Effects of Strained Parent-Child Relationships on Children's Brains",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 52,
+      "answer_cn": "长期高压的亲子互动改变儿童HPA轴设定点，影响前额叶发育和杏仁核反应性。孩子的“不听话”，有时是大脑在高压下的生存策略。",
+      "answer_en": "Long-term high-pressure parent-child interactions alter children's HPA axis set point, affecting prefrontal development and amygdala reactivity. A child's \"disobedience\" is sometimes the brain's survival strategy under high pressure."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 5,
+    "questiontext_cn": "朋友少与老年痴呆风险：有明确关联",
+    "questiontext_en": "Few Friends and Dementia Risk: A Clear Association",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 53,
+      "answer_cn": "社会隔离是痴呆的独立危险因素。社交刺激维持认知储备，孤独则加速衰退。朋友是大脑的“健身房”。",
+      "answer_en": "Social isolation is an independent risk factor for dementia. Social stimulation maintains cognitive reserve, while loneliness accelerates decline. Friends are the brain's \"gym.\""
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 6,
+    "questiontext_cn": "被排斥的“社会疼痛”和物理疼痛，共享脑区",
+    "questiontext_en": "The \"Social Pain\" of Exclusion and Physical Pain Share Brain Regions",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 54,
+      "answer_cn": "社会排斥激活的前扣带皮层和物理疼痛是同一区域。心碎不是修辞，是神经现实。",
+      "answer_en": "The anterior cingulate cortex activated by social exclusion is the same region involved in physical pain. Heartbreak is not a figure of speech; it is a neural reality."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 7,
+    "questiontext_cn": "护理者压力如何“致癌”？",
+    "questiontext_en": "How Does Caregiver Stress \"Cause Cancer\"?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 55,
+      "answer_cn": "长期照护压力→慢性炎症、免疫监视下降、端粒缩短。照顾别人的人，自己也需要被照顾。",
+      "answer_en": "Long-term caregiving stress → chronic inflammation, reduced immune surveillance, and telomere shortening. Those who care for others also need to be cared for."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 8,
+    "questiontext_cn": "网络暴力对青少年内分泌的冲击",
+    "questiontext_en": "The Impact of Cyberbullying on Adolescents' Endocrine System",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 56,
+      "answer_cn": "网络暴力是不可逃避的、公开的、持续的羞辱。青少年皮质醇反应被反复触发，HPA轴可能走向钝化或过度唤醒。屏幕后面的恶意，是真实的内分泌毒药。",
+      "answer_en": "Cyberbullying is inescapable, public, and persistent humiliation. Adolescents' cortisol responses are repeatedly triggered, and the HPA axis may become blunted or over-aroused. Malice behind the screen is a real endocrine poison."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 9,
+    "questiontext_cn": "良好的社会支持如何“缓冲”端粒磨损？",
+    "questiontext_en": "How Does Good Social Support \"Buffer\" Telomere Wear?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 57,
+      "answer_cn": "社会支持高的人，面对压力时皮质醇反应更温和，端粒缩短更慢。一个可以倾诉的人，可能是端粒的“保护神”。",
+      "answer_en": "People with high social support have a gentler cortisol response to stress and slower telomere shortening. Someone you can confide in may be the \"guardian angel\" of your telomeres."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C4",
+    "questionno": 10,
+    "questiontext_cn": "社交时差对情绪节律的破坏，比你想的更严重",
+    "questiontext_en": "Social Jet Lag Disrupts Emotional Rhythms More Seriously Than You Think",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 58,
+      "answer_cn": "周末晚睡晚起打乱昼夜节律，周一“社会时差”导致情绪低落和认知下降。你的身体不知道今天是周几，它只知道光照和睡眠。",
+      "answer_en": "Staying up late and waking late on weekends disrupts circadian rhythms, and Monday \"social jet lag\" leads to low mood and cognitive decline. Your body does not know what day of the week it is; it only knows light and sleep."
+    },
+    "scoringrule": {},
+    "dimension": "人际关系与社会情绪健康"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 1,
+    "questiontext_cn": "抑郁症的躯体症状：不只是“心情不好”",
+    "questiontext_en": "The Physical Symptoms of Depression: Not Just \"Feeling Down\"",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 59,
+      "answer_cn": "睡眠障碍、食欲改变、慢性疼痛、消化问题、性欲下降、疲劳——抑郁是全身性疾病，只是诊断标准盯着情绪。身体在替你说“我撑不住了”。",
+      "answer_en": "Sleep disturbances, appetite changes, chronic pain, digestive problems, decreased libido, fatigue—depression is a systemic disease; the diagnostic criteria just focus on mood. The body is saying \"I can't hold on anymore\" on your behalf."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 2,
+    "questiontext_cn": "广泛性焦虑为什么伴随心悸和手抖？",
+    "questiontext_en": "Why Does Generalized Anxiety Come with Palpitations and Tremors?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 60,
+      "answer_cn": "交感神经过度激活→心率加快、血管收缩、肌肉紧张。焦虑不是“想太多”，是自主神经系统在“假警报”。",
+      "answer_en": "Overactivation of the sympathetic nervous system → increased heart rate, vasoconstriction, muscle tension. Anxiety is not \"overthinking\"; it is the autonomic nervous system sounding a \"false alarm.\""
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 3,
+    "questiontext_cn": "躯体形式障碍：检查无异常，疼痛却真实存在",
+    "questiontext_en": "Somatoform Disorder: Tests Show Nothing Abnormal, Yet the Pain Is Real",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 61,
+      "answer_cn": "疼痛信号是真实的神经活动，只是来源不是“病灶”，而是中枢敏化和自主神经功能紊乱。“查不出来”不等于“不存在”。",
+      "answer_en": "Pain signals are real neural activity; the source is not a \"lesion\" but central sensitization and autonomic dysfunction. \"Nothing found on tests\" does not mean \"it doesn't exist.\""
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 4,
+    "questiontext_cn": "创伤后应激障碍如何改变海马体结构？",
+    "questiontext_en": "How Does PTSD Change the Structure of the Hippocampus?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 62,
+      "answer_cn": "慢性应激→皮质醇毒性→海马体神经发生减少、树突萎缩。海马体负责区分“过去”和“现在”，受损后创伤记忆不断“入侵”当下。创伤不只在心里，它刻在脑结构里。",
+      "answer_en": "Chronic stress → cortisol toxicity → reduced hippocampal neurogenesis and dendritic atrophy. The hippocampus is responsible for distinguishing \"past\" from \"present\"; when damaged, traumatic memories keep \"invading\" the present. Trauma is not only in the mind; it is carved into brain structure."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 5,
+    "questiontext_cn": "惊恐发作和心脏病发作：如何鉴别？",
+    "questiontext_en": "Panic Attacks vs. Heart Attacks: How to Tell Them Apart?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 63,
+      "answer_cn": "惊恐发作：胸闷+手麻+恐惧感，心电图正常。心脏病：胸闷+压榨感+放射痛+出汗，心电图异常。但很多惊恐发作患者最终去了急诊——这是正确的选择。",
+      "answer_en": "Panic attack: chest tightness + numbness in hands + fear, with a normal ECG. Heart attack: chest tightness + crushing sensation + radiating pain + sweating, with an abnormal ECG. But many panic attack patients end up in the emergency room—which is the correct choice."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 6,
+    "questiontext_cn": "季节性情感障碍与血清素",
+    "questiontext_en": "Seasonal Affective Disorder and Serotonin",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 64,
+      "answer_cn": "秋冬光照减少→血清素合成下降→抑郁。季节性情感障碍是“生物学的乡愁”，对光的乡愁。",
+      "answer_en": "Reduced light in autumn and winter → decreased serotonin synthesis → depression. Seasonal affective disorder is a \"biological homesickness\"—a homesickness for light."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 7,
+    "questiontext_cn": "强迫行为能短暂缓解焦虑，但长期损害健康",
+    "questiontext_en": "Compulsive Behavior Relieves Anxiety Briefly but Harms Health Long-Term",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 65,
+      "answer_cn": "强迫行为是“负强化”——做了就舒服一会儿，但强化了“不做会出事”的信念。缓解是真实的，代价也是真实的。",
+      "answer_en": "Compulsive behavior is \"negative reinforcement\"—doing it brings temporary relief, but it reinforces the belief that \"not doing it will cause disaster.\" The relief is real, and so is the cost."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 8,
+    "questiontext_cn": "双相躁狂期为什么“不知疲倦”？",
+    "questiontext_en": "Why Do People in Bipolar Manic Episodes Feel \"Tireless\"?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 66,
+      "answer_cn": "躁狂期多巴胺和去甲肾上腺素过度活跃，睡眠需求下降，精力暴增。躁狂不是“状态好”，是引擎在红线区运转。",
+      "answer_en": "During manic episodes, dopamine and norepinephrine are overactive, sleep need decreases, and energy surges. Mania is not \"being in a good state\"; it is the engine running in the red zone."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 9,
+    "questiontext_cn": "疑病症反复就医：免疫系统是保护还是消耗？",
+    "questiontext_en": "Repeated Medical Visits for Hypochondria: Is the Immune System Protecting or Being Depleted?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 67,
+      "answer_cn": "反复检查→暂时安心→焦虑回来→再检查。焦虑持续激活，免疫系统被慢性应激消耗。反复求证不是保护，是另一种消耗。",
+      "answer_en": "Repeated tests → temporary reassurance → anxiety returns → more tests. Anxiety remains persistently activated, and the immune system is depleted by chronic stress. Repeated reassurance-seeking is not protection; it is another form of depletion."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 10,
+    "questiontext_cn": "进食障碍如何导致电解质紊乱？",
+    "questiontext_en": "How Do Eating Disorders Cause Electrolyte Imbalance?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 68,
+      "answer_cn": "催吐→胃酸丢失→低钾低氯性碱中毒。暴食→血糖剧烈波动。进食障碍是死亡率最高的精神疾病之一，电解质紊乱是主要原因。",
+      "answer_en": "Self-induced vomiting → loss of stomach acid → hypokalemic hypochloremic alkalosis. Binge eating → severe blood sugar fluctuations. Eating disorders are among the mental illnesses with the highest mortality rates, and electrolyte imbalance is the main cause."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 11,
+    "questiontext_cn": "睡眠障碍：原因还是结果？",
+    "questiontext_en": "Sleep Disorders: Cause or Result?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 69,
+      "answer_cn": "两者都是，形成恶性循环。 失眠加重情绪问题，情绪问题恶化失眠。打破循环需要同时干预。",
+      "answer_en": "Both, forming a vicious cycle. Insomnia worsens emotional problems, and emotional problems worsen insomnia. Breaking the cycle requires intervening in both at the same time."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 12,
+    "questiontext_cn": "慢性疲劳综合征与情绪耗竭",
+    "questiontext_en": "Chronic Fatigue Syndrome and Emotional Exhaustion",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 70,
+      "answer_cn": "线粒体功能下降、HPA轴钝化、免疫激活——慢性疲劳和情绪耗竭共享生理通路。累到“起不来”，可能是身体在强制关机。",
+      "answer_en": "Decreased mitochondrial function, blunted HPA axis, immune activation—chronic fatigue and emotional exhaustion share physiological pathways. Being too tired to \"get up\" may be the body forcing a shutdown."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 13,
+    "questiontext_cn": "焦虑症患者为什么常有耳鸣或脑鸣？",
+    "questiontext_en": "Why Do Anxiety Patients Often Have Tinnitus or Head Noises?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 71,
+      "answer_cn": "焦虑→交感神经兴奋→内耳血管收缩→耳鸣。肌肉紧张→颈部和下颌→压迫相关神经。耳鸣是焦虑的“听觉版本”。",
+      "answer_en": "Anxiety → sympathetic excitation → constriction of inner ear blood vessels → tinnitus. Muscle tension → neck and jaw → compression of related nerves. Tinnitus is the \"auditory version\" of anxiety."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C5",
+    "questionno": 14,
+    "questiontext_cn": "述情障碍：无法识别情绪的人，身体更遭罪",
+    "questiontext_en": "Alexithymia: People Who Cannot Identify Emotions Suffer More Physically",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 72,
+      "answer_cn": "说不出“我生气”，身体就用高血压、胃痛、头痛来“说”。情绪需要词汇，没有词汇的情绪会变成症状。",
+      "answer_en": "If you cannot say \"I am angry,\" the body will \"speak\" through high blood pressure, stomach pain, and headaches. Emotions need words; emotions without words become symptoms."
+    },
+    "scoringrule": {},
+    "dimension": "情绪障碍与躯体化症状"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 1,
+    "questiontext_cn": "愤怒时血压飙升，血管内皮经历了什么？",
+    "questiontext_en": "When Blood Pressure Surges During Anger, What Happens to the Vascular Endothelium?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 73,
+      "answer_cn": "血压冲击→内皮细胞剪切力增大→一氧化氮释放紊乱→微损伤积累。每一次暴怒，都在血管内壁上“刮”了一下。",
+      "answer_en": "Blood pressure surge → increased shear stress on endothelial cells → disrupted nitric oxide release → accumulation of micro-damage. Every outburst of rage \"scrapes\" the inner wall of your blood vessels."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 2,
+    "questiontext_cn": "长期焦虑为什么引发功能性消化不良？",
+    "questiontext_en": "Why Does Long-Term Anxiety Trigger Functional Dyspepsia?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 74,
+      "answer_cn": "焦虑→交感兴奋→胃肠血流减少、蠕动紊乱、内脏高敏感。焦虑的胃不是“装病”，是真的在难受。",
+      "answer_en": "Anxiety → sympathetic excitation → reduced gastrointestinal blood flow, disordered motility, and visceral hypersensitivity. An anxious stomach is not \"faking it\"; it is genuinely uncomfortable."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 3,
+    "questiontext_cn": "悲伤的眼泪里有没有应激激素？",
+    "questiontext_en": "Do Tears of Sadness Contain Stress Hormones?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 75,
+      "answer_cn": "有。情绪性眼泪中促肾上腺皮质激素和催乳素水平高于反射性眼泪。哭出来，是把应激激素“排”出去。",
+      "answer_en": "Yes. Emotional tears contain higher levels of adrenocorticotropic hormone and prolactin than reflex tears. Crying is a way of \"expelling\" stress hormones."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 4,
+    "questiontext_cn": "恐惧导致尿频的机制",
+    "questiontext_en": "The Mechanism Behind Fear-Induced Frequent Urination",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 76,
+      "answer_cn": "恐惧→交感兴奋→膀胱逼尿肌收缩、括约肌松弛。这是“战斗或逃跑”的副产物——身体在做最坏打算：如果跑不掉，至少要轻装上阵。",
+      "answer_en": "Fear → sympathetic excitation → contraction of the detrusor muscle and relaxation of the sphincter. This is a by-product of \"fight or flight\"—the body is preparing for the worst: if you cannot escape, at least travel light."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 5,
+    "questiontext_cn": "长期抑郁与骨质疏松",
+    "questiontext_en": "Long-Term Depression and Osteoporosis",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 77,
+      "answer_cn": "抑郁→皮质醇偏高→抑制成骨细胞、促进破骨细胞。抑郁患者也常缺乏运动和日照。骨头也在听你的情绪。",
+      "answer_en": "Depression → elevated cortisol → inhibition of osteoblasts and promotion of osteoclasts. Depressed patients also often lack exercise and sunlight. Your bones are listening to your emotions too."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 6,
+    "questiontext_cn": "嫉妒与偏头痛",
+    "questiontext_en": "Jealousy and Migraines",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 78,
+      "answer_cn": "嫉妒→交感激活+肌肉紧张+血管收缩→偏头痛触发。嫉妒的痛，是真实的痛。",
+      "answer_en": "Jealousy → sympathetic activation + muscle tension + vasoconstriction → migraine trigger. The pain of jealousy is real pain."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 7,
+    "questiontext_cn": "过度思虑为什么伤脾、影响食欲？",
+    "questiontext_en": "Why Does Excessive Worry Harm the Spleen and Affect Appetite?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 79,
+      "answer_cn": "思虑→交感兴奋→消化系统血流减少、蠕动减慢。“思伤脾”有自主神经基础。想太多，胃先罢工。",
+      "answer_en": "Worry → sympathetic excitation → reduced digestive system blood flow and slowed motility. \"Worry harms the spleen\" has an autonomic basis. Overthink, and the stomach goes on strike first."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 8,
+    "questiontext_cn": "羞耻感与皮肤潮红、荨麻疹",
+    "questiontext_en": "Shame, Facial Flushing, and Hives",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 80,
+      "answer_cn": "羞耻→交感激活→面部血管扩张（潮红）+肥大细胞脱颗粒（荨麻疹）。羞耻是“皮肤可见的情绪”。",
+      "answer_en": "Shame → sympathetic activation → facial vasodilation (flushing) + mast cell degranulation (hives). Shame is an emotion \"visible on the skin.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 9,
+    "questiontext_cn": "敌意情绪是冠心病的独立危险因素吗？",
+    "questiontext_en": "Is Hostility an Independent Risk Factor for Coronary Heart Disease?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 81,
+      "answer_cn": "是。敌意和愤怒与冠心病风险独立相关，不依赖于吸烟、饮食等传统因素。对世界充满敌意的人，心脏也在承受敌意。",
+      "answer_en": "Yes. Hostility and anger are independently associated with coronary heart disease risk, regardless of traditional factors such as smoking and diet. For people full of hostility toward the world, their hearts bear that hostility too."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 10,
+    "questiontext_cn": "惊恐发作的胸闷窒息感从何而来？",
+    "questiontext_en": "Where Does the Chest Tightness and Suffocation of a Panic Attack Come From?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 82,
+      "answer_cn": "过度换气→二氧化碳降低→呼吸性碱中毒→血管收缩→胸闷、手麻、头晕。不是缺氧，是“氧太多但用不了”。",
+      "answer_en": "Hyperventilation → decreased carbon dioxide → respiratory alkalosis → vasoconstriction → chest tightness, numb hands, dizziness. It is not lack of oxygen; it is \"too much oxygen but unable to use it.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 11,
+    "questiontext_cn": "情绪性哮喘与过敏性哮喘的区别",
+    "questiontext_en": "The Difference Between Emotional Asthma and Allergic Asthma",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 83,
+      "answer_cn": "情绪性哮喘由自主神经触发，过敏性哮喘由免疫触发。但两者常共存——情绪加重过敏反应。情绪不是过敏原，但可以是“放大器”。",
+      "answer_en": "Emotional asthma is triggered by the autonomic nervous system, while allergic asthma is triggered by the immune system. But the two often coexist—emotions worsen allergic reactions. Emotions are not allergens, but they can be \"amplifiers.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 12,
+    "questiontext_cn": "长期压抑悲伤与慢性咽炎",
+    "questiontext_en": "Long-Term Suppressed Sadness and Chronic Pharyngitis",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 84,
+      "answer_cn": "悲伤压抑→喉部肌肉紧张+交感兴奋→咽部黏膜血流减少、干燥感。说不出的悲伤，卡在喉咙里。",
+      "answer_en": "Suppressed sadness → tension in the throat muscles + sympathetic excitation → reduced blood flow to the pharyngeal mucosa and a dry sensation. The sadness that cannot be spoken gets stuck in the throat."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 13,
+    "questiontext_cn": "焦虑性肌肉紧张与颈肩疼痛",
+    "questiontext_en": "Anxiety-Related Muscle Tension and Neck-Shoulder Pain",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 85,
+      "answer_cn": "焦虑→斜方肌和肩胛提肌持续收缩→缺血→疼痛。肩膀疼不一定是“坐姿不好”，可能是“心里绷着”。",
+      "answer_en": "Anxiety → sustained contraction of the trapezius and levator scapulae muscles → ischemia → pain. Shoulder pain is not necessarily from \"bad posture\"; it may be from \"mental tension.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 14,
+    "questiontext_cn": "情绪应激与肠易激综合征",
+    "questiontext_en": "Emotional Stress and Irritable Bowel Syndrome",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 86,
+      "answer_cn": "应激→肠脑轴紊乱→内脏高敏感+蠕动异常。肠易激是肠道的“情绪表达障碍”。",
+      "answer_en": "Stress → disrupted gut-brain axis → visceral hypersensitivity + abnormal motility. IBS is the gut's \"emotional expression disorder.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 15,
+    "questiontext_cn": "长期绝望感与端粒长度",
+    "questiontext_en": "Long-Term Hopelessness and Telomere Length",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 87,
+      "answer_cn": "绝望感加速端粒缩短，端粒缩短又加剧衰老感，形成循环。绝望不只是“想法”，是细胞层面的加速折旧。",
+      "answer_en": "Hopelessness accelerates telomere shortening, and shortened telomeres in turn intensify the sense of aging, forming a loop. Hopelessness is not just a \"thought\"; it is accelerated depreciation at the cellular level."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 16,
+    "questiontext_cn": "懊悔自责与肝胆功能",
+    "questiontext_en": "Regret, Self-Blame, and Liver-Gallbladder Function",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 88,
+      "answer_cn": "自责→交感兴奋→肝胆血流减少，胆汁分泌紊乱。懊悔是“对过去的持续攻击”，身体分不清过去和现在。",
+      "answer_en": "Self-blame → sympathetic excitation → reduced liver and gallbladder blood flow, disordered bile secretion. Regret is a \"continuous attack on the past,\" and the body cannot tell past from present."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 17,
+    "questiontext_cn": "情绪波动大与甲状腺结节",
+    "questiontext_en": "Severe Emotional Fluctuations and Thyroid Nodules",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 89,
+      "answer_cn": "慢性应激影响下丘脑-垂体-甲状腺轴，甲状腺激素分泌波动。甲状腺是情绪的“靶器官”之一。",
+      "answer_en": "Chronic stress affects the hypothalamic-pituitary-thyroid axis, causing fluctuations in thyroid hormone secretion. The thyroid is one of the \"target organs\" of emotion."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 18,
+    "questiontext_cn": "紧张时手心出汗与交感神经",
+    "questiontext_en": "Sweaty Palms When Nervous and the Sympathetic Nervous System",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 90,
+      "answer_cn": "交感胆碱能纤维激活汗腺。手心出汗是身体在说“我准备好了——虽然我不知道准备好了什么”。",
+      "answer_en": "Sympathetic cholinergic fibers activate sweat glands. Sweaty palms are the body saying, \"I'm ready—even though I don't know what I'm ready for.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 19,
+    "questiontext_cn": "孤独感与炎症水平",
+    "questiontext_en": "Loneliness and Inflammation Levels",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 91,
+      "answer_cn": "孤独→HPA轴和交感激活→IL-6、CRP升高。孤独是“低度炎症的慢性来源”。",
+      "answer_en": "Loneliness → activation of the HPA axis and sympathetic system → elevated IL-6 and CRP. Loneliness is a \"chronic source of low-grade inflammation.\""
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C6",
+    "questionno": 20,
+    "questiontext_cn": "情绪压抑与乳腺增生、子宫肌瘤",
+    "questiontext_en": "Emotional Suppression, Breast Hyperplasia, and Uterine Fibroids",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 92,
+      "answer_cn": "情绪压抑→雌激素代谢紊乱+免疫监视下降→激素依赖性组织增生。情绪压抑的“激素回声”落在靶器官上。",
+      "answer_en": "Emotional suppression → disrupted estrogen metabolism + reduced immune surveillance → hormone-dependent tissue proliferation. The \"hormonal echo\" of suppressed emotions lands on target organs."
+    },
+    "scoringrule": {},
+    "dimension": "负面情绪与器官影响"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 1,
+    "questiontext_cn": "孕期焦虑如何影响胎儿心率？",
+    "questiontext_en": "How Does Anxiety During Pregnancy Affect Fetal Heart Rate?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 93,
+      "answer_cn": "母体皮质醇通过胎盘→胎儿HPA轴受影响→胎儿心率变异性改变。妈妈的情绪，是胎儿的第一堂“情绪课”。",
+      "answer_en": "Maternal cortisol passes through the placenta → the fetal HPA axis is affected → fetal heart rate variability changes. A mother's emotions are the fetus's first \"emotion lesson.\""
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 2,
+    "questiontext_cn": "产后抑郁不处理，对婴儿免疫的影响",
+    "questiontext_en": "The Impact of Untreated Postpartum Depression on Infant Immunity",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 94,
+      "answer_cn": "产后抑郁→母婴互动质量下降→婴儿应激反应性升高→免疫发育受影响。产后抑郁不只影响妈妈，也影响宝宝的免疫“编程”。",
+      "answer_en": "Postpartum depression → reduced quality of mother-infant interaction → increased infant stress reactivity → affected immune development. Postpartum depression affects not only the mother but also the baby's immune \"programming.\""
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 3,
+    "questiontext_cn": "更年期情绪烦躁与骨质疏松的相互影响",
+    "questiontext_en": "The Mutual Influence of Menopausal Mood Irritability and Osteoporosis",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 95,
+      "answer_cn": "雌激素下降→情绪波动+骨吸收加速。情绪波动→皮质醇升高→进一步抑骨。更年期的骨头和情绪，是一对难兄难弟。",
+      "answer_en": "Declining estrogen → mood swings + accelerated bone resorption. Mood swings → elevated cortisol → further bone suppression. In menopause, bones and emotions are a pair of hapless brothers in misfortune."
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 4,
+    "questiontext_cn": "儿童期情绪虐待如何重塑疼痛感知",
+    "questiontext_en": "How Childhood Emotional Abuse Reshapes Pain Perception",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 96,
+      "answer_cn": "早期虐待→HPA轴设定点改变+中枢敏化→成年后疼痛阈值降低。被伤害过的身体，学会了“过度警惕”。",
+      "answer_en": "Early abuse → altered HPA axis set point + central sensitization → lower pain threshold in adulthood. A body that has been hurt learns to be \"hypervigilant.\""
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 5,
+    "questiontext_cn": "老年人丧偶后的“心碎综合征”",
+    "questiontext_en": "\"Broken Heart Syndrome\" After Widowhood in Older Adults",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 97,
+      "answer_cn": "极度悲伤→儿茶酚胺风暴→心尖球囊样改变。心碎综合征是“真实的心脏病”，由情绪触发。",
+      "answer_en": "Extreme grief → catecholamine storm → apical ballooning. Broken heart syndrome is a \"real heart disease\" triggered by emotion."
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 6,
+    "questiontext_cn": "青春期情绪起伏与激素紊乱的区分",
+    "questiontext_en": "Distinguishing Adolescent Mood Swings from Hormonal Disorders",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 98,
+      "answer_cn": "青春期情绪波动是“正常发育现象”，激素相关情绪障碍有更明确的周期性和严重度。区分“成长的烦恼”和“需要干预的问题”很重要。",
+      "answer_en": "Adolescent mood swings are a \"normal developmental phenomenon,\" while hormone-related mood disorders have clearer periodicity and severity. It is important to distinguish \"growing pains\" from \"problems that need intervention.\""
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 7,
+    "questiontext_cn": "男性“易怒型抑郁”为什么常被误诊？",
+    "questiontext_en": "Why Is Male \"Irritable Depression\" Often Misdiagnosed?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 99,
+      "answer_cn": "男性抑郁常表现为易怒、酗酒、工作狂，而非典型悲伤。他可能不是“脾气差”，是抑郁在“穿男装”。",
+      "answer_en": "Male depression often manifests as irritability, alcohol abuse, and workaholism rather than typical sadness. He may not be \"bad-tempered\"; it is depression \"wearing men's clothing.\""
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C7",
+    "questionno": 8,
+    "questiontext_cn": "职场高压人群为什么易患胃溃疡和脱发？",
+    "questiontext_en": "Why Are High-Stress Professionals Prone to Gastric Ulcers and Hair Loss?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 100,
+      "answer_cn": "高压→交感兴奋→胃黏膜缺血+皮质醇→免疫紊乱→毛囊进入休止期。高压的“毛发和胃黏膜”是第一批受害者。",
+      "answer_en": "High stress → sympathetic excitation → gastric mucosal ischemia + cortisol → immune dysregulation → hair follicles enter the resting phase. Under high stress, \"hair and gastric mucosa\" are the first victims."
+    },
+    "scoringrule": {},
+    "dimension": "特殊人群与生命阶段"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 1,
+    "questiontext_cn": "认知行为疗法能改善免疫指标吗？",
+    "questiontext_en": "Can Cognitive Behavioral Therapy Improve Immune Indicators?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 102,
+      "answer_cn": "能。CBT不仅改善情绪，还能降低炎症标志物、增强免疫功能。改变想法，身体会“收到通知”。",
+      "answer_en": "Yes. CBT not only improves mood but also lowers inflammatory markers and enhances immune function. Change your thoughts, and your body will \"get the notice.\""
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 2,
+    "questiontext_cn": "抗抑郁药起效慢，是因为在“修复脑细胞”吗？",
+    "questiontext_en": "Do Antidepressants Work Slowly Because They Are \"Repairing Brain Cells\"?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 103,
+      "answer_cn": "部分正确。抗抑郁药起效需要数周，涉及BDNF上调、神经可塑性恢复、HPA轴调节。药不是“立刻开心”，是“给大脑创造条件慢慢修复”。",
+      "answer_en": "Partly correct. Antidepressants take weeks to work, involving BDNF upregulation, restoration of neuroplasticity, and HPA axis regulation. The drug does not \"make you happy immediately\"; it \"creates conditions for the brain to repair itself slowly.\""
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 3,
+    "questiontext_cn": "针刺哪些穴位能同时调节情绪和胃肠？",
+    "questiontext_en": "Which Acupuncture Points Can Regulate Both Emotion and Gastrointestinal Function?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 104,
+      "answer_cn": "内关、足三里、太冲——传统中医的“情绪-消化”共治穴位。现代研究显示这些穴位刺激可调节自主神经。针扎对地方，情绪和胃一起松。",
+      "answer_en": "Neiguan, Zusanli, and Taichong—the traditional Chinese medicine points for treating both \"emotion and digestion.\" Modern research shows that stimulating these points can regulate the autonomic nervous system. When the needle hits the right spot, emotions and stomach relax together."
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 4,
+    "questiontext_cn": "情绪日记对血压和血糖的平复作用",
+    "questiontext_en": "The Calming Effect of an Emotion Diary on Blood Pressure and Blood Sugar",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 105,
+      "answer_cn": "记录情绪→觉察→调节→交感张力下降。研究显示情绪日记可改善血压和血糖波动。写下来，就是把情绪从“体内”移到“纸上”。",
+      "answer_en": "Recording emotions → awareness → regulation → decreased sympathetic tone. Research shows that an emotion diary can improve blood pressure and blood sugar fluctuations. Writing it down moves emotions from \"inside the body\" to \"on paper.\""
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 5,
+    "questiontext_cn": "生物反馈训练：让人“看见”并控制压力",
+    "questiontext_en": "Biofeedback Training: Helping People \"See\" and Control Stress",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 106,
+      "answer_cn": "通过心率变异性、皮温、肌电等指标的实时反馈，学会自主调节。看到，就能控制。",
+      "answer_en": "Through real-time feedback on indicators such as heart rate variability, skin temperature, and muscle electricity, people learn to self-regulate. If you can see it, you can control it."
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 6,
+    "questiontext_cn": "瑜伽交替鼻孔呼吸如何平衡自主神经？",
+    "questiontext_en": "How Does Yoga Alternate Nostril Breathing Balance the Autonomic Nervous System?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 107,
+      "answer_cn": "交替刺激左右鼻孔→调节自主神经张力→心率变异性提升。呼吸是唯一可以“手动”调节自主神经的入口。",
+      "answer_en": "Alternately stimulating the left and right nostrils → regulating autonomic tone → increased heart rate variability. Breathing is the only entry point through which you can \"manually\" regulate the autonomic nervous system."
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C8",
+    "questionno": 7,
+    "questiontext_cn": "躯体症状明显时，该挂心理科还是内科？",
+    "questiontext_en": "When Physical Symptoms Are Prominent, Should You See a Psychiatrist or an Internist?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 108,
+      "answer_cn": "先内科排查，再心理科干预。 但两者不是“二选一”——很多情况下需要同时进行。内科查“有没有病”，心理科查“情绪在哪儿作祟”。",
+      "answer_en": "First rule out organic causes in internal medicine, then intervene in mental health. But the two are not an \"either-or\"—in many cases they need to be done simultaneously. Internal medicine checks \"whether there is disease\"; mental health checks \"where emotions are causing trouble.\""
+    },
+    "scoringrule": {},
+    "dimension": "干预、治疗与自我调适"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 1,
+    "questiontext_cn": "情绪韧性有遗传性吗？",
+    "questiontext_en": "Is Emotional Resilience Hereditary?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 109,
+      "answer_cn": "遗传度约30%到50%，涉及5-HTTLPR、BDNF、FKBP5等基因。但后天环境通过表观遗传显著改变表达。基因不是命运，是“倾向”。",
+      "answer_en": "Heritability is about 30% to 50%, involving genes such as 5-HTTLPR, BDNF, and FKBP5. But the postnatal environment significantly changes expression through epigenetics. Genes are not destiny; they are \"tendencies.\""
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 2,
+    "questiontext_cn": "父母抑郁如何“跨代”影响子代免疫？",
+    "questiontext_en": "How Does Parental Depression \"Cross Generations\" to Affect Offspring Immunity?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 110,
+      "answer_cn": "父母孕前或孕期应激→精子/卵子或胎盘中糖皮质激素受体基因甲基化改变→子代HPA轴更敏感、炎症基线偏高。父母经历的，可能“写”进孩子的基因调控里。",
+      "answer_en": "Parental stress before or during pregnancy → altered methylation of the glucocorticoid receptor gene in sperm/eggs or the placenta → offspring have a more sensitive HPA axis and higher baseline inflammation. What parents experience may be \"written\" into their children's gene regulation."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 3,
+    "questiontext_cn": "童年积极情绪体验能改变基因表达吗？",
+    "questiontext_en": "Can Positive Emotional Experiences in Childhood Change Gene Expression?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 111,
+      "answer_cn": "能。早期正向刺激促进组蛋白乙酰化，上调前额叶BDNF，增强杏仁核-前额叶连接效率。被爱过的童年，在基因上留了“批注”。",
+      "answer_en": "Yes. Early positive stimulation promotes histone acetylation, upregulates prefrontal BDNF, and enhances amygdala-prefrontal connectivity efficiency. A childhood that was loved leaves \"annotations\" on the genes."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 4,
+    "questiontext_cn": "利他行为降低死亡率的效果，强于自我取乐",
+    "questiontext_en": "Altruistic Behavior Reduces Mortality More Strongly Than Self-Pleasure",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 112,
+      "answer_cn": "规律利他者全因死亡率降低22%到24%，享乐型活动仅7%。利他激活迷走神经背核，释放催产素，降低C反应蛋白。帮别人，身体给你的回报更丰厚。",
+      "answer_en": "Regular altruists have a 22% to 24% lower all-cause mortality rate, while hedonic activities reduce it by only 7%. Altruism activates the dorsal motor nucleus of the vagus, releases oxytocin, and lowers C-reactive protein. When you help others, the body rewards you more generously."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 5,
+    "questiontext_cn": "积极情绪能“逆转”端粒缩短吗？",
+    "questiontext_en": "Can Positive Emotions \"Reverse\" Telomere Shortening?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 113,
+      "answer_cn": "尚不能逆转长度，但正念冥想和感恩练习显著提升端粒酶活性。一项8周干预中，端粒酶活性提高30%。不能返老还童，但能老得慢一点。",
+      "answer_en": "It cannot yet reverse length, but mindfulness meditation and gratitude practices significantly increase telomerase activity. In an 8-week intervention, telomerase activity increased by 30%. You cannot grow young again, but you can age a little more slowly."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 6,
+    "questiontext_cn": "家族跨代创伤会在子代留下皮质醇模式吗？",
+    "questiontext_en": "Does Intergenerational Family Trauma Leave a Cortisol Pattern in Offspring?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 114,
+      "answer_cn": "会。子代即使未经历创伤，唾液皮质醇晨峰和应激反应曲线常与父母相似。这是跨代表观遗传的压力印记。",
+      "answer_en": "Yes. Even if the offspring did not experience trauma, their salivary cortisol morning peak and stress response curve are often similar to their parents'. This is an intergenerational epigenetic stress imprint."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 7,
+    "questiontext_cn": "感恩与副交感神经的关联，受基因型调节吗？",
+    "questiontext_en": "Is the Link Between Gratitude and the Parasympathetic Nervous System Modulated by Genotype?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 115,
+      "answer_cn": "携带COMT Val/Val基因型的人，感恩干预后心率变异性提升更显著。基因调节效益幅度，但不关闭效益窗口。",
+      "answer_en": "People carrying the COMT Val/Val genotype show more significant improvements in heart rate variability after gratitude intervention. Genes modulate the magnitude of the benefit but do not close the window of benefit."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 8,
+    "questiontext_cn": "积极情绪通过自主神经降低心血管事件风险吗？",
+    "questiontext_en": "Do Positive Emotions Reduce Cardiovascular Event Risk Through the Autonomic Nervous System?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 116,
+      "answer_cn": "是的。高频心率变异性持续偏高，抑制去甲肾上腺素过度释放，MACE风险降低15%到20%。",
+      "answer_en": "Yes. Persistently higher high-frequency heart rate variability suppresses excessive norepinephrine release, reducing MACE risk by 15% to 20%."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 9,
+    "questiontext_cn": "情绪健康是事业成功的“基石”还是“副产品”？",
+    "questiontext_en": "Is Emotional Health the \"Cornerstone\" of Career Success or a \"By-Product\"?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 117,
+      "answer_cn": "基石。 20岁积极情绪高的人，40岁时收入、职业满意度、婚姻稳定性均更高，独立于父母社会经济地位。",
+      "answer_en": "Cornerstone. People with high positive emotion at age 20 have higher income, career satisfaction, and marital stability at age 40, independent of parents' socioeconomic status."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 10,
+    "questiontext_cn": "PERMA干预能在分子层面验证抗炎效果吗？",
+    "questiontext_en": "Can PERMA Intervention Verify Anti-Inflammatory Effects at the Molecular Level?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 118,
+      "answer_cn": "能。8周后NF-κB通路活性下调，TNF-α和IL-1β降低，与地塞米松抗炎效果有部分重合通路。",
+      "answer_en": "Yes. After 8 weeks, NF-κB pathway activity is downregulated, and TNF-α and IL-1β are reduced, with partial overlap in pathways with the anti-inflammatory effects of dexamethasone."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 11,
+    "questiontext_cn": "长期孤独有“类遗传”的加速衰老效应吗？",
+    "questiontext_en": "Does Long-Term Loneliness Have a \"Quasi-Genetic\" Accelerated Aging Effect?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 119,
+      "answer_cn": "神经影像显示孤独者灰质萎缩加快，表观年龄加速2到3年。孤独的“衰老加速”可能通过应激影响生殖细胞表观组轻微传递。",
+      "answer_en": "Neuroimaging shows that lonely individuals have accelerated gray matter atrophy and an epigenetic age acceleration of 2 to 3 years. The \"aging acceleration\" of loneliness may be slightly transmitted through stress effects on the germ cell epigenome."
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  },
+  {
+    "categorycode": "QX4_C9",
+    "questionno": 12,
+    "questiontext_cn": "积极的家族情绪文化能累积成“健康红利”吗？",
+    "questiontext_en": "Can a Positive Family Emotional Culture Accumulate into a \"Health Dividend\"?",
+    "optiontype": null,
+    "optionconfig": {
+      "global_no": 120,
+      "answer_cn": "能。三世代追踪显示，祖辈积极情绪表达频率高的家庭，孙辈代谢综合征患病率降低35%。这不是教养的“软传承”，是跨代的生物学“硬积累”。",
+      "answer_en": "Yes. Three-generation tracking shows that families with high frequencies of positive emotional expression in grandparents have a 35% lower prevalence of metabolic syndrome in grandchildren. This is not a \"soft inheritance\" of upbringing but a cross-generational biological \"hard accumulation.\""
+    },
+    "scoringrule": {},
+    "dimension": "积极心理学前沿：从分子到家族"
+  }
+]

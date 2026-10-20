@@ -1,10 +1,9 @@
 /* ================================================================
    情绪宝 - qx3 报告分析
-   v5：
-   - 覆盖率不足时：不灌 mock，直接空图 + 说明
-   - 三个 draw 函数空数据时不再硬撑坐标轴
-   - buildSummary 空数据时只给一句
-   - setDemoMode('incomplete') 文案改为「数据不足，无法生成报告」
+   v7（2026-10-14）：
+   - buildSummary() 顶部"rangeLabel.cn"按语言选（英文显示 rangeLabel.en）
+   - buildSummary() parts.join('') 按语言加分隔符：中文无、英文空格
+   - 其余同 v6
    ================================================================ */
 
    (function () {
@@ -31,7 +30,7 @@
         { code: 4, cn: '轻快', en: 'Lively' },
         { code: 5, cn: '明朗', en: 'Bright' },
         { code: 6, cn: '平静', en: 'Calm' },
-        { code: 7, cn: '压抑', en: 'Depressed' },
+        { code: 7, cn: '压抑', en: 'Down' },
         { code: 8, cn: '忧伤', en: 'Melancholy' },
         { code: 9, cn: '悲伤', en: 'Sad' },
     ];
@@ -921,7 +920,10 @@
                 return lang === 1 ? f.nameCn : (f.nameEn || f.nameCn);
             }).filter(n => n);
             if (names.length > 0) {
-                const quoted = names.map(n => '“' + n + '”').join('');
+                /* 引号按语言选：中文“”，英文 "" */
+                const LQ = lang === 1 ? '“' : '"';
+                const RQ = lang === 1 ? '”' : '"';
+                const quoted = names.map(n => LQ + n + RQ).join('');
                 parts.push(t(
                     `${rangeLabel.cn}情绪受${quoted}影响较多。`,
                     `${rangeLabel.en}, emotion is strongly affected by ${quoted}.`
@@ -988,7 +990,8 @@
         } else if (riskLevel === 'low') {
             lines.push(`<div class="qx3-summary-level" style="color:#2ECC71">${t('低风险', 'Low risk')} · ${t('总分', 'Score')} ${totalScore}</div>`);
         } else {
-            lines.push(`<div class="qx3-summary-level" style="color:#2C7BE5">${rangeLabel.cn} · ${t('事件', 'Events')} ${totalEvents} ${t('条', '')}</div>`);
+            const rangeText = (lang === 1) ? rangeLabel.cn : rangeLabel.en;
+            lines.push(`<div class="qx3-summary-level" style="color:#2C7BE5">${rangeText} · ${t('事件', 'Events')} ${totalEvents} ${t('条', '')}</div>`);
         }
 
         lines.push(`<div class="qx3-summary-row"><b>${t('正性事件刺激量', 'Positive')}</b>：${posScore} · <b>${t('负性事件刺激量', 'Negative')}</b>：${negScore}</div>`);
@@ -996,7 +999,8 @@
         lines.push(`<div class="qx3-summary-row"><b>${t('HRV 基线', 'HRV baseline')}</b>：${hrvRmssd != null ? `RMSSD ${hrvRmssd.toFixed(1)}${hrvBpm != null ? ' / HR ' + hrvBpm.toFixed(0) : ''}` : '—'}</div>`);
 
         if (parts.length > 0) {
-            lines.push(`<div class="qx3-summary-narrative">${parts.join('')}</div>`);
+            const sep = (lang === 1) ? '' : ' ';
+            lines.push(`<div class="qx3-summary-narrative">${parts.join(sep)}</div>`);
         }
 
         lines.push(`<div class="qx3-summary-advice">${advice}</div>`);

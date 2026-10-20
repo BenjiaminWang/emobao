@@ -47,7 +47,7 @@
                     { id: 'stats_users',   icon: '📊', cn: '用户总体情况',   en: 'User Overview' },
                     { id: 'redeem',        icon: '🎫', cn: '兑换码管理',     en: 'Redeem Codes' },
                     { id: 'manage_users',  icon: '👥', cn: '用户管理',       en: 'Manage Users' },
-                    { id: 'qa_engine',     icon: '💬', cn: '问答/推送管理',  en: 'Q&A / Engine' },
+                    { id: 'qa_engine',     icon: '📚', cn: '知识库维护',  en: 'Knowledge Base' },
                 ],
             });
         }
@@ -93,7 +93,7 @@
         stats_users:     { cn: '用户总体情况', en: 'User Overview' },
         redeem:          { cn: '兑换码管理', en: 'Redeem Codes' },
         manage_users:    { cn: '用户管理',   en: 'User Management' },
-        qa_engine:       { cn: '问答/推送管理', en: 'Q&A / Engine' },
+        qa_engine:       { cn: '知识库维护', en: 'Knowledge Base' },
         music_lib:       { cn: '音乐库管理', en: 'Music Library' },
         music_workbench: { cn: '音乐导师工作台', en: 'Music Workbench' },
         rule_edit:       { cn: '组曲规则',   en: 'Playlist Rules' },

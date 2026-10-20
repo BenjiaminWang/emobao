@@ -1,13 +1,6 @@
 /* ================================================================
-   style.css  V61
-   日期：2026-10-13
-   改动（V60 → V61）：
-   - .qx-hrv-btn 注释澄清：主按钮 20px / 紧凑 18px（规则未变）
-   - 删除冗余的 .qx6-menu-section-danger .qx6-menu-rows 背景声明
-   - 删除孤儿规则 #qx2_hrv_wave_hidden（该 ID 在 index.html 中不存在）
-   - .qx1-impact-chart 补 canvas 显示规则（消除行内间隙）
-   - .qx6-cam-row-current 高亮加深（#EBF3FE → #DCE9FF + 左侧蓝条）
-   - 移除历史版本号注释（v15 等），只保留功能说明
+   style.css  V67 (强制修复版)
+   日期：2026-10-18
    ================================================================ */
 
    :root {
@@ -796,7 +789,7 @@ body.function-active .qx0-content { display: none; }
 .qx2-heal-tab { padding: 3px 10px; border: 1px solid #E1E8F0; border-radius: 4px; background: #fff; cursor: pointer; font-family: inherit; font-size: 11px; color: #333; transition: background 0.15s, color 0.15s, border-color 0.15s; }
 .qx2-heal-tab:hover { border-color: #2C7BE5; color: #2C7BE5; }
 .qx2-heal-tab.active { background: #2C7BE5; color: #fff; border-color: #2C7BE5; }
-.qx2-heal-canvas-wrap { flex: 1; min-height: 0; display: flex; }
+.qx2-heal-canvas-wrap { flex: 1; min-height: 0; display: flex; position: relative; }
 .qx2-heal-canvas { flex: 1; min-width: 0; min-height: 0; border-radius: 4px; overflow: hidden; background: #0A1628; display: flex; align-items: center; justify-content: center; }
 .qx2-heal-placeholder { color: #AAA; font-size: 12px; }
 .qx2-feedback-area { flex: 0 0 16%; min-width: 0; background: #fff; border-radius: 6px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden; }
@@ -3113,4 +3106,686 @@ body.polar-mode .qx1-heal-wave-video-wrap {
     border: 1px solid #E74C3C;
     border-radius: 6px;
     line-height: 1.6;
+}
+/* 英文模式：qx2 流程条里的文字横排（中文竖排保留） */
+body.lang-en .qx2-flow-name {
+    writing-mode: horizontal-tb;
+    text-orientation: mixed;
+    letter-spacing: 0.5px;
+    font-size: 13px;
+}
+
+/* ================================================================
+   qx6_7 知识库维护面板样式
+   移动优先：默认按手机竖屏布局，再向平板/桌面增强
+   ================================================================ */
+
+   .qx6-kb-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 8px;
+}
+
+/* ---------- 顶部工具条：手机竖排 ---------- */
+.qx6-kb-toolbar {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.qx6-kb-search,
+.qx6-kb-filter {
+    width: 100%;
+    box-sizing: border-box;
+}
+.qx6-kb-add {
+    width: 100%;
+    height: 40px;
+    box-shadow: 0 3px 0 #1A5BB8;
+}
+
+/* ---------- 主体：手机上下堆叠 ---------- */
+.qx6-kb-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ---------- 左侧树 ---------- */
+.qx6-kb-tree {
+    flex: 0 0 auto;
+    max-height: 32vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    -webkit-overflow-scrolling: touch;
+}
+
+.qx6-kb-cat { margin-bottom: 3px; }
+
+.qx6-kb-cat-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 10px;
+    border-radius: 6px;
+    background: #F8FBFF;
+    cursor: pointer;
+    user-select: none;
+    font-size: 13px;
+    font-weight: bold;
+    color: #1A2B4A;
+}
+.qx6-kb-cat-head:active { background: #EEF4FF; }
+.qx6-kb-arrow {
+    font-size: 11px;
+    color: #5A6B87;
+    width: 14px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.qx6-kb-cat-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qx6-kb-cat-en {
+    display: none;   /* 手机上隐藏英文大类名，省空间 */
+    font-size: 11px;
+    font-weight: normal;
+    color: #96A3B8;
+}
+.qx6-kb-cat-edit {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid #E1E8F0;
+    border-radius: 4px;
+    background: #fff;
+    color: #5A6B87;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.qx6-kb-cat-edit:active {
+    border-color: #2C7BE5;
+    color: #2C7BE5;
+    background: #EEF4FF;
+}
+
+.qx6-kb-list { padding: 4px 0 4px 14px; }
+
+.qx6-kb-item {
+    padding: 9px 10px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+}
+.qx6-kb-item:active { background: #EEF4FF; }
+.qx6-kb-item.selected {
+    background: #DCE9FF;
+    color: #1A5BB8;
+    font-weight: bold;
+    border-left-color: #2C7BE5;
+}
+.qx6-kb-empty {
+    padding: 10px;
+    font-size: 12px;
+    color: #96A3B8;
+}
+
+/* ---------- 右侧详情 ---------- */
+.qx6-kb-detail {
+    flex: 1;
+    min-height: 40vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    -webkit-overflow-scrolling: touch;
+}
+.qx6-kb-detail-empty {
+    text-align: center;
+    color: #96A3B8;
+    font-size: 13px;
+    padding: 32px 12px;
+    line-height: 1.8;
+}
+.qx6-kb-detail-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1A2B4A;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #EEF3F8;
+}
+
+.qx6-kb-field { display: block; margin-bottom: 14px; }
+.qx6-kb-field > span {
+    display: block;
+    font-size: 12px;
+    color: #5A6B87;
+    margin-bottom: 5px;
+}
+.qx6-kb-field .qx6-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 15px;    /* 手机输入 15px 防止 iOS 缩放 */
+}
+.qx6-kb-textarea {
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.6;
+    padding: 10px 12px;
+}
+
+/* ---------- 事件标签 ---------- */
+.qx6-kb-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+    min-height: 40px;
+    background: #F8FBFF;
+    border: 1px solid #E1E8F0;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+.qx6-kb-events-empty {
+    font-size: 12px;
+    color: #96A3B8;
+    line-height: 24px;
+}
+.qx6-kb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    background: #2C7BE5;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+}
+.qx6-kb-chip-x {
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.85;
+    padding: 0 2px;
+}
+.qx6-kb-chip-x:active { opacity: 1; }
+
+/* ---------- 底部按钮 ---------- */
+.qx6-kb-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #EEF3F8;
+}
+.qx6-kb-actions .qx6-btn {
+    flex: 1;
+    height: 44px;
+}
+
+/* ---------- 事件选择弹层：手机全屏 ---------- */
+.qx6-kb-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9800;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.qx6-kb-picker {
+    width: 100%;
+    max-height: 90vh;
+    background: #fff;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.qx6-kb-picker-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid #EEF3F8;
+    font-size: 15px;
+    font-weight: bold;
+    color: #1A2B4A;
+}
+.qx6-kb-picker-close {
+    width: 32px; height: 32px;
+    padding: 0;
+    border: 1px solid #E1E8F0;
+    border-radius: 50%;
+    background: #fff;
+    color: #5A6B87;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.qx6-kb-picker-search {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border-bottom: 1px solid #EEF3F8;
+}
+.qx6-kb-picker-search .qx6-input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 15px;
+}
+.qx6-kb-picker-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 8px 16px 16px;
+    -webkit-overflow-scrolling: touch;
+}
+.qx6-kb-picker-group { margin-bottom: 14px; }
+.qx6-kb-picker-group-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: #96A3B8;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    padding: 2px 0;
+}
+.qx6-kb-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 4px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.qx6-kb-picker-row:active { background: #EEF4FF; }
+.qx6-kb-picker-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    flex-shrink: 0;
+}
+.qx6-kb-picker-foot {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid #EEF3F8;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0));
+}
+.qx6-kb-picker-foot .qx6-btn {
+    flex: 1;
+    height: 44px;
+}
+
+/* ================================================================
+   平板 / 桌面：两栏
+   ================================================================ */
+@media (min-width: 641px) {
+    /* 工具条恢复横排 */
+    .qx6-kb-toolbar {
+        flex-direction: row;
+        align-items: center;
+        padding: 8px 10px;
+    }
+    .qx6-kb-search { flex: 1; min-width: 0; }
+    .qx6-kb-filter { flex: 0 0 200px; width: auto; }
+    .qx6-kb-add {
+        width: auto;
+        flex-shrink: 0;
+        padding: 0 18px;
+        height: 38px;
+    }
+
+    /* 主体两栏 */
+    .qx6-kb-body {
+        flex-direction: row;
+    }
+    .qx6-kb-tree {
+        flex: 0 0 42%;
+        max-width: 42%;
+        min-width: 260px;
+        max-height: none;
+        height: 100%;
+    }
+    .qx6-kb-detail {
+        min-height: 0;
+        height: 100%;
+    }
+
+    /* 弹层改为居中卡片 */
+    .qx6-kb-overlay {
+        align-items: center;
+        padding: 16px;
+        box-sizing: border-box;
+    }
+    .qx6-kb-picker {
+        max-width: 520px;
+        border-radius: 12px;
+        max-height: 80vh;
+    }
+}
+
+/* ================================================================
+   桌面：两栏比例稍调
+   ================================================================ */
+@media (min-width: 1025px) {
+    .qx6-kb-tree {
+        flex: 0 0 36%;
+        max-width: 36%;
+    }
+}
+
+/* ================================================================
+   qx2 作品选择弹层
+   ================================================================ */
+.qx2-work-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1px solid #E1E8F0;
+    border-radius: 8px;
+    background: #FAFAFA;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.qx2-work-item:hover {
+    border-color: #2C7BE5;
+    background: #EEF4FF;
+}
+.qx2-work-cover {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    background-color: #E1E8F0;
+    background-size: cover;
+    background-position: center;
+}
+.qx2-work-info { flex: 1; min-width: 0; }
+.qx2-work-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1A2B4A;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qx2-work-meta {
+    font-size: 12px;
+    color: #5A6B87;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ================================================================
+   qx2 作品信息卡
+   ================================================================ */
+.qx2-work-info-card {
+    background: #F8FBFF;
+    border: 1px solid #DCE9FF;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    max-height: 40vh;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #1A2B4A;
+    -webkit-overflow-scrolling: touch;
+}
+.qx2-wi-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1A5BB8;
+    margin-bottom: 2px;
+}
+.qx2-wi-meta {
+    font-size: 11px;
+    color: #5A6B87;
+    margin-bottom: 6px;
+}
+.qx2-wi-section {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed #DCE9FF;
+}
+.qx2-wi-label {
+    font-weight: bold;
+    color: #5A6B87;
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+.qx2-wi-curr-seg {
+    background: #EEF4FF;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border-left: 3px solid #2C7BE5;
+    margin-bottom: 6px;
+}
+.qx2-wi-curr-seg-title {
+    font-weight: bold;
+    color: #2C7BE5;
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+.qx2-wi-guide {
+    color: #333;
+    font-size: 12px;
+    line-height: 1.6;
+}
+.qx2-wi-seg-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+.qx2-wi-seg-item {
+    font-size: 10px;
+    padding: 2px 6px;
+    background: #fff;
+    border: 1px solid #DCE9FF;
+    border-radius: 10px;
+    color: #5A6B87;
+}
+.qx2-wi-seg-item.active {
+    background: #2C7BE5;
+    color: #fff;
+    border-color: #2C7BE5;
+}
+.qx2-wi-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.qx2-wi-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: #FFF8E1;
+    border: 1px solid #FBC02D;
+    border-radius: 10px;
+    color: #B9770E;
+}
+.qx2-wi-va {
+    font-size: 11px;
+    color: #5A6B87;
+}
+
+/* ================================================================
+   qx2 布局与状态控制（V67 终极强制版）
+   ================================================================ */
+
+/* 基础：左右分析和评价区默认可见 */
+.qx2-analysis-area,
+.qx2-feedback-area {
+    display: flex;
+}
+
+/* ----------------------------------------------------------------
+   核心修复：仅当进入 Step 2 且为 work-mode 时，隐藏那一行
+   ---------------------------------------------------------------- */
+.qx2-container.step2-mode.work-mode .qx2-music-row {
+    display: none !important;
+}
+
+/* Step 2 且选曲：隐藏左右分析/评价区，让治愈图铺满中间 */
+.qx2-container.step2-mode.work-mode .qx2-analysis-area,
+.qx2-container.step2-mode.work-mode .qx2-feedback-area {
+    display: none !important;
+}
+
+/* Step 2 且选曲：让中间的治愈图区域撑满所有剩余高度 */
+.qx2-container.step2-mode.work-mode .qx2-heal-area {
+    flex: 1 !important;
+    width: 100% !important;
+}
+
+/* Step 2 且选曲：隐藏治愈图自己的标题和切换 Tab，让画面更大 */
+.qx2-container.step2-mode.work-mode .qx2-heal-title,
+.qx2-container.step2-mode.work-mode .qx2-heal-tabs {
+    display: none !important;
+}
+
+/* ----------------------------------------------------------------
+   qx2 悬浮波形栏与画布设置（选曲模式专用）
+   ---------------------------------------------------------------- */
+.qx2-container.work-mode .qx2-heal-canvas-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+}
+
+.qx2-container.work-mode .qx2-heal-canvas {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #0A1628;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 底部悬浮条（选曲模式专用） */
+.qx2-container.work-mode .qx2-heal-overlay-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    background: linear-gradient(to top, rgba(10, 22, 40, 0.8) 0%, transparent 100%);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-mini {
+    flex: 1;
+    height: 30px;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: flex-end;
+    padding: 0;
+}
+.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-score {
+    display: none !important;
+}
+.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-mini svg {
+    width: 100%;
+    height: 24px;
+}
+.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-video-wrap {
+    border-color: rgba(255,255,255,0.3);
+    margin-left: 10px;
+}
+
+/* 无数据提示框 */
+.qx2-analysis-tip {
+    padding: 16px 12px;
+    font-size: 13px;
+    color: #5A6B87;
+    line-height: 1.7;
+    text-align: center;
+    background: #F8FBFF;
+    border-radius: 6px;
+    border: 1px dashed #DCE9FF;
+    margin: 8px 0;
+}
+
+/* ================================================================
+   qx2 作品信息卡在 Step 2 下的高度约束
+   ================================================================ */
+.qx2-container.step2-mode .qx2-work-info-card {
+    max-height: 50vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+/* 治愈主图在 Step 2 里占剩下的空间 */
+.qx2-container.step2-mode .qx2-heal-canvas-wrap {
+    flex: 1;
+    min-height: 200px;
+}
+
+/* ================================================================
+   终极修复：无论之前怎么写的，强制恢复 QX1 的点击层级
+   ================================================================ */
+.qx1-tree {
+    position: relative !important;
+    z-index: 10 !important;
+}
+.qx1-tree-children {
+    position: relative !important;
+    z-index: 20 !important;
+}
+.qx1-tree-item {
+    position: relative !important;
+    z-index: 30 !important;
+    display: block !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
 }

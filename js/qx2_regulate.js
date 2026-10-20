@@ -1,10 +1,7 @@
 /* ================================================================
-   情绪宝 - qx2 情绪调节（v19）
-   日期：2026-09-29
-   改动：
-   - initMirrorBefore 传 thermometerSide: 'right'
-   - initMirrorAfter 传 thermometerSide: 'left'
-   - 其余同 v18
+   情绪宝 - qx2 情绪调节（v47 终极沉浸版）
+   日期：2026-10-20
+   修复：开篇内嵌无弹窗、伴随式乐器飘字、静默音频报错、超时自动播放音乐
    ================================================================ */
 
    (function () {
@@ -14,12 +11,18 @@
     const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
 
     const MUSIC_LEVELS = [
-        { code: 1,  cn: '壮丽' }, { code: 2,  cn: '激昂' },
-        { code: 3,  cn: '热烈' }, { code: 4,  cn: '欢快' },
-        { code: 5,  cn: '轻快' }, { code: 6,  cn: '明朗' },
-        { code: 7,  cn: '平静' }, { code: 8,  cn: '沉思' },
-        { code: 9,  cn: '忧伤' }, { code: 10, cn: '压抑' },
-        { code: 11, cn: '悲伤' }, { code: 12, cn: '空灵' },
+        { code: 1,  cn: '壮丽', en: 'Grand' },
+        { code: 2,  cn: '激昂', en: 'Intense' },
+        { code: 3,  cn: '热烈', en: 'Passionate' },
+        { code: 4,  cn: '欢快', en: 'Cheerful' },
+        { code: 5,  cn: '轻快', en: 'Lively' },
+        { code: 6,  cn: '明朗', en: 'Bright' },
+        { code: 7,  cn: '平静', en: 'Calm' },
+        { code: 8,  cn: '沉思', en: 'Pensive' },
+        { code: 9,  cn: '忧伤', en: 'Melancholy' },
+        { code: 10, cn: '压抑', en: 'Down' },
+        { code: 11, cn: '悲伤', en: 'Sad' },
+        { code: 12, cn: '空灵', en: 'Ethereal' },
     ];
 
     function getMusicLevelName(code) {
@@ -30,33 +33,26 @@
     }
 
     let state = {
-        step: 1,
-        isGuest: false,
-        inputEmotionCode: 0,
-        outputEmotionCode: 0,
-        feedback: null,
-        playlist: [],
-        currentIndex: 0,
-        audio: null,
-        hrvResult: null,
-        hrvAborted: false,
-        started: false,
-        finished: false,
-        initialized: false,
-        pickedRule: null,
-        hrvSeries: [],
-        hfSeries: [],
-        latestHint: '',
-        latestQuality: 'unknown',
+        step: 1, isGuest: false, inputEmotionCode: 0, outputEmotionCode: 0, feedback: null,
+        playlist: [], currentIndex: 0, audio: null, hrvResult: null, hrvAborted: false,
+        started: false, finished: false, initialized: false, hrvSeries: [], hfSeries: [],
+        latestHint: '', latestQuality: 'unknown', isWorkMode: false, lastSpokenText: '', lastSpokenTime: 0,
     };
 
-    function t(cn, en) {
-        const lang = (window.mQxb && window.mQxb.Language) || 1;
-        return lang === 1 ? cn : en;
-    }
+    function t(cn, en) { const lang = (window.mQxb && window.mQxb.Language) || 1; return lang === 1 ? cn : en; }
     function getUserId() { return window.mQxb && window.mQxb.user_id; }
     function getUserType() { return (window.mQxb && parseInt(window.mQxb.user_id_Type)) || 1; }
-    function getUserName() { return (window.mQxb && window.mQxb.Username) || ''; }
+    function getLang() { return (window.mQxb && window.mQxb.Language) || 1; }
+
+    function getCameraGuideText() {
+        let facing = 'user';
+        if (window.mQxb && window.mQxb.Sensor && window.mQxb.Sensor.hrvCameraFacing) { facing = window.mQxb.Sensor.hrvCameraFacing; }
+        const isFront = (facing === 'user');
+        
+        return getLang() === 1
+            ? `请您闭上眼睛听音乐的同时，把干净手指放在${isFront ? '前' : '后'}摄像头上，这样可以帮助您分析出音乐对您情绪的影响。`
+            : `Please close your eyes and listen to the music. Put a clean finger on the ${isFront ? 'front' : 'back'} camera. This will help us analyze the impact of music on your emotions.`;
+    }
 
     let _toastTimer = null;
     function toast(text, type) {
@@ -92,6 +88,10 @@
         return res.json();
     }
 
+    function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function renderFlowBar() {
         const bar = document.getElementById('qx2_flow_bar');
         if (!bar) return;
@@ -105,45 +105,53 @@
             if (s !== state.step + 1) el.classList.add('disabled');
         });
     }
+    function applyStepLayout() {
+        const container = document.getElementById('qx2_container');
+        if (!container) return;
+        if (state.step === 2) {
+            container.classList.add('step2-mode');
+            if (state.isWorkMode) {
+                container.classList.add('work-mode');
+            } else {
+                container.classList.remove('work-mode');
+            }
+        } else {
+            container.classList.remove('step2-mode');
+            container.classList.remove('work-mode');
+        }
+    }
     function setStep(n) {
         state.step = n;
         renderFlowBar();
         updateAllButtonsState();
+        applyStepLayout();
     }
 
     function updateAllButtonsState() {
         const btnStart = document.getElementById('qx2_btn_start');
-        const btnCollect = document.getElementById('qx2_btn_collect');
         const btnCollection = document.getElementById('qx2_btn_collection');
         const inStep1 = (state.step === 1);
-        const inStep3 = (state.step === 3);
         if (btnStart) btnStart.disabled = !inStep1 || !state.inputEmotionCode;
         if (btnCollection) btnCollection.disabled = !inStep1;
-        if (btnCollect) {
-            const ready = inStep3 && state.outputEmotionCode && state.feedback
-                          && state.playlist.length > 0 && !state.pickedRule;
-            btnCollect.disabled = !ready;
-        }
     }
 
     let mirrorBeforeId = null;
     let mirrorAfterId = null;
     function initMirrorBefore(initialCode) {
         mirrorBeforeId = qxMoodMirror.create('qx2_wheel_before', {
-            mode: '听前情绪',
+            mode: t('听前情绪', 'Before Emotion'),
             initialCode: initialCode || 0,
             doIt: '做',
             thermometerSide: 'right',
             onChange: (code) => {
                 state.inputEmotionCode = (code == null) ? 0 : code;
                 updateAllButtonsState();
-                clearPickedRule();
             }
         });
     }
     function initMirrorAfter() {
         mirrorAfterId = qxMoodMirror.create('qx2_wheel_after', {
-            mode: '听后情绪',
+            mode: t('听后情绪', 'After Emotion'),
             initialCode: 0,
             doIt: '不做',
             thermometerSide: 'left',
@@ -161,12 +169,19 @@
             return { ok: true, rule: rules[0] };
         } catch (e) { return { ok: false, error: 'NETWORK_RULE' }; }
     }
-    async function loadCollectedRules(emotionCode) {
+
+    async function loadWorks() {
         try {
-            const rules = await restGet(`emobao_regulationrule?emotioncode=eq.${emotionCode}&isactive=eq.true&ruletype=eq.user_collected&order=createdat.desc`);
-            return rules || [];
-        } catch (e) { return []; }
+            const works = await restGet(
+                `emo_works?is_published=eq.true&select=workid,title_cn,title_en,composer,cover_url,audio_url,total_duration,era,form,global_valence,global_arousal&order=created_at.asc`
+            );
+            return works || [];
+        } catch (e) {
+            console.warn('[qx2] 加载作品失败', e);
+            return [];
+        }
     }
+
     async function generatePlaylist(rule) {
         if (!rule || !rule.sequence || !Array.isArray(rule.sequence)) return { ok: false, error: 'BROKEN_RULE' };
         const playlist = [];
@@ -206,40 +221,70 @@
     }
 
     function renderTrendMini() {
-        const el = document.getElementById('qx2_trend_mini');
+        let el = document.getElementById('qx2_trend_mini_overlay')
+              || document.querySelector('#qx2_heal_overlay .qx2-trend-mini')
+              || document.getElementById('qx2_trend_mini');
         if (!el) return;
+
         const videoWrap = el.querySelector('.qx2-trend-video-wrap');
         el.innerHTML = '';
         if (videoWrap) el.appendChild(videoWrap);
         const pl = state.playlist;
         if (pl.length === 0) return;
-        const score = document.createElement('span');
-        score.className = 'qx2-trend-score';
-        const cur = Math.min(state.currentIndex + 1, pl.length);
-        score.innerText = `${cur}/${pl.length}`;
-        el.insertBefore(score, videoWrap || null);
-        for (let i = 0; i < pl.length - 1; i++) {
-            if (state.currentIndex < i + 1) break;
-            const a = MUSIC_LEVELS.find(m => m.code === pl[i].musictypecode);
-            const b = MUSIC_LEVELS.find(m => m.code === pl[i + 1].musictypecode);
-            const na = a ? a.code : 7, nb = b ? b.code : 7;
-            const SEG_W = 24, SEG_H = 24, MID_Y = 12, DELTA = 3, PAD_X = 6;
-            let y1, y2, cls;
-            if (nb < na)      { y1 = MID_Y + DELTA; y2 = MID_Y - DELTA; cls = 'qx2-trend-up'; }
-            else if (nb > na) { y1 = MID_Y - DELTA; y2 = MID_Y + DELTA; cls = 'qx2-trend-down'; }
-            else              { y1 = MID_Y;         y2 = MID_Y;         cls = 'qx2-trend-flat'; }
-            const svg = `<svg viewBox="0 0 ${SEG_W} ${SEG_H}" xmlns="http://www.w3.org/2000/svg"><line class="qx2-trend-line ${cls}" x1="${PAD_X}" y1="${y1}" x2="${SEG_W - PAD_X}" y2="${y2}"/></svg>`;
-            el.insertBefore(document.createRange().createContextualFragment(svg), videoWrap || null);
+
+        if (pl.length > 1) {
+            const score = document.createElement('span');
+            score.className = 'qx2-trend-score';
+            const cur = Math.min(state.currentIndex + 1, pl.length);
+            score.innerText = `${cur}/${pl.length}`;
+            el.insertBefore(score, videoWrap || null);
+            
+            for (let i = 0; i < pl.length - 1; i++) {
+                if (state.currentIndex < i + 1) break;
+                const a = MUSIC_LEVELS.find(m => m.code === pl[i].musictypecode);
+                const b = MUSIC_LEVELS.find(m => m.code === pl[i + 1].musictypecode);
+                const na = a ? a.code : 7, nb = b ? b.code : 7;
+                const SEG_W = 24, SEG_H = 24, MID_Y = 12, DELTA = 3, PAD_X = 6;
+                let y1, y2, cls;
+                if (nb < na)      { y1 = MID_Y + DELTA; y2 = MID_Y - DELTA; cls = 'qx2-trend-up'; }
+                else if (nb > na) { y1 = MID_Y - DELTA; y2 = MID_Y + DELTA; cls = 'qx2-trend-down'; }
+                else              { y1 = MID_Y;         y2 = MID_Y;         cls = 'qx2-trend-flat'; }
+                const svg = `<svg viewBox="0 0 ${SEG_W} ${SEG_H}" xmlns="http://www.w3.org/2000/svg"><line class="qx2-trend-line ${cls}" x1="${PAD_X}" y1="${y1}" x2="${SEG_W - PAD_X}" y2="${y2}"/></svg>`;
+                el.insertBefore(document.createRange().createContextualFragment(svg), videoWrap || null);
+            }
         }
     }
 
     function initAudio() {
         if (!state.audio) {
             state.audio = new Audio();
+            state.audio.preload = 'auto';
             state.audio.addEventListener('ended', onTrackEnded);
+            
+            state.audio.addEventListener('stalled', () => {
+                if (state.audio && !state.finished) {
+                    state.audio.load();
+                    state.audio.play().catch(() => {});
+                }
+            });
+
             state.audio.addEventListener('error', (e) => {
-                console.error('音频播放失败', e);
-                toast(t('音频播放失败', 'Audio error'), 'error');
+                if (!state.audio || !state.audio.error) return;
+                
+                const errCode = state.audio.error.code;
+                const curSrc = state.audio.currentSrc;
+                
+                if (curSrc && !state.finished) {
+                    const curTime = state.audio.currentTime;
+                    setTimeout(() => {
+                        state.audio.load();
+                        state.audio.currentTime = curTime;
+                        state.audio.play().catch(() => {});
+                    }, 500);
+                    return;
+                }
+                
+                toast(t('音频连接中断，请点击重新调整', 'Audio disconnected, please restart'), 'error');
             });
         }
     }
@@ -267,6 +312,7 @@
                 }, 30000);
             }
         }).catch(err => {
+            if (err.name === 'AbortError') return;
             console.error('播放失败', err);
             toast(t('播放失败，请检查文件', 'Play failed'), 'error');
         });
@@ -284,6 +330,18 @@
         setStep(3);
         if (mirrorAfterId) qxMoodMirror.setDoIt('qx2_wheel_after', '做');
         if (window.qxHealChart) { try { qxHealChart.finish(); } catch (e) {} }
+        
+        if (_workInfo && _workInfo.timelines) {
+            const outro = _workInfo.timelines.find(x => x.start_time === x.end_time && x.start_time > 0);
+            if (outro && window.qxHelpCard) {
+                const lang = getLang();
+                const text = lang === 2 ? (outro.ai_guide_text_en || outro.ai_guide_text) : outro.ai_guide_text;
+                setTimeout(() => {
+                    qxHelpCard.show({ title: t('聆听回顾', 'Post-Listening Review'), body: text });
+                }, 500);
+            }
+        }
+        
         toast(t('音乐播放完成，请填写听后评价并选择听后情绪', 'Music done.'), 'success');
     }
 
@@ -320,17 +378,9 @@
         const body = document.getElementById('qx2_analysis_body');
         if (!body) return;
         const series = state.hrvSeries;
-        const quality = state.latestQuality;
-
+        
         if (series.length < 2) {
-            let tip = '';
-            if (quality === 'no_press')      tip = t('请把手指放到摄像头上', 'Place finger on camera');
-            else if (quality === 'too_hard') tip = t('手指放松一点，不要压太重', 'Press lighter');
-            else if (quality === 'lost')     tip = t('信号丢失，请保持不动', 'Signal lost');
-            else if (quality === 'weak')     tip = t('手指稳住，保持不动', 'Hold still');
-            else if (quality === 'noisy')    tip = t('信号不稳，请保持不动', 'Signal noisy');
-            else                             tip = t('等待采样…', 'Waiting for samples…');
-            body.innerHTML = `<div class="qx2-analysis-placeholder">${tip}</div>`;
+            body.innerHTML = `<div class="qx2-analysis-placeholder">${t('等待采样…', 'Waiting for samples…')}</div>`;
             return;
         }
         renderAnalysis();
@@ -353,16 +403,12 @@
                     : (series.length >= 2 ? 1 : 0);
 
         if (series.length < 2 || cov < 0.30) {
-            const fbMap = {
-                better: t('更好', 'Better'),
-                same:   t('一样', 'Same'),
-                worse:  t('更差', 'Worse'),
-            };
-            const fb = state.feedback ? fbMap[state.feedback] : t('未填', 'N/A');
-            const covPct = Math.round(cov * 100);
-            html.push(`<div class="qx2-analysis-conclusion">${t('本次 HRV 有效数据不足 30%，仅记录主观评价', 'HRV coverage < 30%, subjective only')}</div>`);
-            html.push(`<div class="qx2-analysis-item"><b>${t('有效数据占比', 'Coverage')}</b><br>${covPct}%</div>`);
-            html.push(`<div class="qx2-analysis-item"><b>${t('主观评价', 'Subjective')}</b><br>${fb}</div>`);
+            html.push(`<div class="qx2-analysis-tip">
+                ${t(
+                    '如果您在听音乐时进行了 HRV 采样（用手机摄像头或心率带），可以分析音乐对您情绪的影响。',
+                    'If you captured HRV while listening (via camera or chest strap), we can analyze the impact of music on your emotions.'
+                )}
+            </div>`);
             body.innerHTML = html.join('');
             return;
         }
@@ -450,58 +496,277 @@
         body.innerHTML = html.join('');
     }
 
-    function paintCameraStatus(rt) {
-        const hintEl = document.getElementById('qx2_camera_hint');
-        if (!hintEl) return;
+    /* ============ 时间轴导赏 & 作品信息卡 ============ */
+    let _timelineCache = {};
+    let _workInfo = {
+        work: null,
+        timelines: [],
+        tags: { instruments: [], styles: [] },
+    };
 
-        const q = rt && rt.quality ? rt.quality : 'unknown';
-        const h = rt && rt.hint ? rt.hint : '';
+    async function renderWorkInfo(work) {
+        const card = document.getElementById('qx2_work_info');
+        if (!card) return;
+        card.style.display = 'block';
+        
+        const lang = getLang();
+        const title = lang === 1 ? (work.title_cn || work.title_en) : (work.title_en || work.title_cn);
+        const composer = work.composer || ''; 
 
-        let text = t('等待采样…', 'Waiting…');
-        let color = '#5A6B87';
+        const dur = work.total_duration ? Math.floor(work.total_duration / 60) + ':' + String(work.total_duration % 60).padStart(2, '0') : '--';
+        card.innerHTML = `
+            <div class="qx2-wi-title">${escapeHtml(title)}</div>
+            <div class="qx2-wi-meta">${escapeHtml(composer)} · ${dur}${work.era ? ' · ' + escapeHtml(work.era) : ''}${work.form ? ' · ' + escapeHtml(work.form) : ''}</div>
+            <div class="qx2-wi-curr-seg" id="qx2_wi_curr_seg" style="display:none;">
+                <div class="qx2-wi-curr-seg-title" id="qx2_wi_curr_title"></div>
+                <div class="qx2-wi-guide" id="qx2_wi_curr_text"></div>
+            </div>
+            <div class="qx2-wi-section" id="qx2_wi_struct_sec" style="display:none;">
+                <div class="qx2-wi-label">${escapeHtml(t('全曲结构', 'Structure'))}</div>
+                <div class="qx2-wi-seg-list" id="qx2_wi_seg_list"></div>
+            </div>
+            <div class="qx2-wi-section" id="qx2_wi_tags_sec" style="display:none;">
+                <div class="qx2-wi-label">${escapeHtml(t('配器与风格', 'Instruments & Style'))}</div>
+                <div class="qx2-wi-tags" id="qx2_wi_tags"></div>
+            </div>
+        `;
 
-        if (q === 'good') {
-            text = t('采集中，很好', 'Capturing, good');
-            color = '#1E8449';
-        } else if (q === 'too_light') {
-            text = t('手指压太轻，请稍微用力', 'Press a bit harder');
-            color = '#B9770E';
-        } else if (q === 'too_hard') {
-            text = t('手指压太重，请放松一点', 'Press lighter');
-            color = '#B9770E';
-        } else if (q === 'weak') {
-            text = t('信号太弱，请稳住手指', 'Hold still');
-            color = '#B9770E';
-        } else if (q === 'noisy') {
-            text = t('信号不太稳定，请保持不动', 'Signal noisy');
-            color = '#B9770E';
-        } else if (q === 'no_press') {
-            text = t('手指离开，请放回', 'Finger removed');
-            color = '#C0392B';
-        } else if (h) {
-            text = h;
-        }
+        _workInfo = { work: work, timelines: [], tags: { instruments: [], styles: [] } };
 
-        hintEl.innerText = text;
-        hintEl.style.color = color;
-    }
-
-    async function enterAdjustStep() {
-        setStep(2);
-
-        if (mirrorBeforeId) {
-            try { qxMoodMirror.setDoIt('qx2_wheel_before', '不做'); } catch (e) {}
+        try {
+            const timelines = await restGet(
+                `emo_work_timelines?workid=eq.${work.workid}&select=start_time,end_time,ai_guide_text,ai_guide_text_en,section_name,emotion_tag,arousal_score,instruments,dynamics,form_section&order=start_time.asc`
+            );
+            _workInfo.timelines = timelines || [];
+            _timelineCache[work.workid] = _workInfo.timelines;
+            const structSec = document.getElementById('qx2_wi_struct_sec');
+            const segList = document.getElementById('qx2_wi_seg_list');
+            if (structSec && segList && _workInfo.timelines.length > 0) {
+                structSec.style.display = 'block';
+                segList.innerHTML = _workInfo.timelines.filter(tl => tl.start_time !== tl.end_time).map((tl, i) => {
+                    const mm = Math.floor(tl.start_time / 60);
+                    const ss = String(tl.start_time % 60).padStart(2, '0');
+                    return `<span class="qx2-wi-seg-item" data-seg="${tl.start_time}">${mm}:${ss} ${escapeHtml(tl.section_name || tl.emotion_tag || '')}</span>`;
+                }).join('');
+            }
+        } catch (e) { 
+            console.warn('[qx2] 拉 timelines 失败', e); 
         }
 
         try {
-            let rule = null;
-            if (state.pickedRule) { rule = state.pickedRule; }
-            else {
-                const ruleRes = await loadSystemRule(state.inputEmotionCode);
-                if (!ruleRes.ok) { toast(errorToToast(ruleRes.error), 'error'); setStep(1); return; }
-                rule = ruleRes.rule;
+            const tags = await restGet(
+                `emo_work_tags?workid=eq.${work.workid}&select=instrument_name,style_tag`
+            );
+            const instruments = new Set();
+            const styles = new Set();
+            (tags || []).forEach(tg => {
+                if (tg.instrument_name) instruments.add(tg.instrument_name);
+                if (tg.style_tag) styles.add(tg.style_tag);
+            });
+            _workInfo.tags = { instruments: [...instruments], styles: [...styles] };
+            const tagsSec = document.getElementById('qx2_wi_tags_sec');
+            const tagsEl = document.getElementById('qx2_wi_tags');
+            if (tagsSec && tagsEl && (instruments.size + styles.size) > 0) {
+                tagsSec.style.display = 'block';
+                const arr = [];
+                [...instruments].forEach(n => arr.push(`<span class="qx2-wi-tag">🎻 ${escapeHtml(n)}</span>`));
+                [...styles].forEach(n => arr.push(`<span class="qx2-wi-tag">🎨 ${escapeHtml(n)}</span>`));
+                tagsEl.innerHTML = arr.join('');
             }
-            const genRes = await generatePlaylist(rule);
+        } catch (e) { console.warn('[qx2] 拉 tags 失败', e); }
+
+        // ================= 特殊处理《春天里》的代序 Q&A 弹窗 =================
+        if (work.title_cn.includes('春天里')) {
+            state.lastSpokenText = '春天里代序'; 
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+            if (window.qxHelpCard && typeof qxHelpCard.show === 'function') {
+                const cardEl = document.getElementById('qx2_work_info');
+                if (cardEl) {
+                    cardEl.style.backgroundImage = 'none';
+                    cardEl.style.backgroundColor = '#f8f9fa';
+                }
+
+                const bodyText = t(
+`《春天里》，那句“如果有一天，我老无所依，请把我留在，在这春天里”总能触动我心底最柔软的地方。
+
+在这个快节奏的时代，我们像陀螺一样旋转，很难静下心来察觉情绪。我们缺少的往往不是道理，而是一个有效、触手可及的工具。
+
+十年的光阴，我把所有的心血都浇筑进了“情绪宝”。只为在这个充满变数的世界里，给大家提供一个能随时安放情绪、拥抱阳光的“春天”。
+
+在情绪宝的创作旅程中，我并不孤单。衷心感谢高天教授对我的多次悉心培训；衷心感谢多位前辈老师的倾囊相授；特别感谢 Ms. Jane Wu 给了巨大的支持；感谢 Mr. Jerry Jarod 在关键问题上提出的宝贵建议。
+
+情绪宝做了一些用心的、有价值的创新工作——比如把人脸情绪识别与情绪的选择、情绪“温度”的视觉化设计；比如引入科学地测量 HRV 数据印证实际的情绪反映，把抽象的自主神经变化成肉眼可见的图形；比如把相关学科专家积累多年的科学的生活事件量表，与移动互联网结合让大家都方便的监督自己的情绪与健康、特别是情绪宝把丰富的古典音乐华彩乐章送到我们身边，针对您不同的情绪状态，与您“情绪同步”，在欣赏音乐的同时自我调整情绪、情绪宝根据您最近遇到的生活事件，把相关的有价值信息送到“知识问答”、情绪宝提供了丰富的趣味测评游戏，在娱乐的同时不断完善“自我认知画像”……
+
+无论你是老朋友还是新朋友，我都诚挚地欢迎你留下宝贵的意见和建议。
+联系方式：
+情绪宝邮箱：13269595986@163.com
+情绪宝微信：13269595986`,
+`In "Spring", the line "If one day I have nothing left, please leave me in this spring" always touches the softest part of my heart.
+
+In this fast-paced era, we spin like tops, finding it hard to calm down and perceive our emotions. What we often lack is not reason, but an effective, accessible tool.
+
+Over ten years, I have poured all my efforts into "EmoBao". Just to provide a "spring" in this ever-changing world where everyone can safely place their emotions and embrace the sunshine.
+
+In the journey of creating EmoBao, I am not alone. I sincerely thank Professor Gao Tian for his careful training; I sincerely thank many senior teachers for their generous guidance; special thanks to Ms. Jane Wu for her tremendous support; and thanks to Mr. Jerry Jarod for his valuable suggestions on key issues.
+
+EmoBao has made some thoughtful and valuable innovations—such as facial emotion recognition and visual design of emotional "temperature"; introducing scientific HRV measurement to visualize abstract autonomic changes; combining scientific life event scales with mobile internet to help you monitor your emotions and health. Most importantly, EmoBao brings rich classical music masterpieces to you, syncing with your emotional state, allowing you to adjust emotions while appreciating music. EmoBao also delivers valuable knowledge through Q&A based on your recent life events, and offers a variety of fun assessment games to continuously refine your "self-cognitive profile" while entertaining you...
+
+No matter if you are an old or new friend, I sincerely welcome your valuable opinions and suggestions.
+Contact:
+EmoBao Email: 13269595986@163.com
+EmoBao WeChat: 13269595986`);
+
+                qxHelpCard.show({
+                    title: t('情绪宝 · 代序', 'EmoBao · Prologue'),
+                    body: bodyText
+                });
+            }
+        }
+        // =====================================================================
+    }
+
+    function showFloatingTag(text) {
+        if (!text) return;
+        const container = document.getElementById('qx2_container');
+        if (!container) return;
+
+        const tag = document.createElement('div');
+        tag.className = 'qx2-floating-tag';
+        tag.innerText = text;
+
+        tag.style.position = 'absolute';
+        tag.style.bottom = '20%';
+        tag.style.left = '50%';
+        tag.style.transform = 'translateX(-50%) translateY(0)';
+        tag.style.background = 'rgba(0, 0, 0, 0.6)';
+        tag.style.color = '#1DB954';
+        tag.style.padding = '8px 16px';
+        tag.style.borderRadius = '20px';
+        tag.style.fontSize = '14px';
+        tag.style.border = '1px solid rgba(29, 185, 84, 0.4)';
+        tag.style.backdropFilter = 'blur(4px)';
+        tag.style.pointerEvents = 'none';
+        tag.style.opacity = '0';
+        tag.style.transition = 'opacity 1s ease, transform 3s ease';
+        tag.style.zIndex = '9999';
+
+        container.appendChild(tag);
+
+        requestAnimationFrame(() => {
+            tag.style.opacity = '1';
+            tag.style.transform = 'translateX(-50%) translateY(-50px)';
+        });
+
+        setTimeout(() => {
+            tag.style.opacity = '0';
+            setTimeout(() => tag.remove(), 1000);
+        }, 3500);
+    }
+
+    function updateWorkInfoProgress(currentSec) {
+        if (!_workInfo.work) return;
+        if (_workInfo.work.title_cn.includes('春天里')) return;
+
+        const seg = _workInfo.timelines.find(x => currentSec >= x.start_time && currentSec < x.end_time && x.start_time !== x.end_time);
+        const segBox = document.getElementById('qx2_wi_curr_seg');
+        const titleEl = document.getElementById('qx2_wi_curr_title');
+        const textEl = document.getElementById('qx2_wi_curr_text');
+        
+        if (segBox && titleEl && textEl) {
+            if (seg) {
+                segBox.style.display = 'block';
+                
+                const lang = getLang();
+                const guideText = lang === 2 
+                    ? (seg.ai_guide_text_en || seg.ai_guide_text || '') 
+                    : (seg.ai_guide_text || '');
+
+                if (state.lastSpokenText !== guideText && seg.instruments) {
+                    let tagText = '';
+                    if (seg.instruments) tagText += `🎻 ${seg.instruments}`;
+                    if (seg.dynamics) tagText += ` · ${seg.dynamics}`;
+                    showFloatingTag(tagText);
+                }
+
+                const titleStr = `${seg.section_name || ''} ${seg.form_section ? '· ' + seg.form_section : ''}`;
+                titleEl.innerText = titleStr.trim();
+                textEl.innerText = guideText;
+                
+                if (guideText && guideText !== state.lastSpokenText) {
+                    const now = Date.now();
+                    if (now - state.lastSpokenTime > 10000) {
+                        state.lastSpokenText = guideText;
+                        state.lastSpokenTime = now;
+                        if (window.qxSpeak) {
+                            window.qxSpeak(state.lastSpokenText, () => {
+                                if (state.audio && state.audio.paused && !state.finished) {
+                                    state.audio.play().catch(e => console.log('恢复播放失败:', e));
+                                }
+                            });
+                        }
+                    }
+                }
+            } else {
+                segBox.style.display = 'none';
+            }
+        }
+        
+        const list = document.getElementById('qx2_wi_seg_list');
+        if (list) {
+            list.querySelectorAll('.qx2-wi-seg-item').forEach((el) => {
+                const segStartTime = parseFloat(el.dataset.seg);
+                if (seg && seg.start_time === segStartTime) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+        }
+    }
+
+    function hideWorkInfo() {
+        const card = document.getElementById('qx2_work_info');
+        if (card) card.style.display = 'none';
+        _workInfo = { work: null, timelines: [], tags: { instruments: [], styles: [] } };
+        state.lastSpokenText = '';
+    }
+
+    async function showTimelineGuide(workid, currentSec) {
+        if (!workid) return;
+        updateWorkInfoProgress(currentSec);
+        if (!_timelineCache[workid]) {
+            try {
+                _timelineCache[workid] = await restGet(
+                    `emo_work_timelines?workid=eq.${workid}&select=start_time,end_time,ai_guide_text,ai_guide_text_en,section_name,emotion_tag,arousal_score,instruments,dynamics,form_section&order=start_time.asc`
+                );
+            } catch (e) { return; }
+        }
+    }
+
+    function transferVideoStream() {
+        const srcVideo = document.getElementById('qx2_trend_video');
+        const destVideo = document.getElementById('qx2_trend_video_overlay');
+        if (srcVideo && destVideo && srcVideo.srcObject) {
+            destVideo.srcObject = srcVideo.srcObject;
+            destVideo.play().catch(e => console.warn('视频接力播放失败', e));
+        }
+    }
+
+    async function enterAdjustStep() {
+        state.isWorkMode = false;
+        state.lastSpokenText = '';
+        state.lastSpokenTime = 0;
+        hideWorkInfo();
+        setStep(2);
+        
+        if (mirrorBeforeId) {
+            try { qxMoodMirror.setDoIt('qx2_wheel_before', '不做'); } catch (e) {}
+        }
+        try {
+            const ruleRes = await loadSystemRule(state.inputEmotionCode);
+            if (!ruleRes.ok) { toast(errorToToast(ruleRes.error), 'error'); setStep(1); return; }
+            const genRes = await generatePlaylist(ruleRes.rule);
             if (!genRes.ok) { toast(errorToToast(genRes.error), 'error'); setStep(1); return; }
             state.playlist = genRes.playlist;
             state.currentIndex = 0;
@@ -515,9 +780,8 @@
             state.latestQuality = 'unknown';
             renderTrendMini();
             renderAnalysisLive();
-
             if (window.qxHealChart) { try { qxHealChart.start('qx2_heal_canvas'); } catch (e) {} }
-
+            
             const hidId = 'qx2_hrv_wave_hidden';
             if (!document.getElementById(hidId)) {
                 const hid = document.createElement('div');
@@ -533,64 +797,170 @@
             const ok = await qxHrvCapture.start(hidId, {
                 duration: 9999,
                 abortOnNoFinger: false,
-                onWarmupTick: (info) => {
-                    const hintEl = document.getElementById('qx2_camera_hint');
-                    if (hintEl) {
-                        const remain = info && info.remain != null ? info.remain : '?';
-                        const h = info && info.hint ? info.hint : '';
-                        hintEl.innerText = `${t('预备中…', 'Warming up…')} ${remain}s · ${h}`;
-                        hintEl.style.color = '#B9770E';
-                    }
-                    const qx2Wrap = document.querySelector('.qx2-trend-video-wrap');
-                    if (qx2Wrap) {
-                        let c = '#B9770E';
-                        const f = info && info.flag;
-                        if (f === 'good') c = '#2ECC71';
-                        else if (f === 'no_press') c = '#C0392B';
-                        qx2Wrap.style.borderColor = c;
-                    }
-                },
-                onWarmupEnd: () => {
-                    playCurrentTrack();
-                },
                 onProgress: (rt) => {
                     if (!rt) return;
                     if (rt.hint !== undefined) state.latestHint = rt.hint;
                     if (rt.quality) state.latestQuality = rt.quality;
-
-                    paintCameraStatus(rt);
-
                     if (rt.quality === 'good' && rt.bpm > 0) {
                         state.hrvSeries.push({ t: rt.elapsed, bpm: rt.bpm, rmssd: rt.rmssd });
-                        if (rt.hf > 0) {
-                            state.hfSeries.push({ t: rt.elapsed, hf: rt.hf });
-                        }
+                        if (rt.hf > 0) state.hfSeries.push({ t: rt.elapsed, hf: rt.hf });
                     }
                     if (window.qxHealChart) { try { qxHealChart.push(rt); } catch (e) {} }
                     if (state.step === 2) renderAnalysisLive();
                 },
-                onComplete: (result) => {
-                    state.hrvResult = result;
-                    console.log('[qx2] HRV onComplete, coverage =', result && result.coverage);
-                },
-                onAbort: (info) => {
-                    state.hrvAborted = true;
-                    console.log('[qx2] HRV aborted:', info && info.reason);
-                }
+                onComplete: (result) => { state.hrvResult = result; },
+                onAbort: (info) => { state.hrvAborted = true; }
             });
-
             if (!ok) {
                 toast(t('摄像头不可用，请检查权限', 'Camera unavailable'), 'error');
                 setStep(1);
                 return;
             }
-
             const s = document.querySelector('#' + hidId + ' .qx-hrv-btn-start');
             if (s && !s.disabled) s.click();
+
+            const guideText = getCameraGuideText();
+            if (window.qxSpeak) {
+                window.qxSpeak(guideText, () => {
+                    playCurrentTrack();
+                });
+            } else {
+                playCurrentTrack();
+            }
+
+            setTimeout(() => {
+                if (!state.audio || state.audio.paused) {
+                    playCurrentTrack();
+                }
+            }, 6000);
 
             updateAllButtonsState();
         } catch (e) {
             console.error('[qx2] enterAdjustStep 异常', e);
+            toast(t('进入调整失败：', 'Enter adjust failed: ') + e.message, 'error');
+            setStep(1);
+        }
+    }
+
+    async function enterAdjustStepForWork(work) {
+        state.isWorkMode = true;
+        state.lastSpokenText = '';
+        state.lastSpokenTime = 0;
+        setStep(2);
+        transferVideoStream();
+
+        if (mirrorBeforeId) {
+            try { qxMoodMirror.setDoIt('qx2_wheel_before', '不做'); } catch (e) {}
+        }
+        try {
+            state.playlist = [{
+                trackid: work.workid,
+                title_cn: work.title_cn,
+                title_en: work.title_en,
+                fileurl: work.audio_url,
+                musictypecode: 0,
+                isWork: true,
+                workInfo: work,
+            }];
+            state.currentIndex = 0;
+            state.started = true;
+            state.finished = false;
+            state.hrvResult = null;
+            state.hrvAborted = false;
+            state.hrvSeries = [];
+            state.hfSeries = [];
+            state.latestHint = '';
+            state.latestQuality = 'unknown';
+            
+            await renderWorkInfo(work);
+            
+            renderTrendMini();
+            renderAnalysisLive();
+            if (window.qxHealChart) { try { qxHealChart.start('qx2_heal_canvas'); } catch (e) {} }
+            
+            const hidId = 'qx2_hrv_wave_hidden';
+            if (!document.getElementById(hidId)) {
+                const hid = document.createElement('div');
+                hid.id = hidId;
+                hid.style.position = 'absolute';
+                hid.style.width = '1px';
+                hid.style.height = '1px';
+                hid.style.overflow = 'hidden';
+                hid.style.opacity = '0';
+                document.body.appendChild(hid);
+            }
+
+            const ok = await qxHrvCapture.start(hidId, {
+                duration: 9999,
+                abortOnNoFinger: false,
+                onProgress: (rt) => {
+                    if (!rt) return;
+                    if (rt.quality) state.latestQuality = rt.quality;
+                    if (rt.quality === 'good' && rt.bpm > 0) {
+                        state.hrvSeries.push({ t: rt.elapsed, bpm: rt.bpm, rmssd: rt.rmssd });
+                        if (rt.hf > 0) state.hfSeries.push({ t: rt.elapsed, hf: rt.hf });
+                    }
+                    if (window.qxHealChart) { try { qxHealChart.push(rt); } catch (e) {} }
+                    if (state.audio && work.workid) {
+                        showTimelineGuide(work.workid, state.audio.currentTime);
+                    }
+                    if (state.step === 2) renderAnalysisLive();
+                },
+                onComplete: (result) => { state.hrvResult = result; },
+                onAbort: (info) => { state.hrvAborted = true; }
+            });
+            if (!ok) {
+                toast(t('摄像头不可用，请检查权限', 'Camera unavailable'), 'error');
+                setStep(1);
+                return;
+            }
+            const s = document.querySelector('#' + hidId + ' .qx-hrv-btn-start');
+            if (s && !s.disabled) s.click();
+
+            let introText = null;
+            if (_workInfo && _workInfo.timelines) {
+                const intro = _workInfo.timelines.find(x => x.start_time === 0 && x.end_time === 0);
+                if (intro) {
+                    introText = getLang() === 2 ? (intro.ai_guide_text_en || intro.ai_guide_text) : intro.ai_guide_text;
+                }
+            }
+
+            const startAudio = () => {
+                playCurrentTrack();
+                transferVideoStream();
+            };
+
+            if (introText) {
+                const currSegBox = document.getElementById('qx2_wi_curr_seg');
+                const currText = document.getElementById('qx2_wi_curr_text');
+                const currTitle = document.getElementById('qx2_wi_curr_title');
+                if (currSegBox && currText && currTitle) {
+                    currSegBox.style.display = 'block';
+                    currTitle.innerText = t('听前准备', 'Preparation');
+                    currText.innerText = introText;
+                }
+                
+                if (window.qxSpeak) {
+                    const forcePlayTimer = setTimeout(startAudio, 60000);
+                    window.qxSpeak(introText, () => {
+                        clearTimeout(forcePlayTimer);
+                        startAudio();
+                    });
+                } else {
+                    setTimeout(startAudio, 3000);
+                }
+            } else {
+                const guideText = getCameraGuideText();
+                if (window.qxSpeak && !work.title_cn.includes('春天里')) {
+                    window.qxSpeak(guideText, startAudio);
+                } else {
+                    startAudio();
+                }
+            }
+
+            updateAllButtonsState();
+        } catch (e) {
+            console.error('[qx2] enterAdjustStepForWork 异常', e);
             toast(t('进入调整失败：', 'Enter adjust failed: ') + e.message, 'error');
             setStep(1);
         }
@@ -605,19 +975,11 @@
         });
     }
 
-    function clearPickedRule() {
-        state.pickedRule = null;
-        const btn = document.getElementById('qx2_btn_collection');
-        if (btn) btn.innerText = t('选组曲', 'Pick');
+    function closeCollectModal() {
+        const modal = document.getElementById('qx2_collect_modal');
+        if (modal) modal.classList.remove('show');
     }
-    function setPickedRule(rule) {
-        state.pickedRule = rule || null;
-        const btn = document.getElementById('qx2_btn_collection');
-        if (btn) {
-            if (rule) btn.innerText = t(`已选：${rule.rulename}`, `Picked: ${rule.rulename}`);
-            else      btn.innerText = t('选组曲', 'Pick');
-        }
-    }
+
     async function onPickCollection() {
         if (state.step !== 1) return;
         if (!state.inputEmotionCode || state.inputEmotionCode === 0) {
@@ -629,88 +991,49 @@
         if (!modal || !list) return;
         list.innerHTML = '<div class="qx2-collect-empty">' + t('加载中…', 'Loading…') + '</div>';
         modal.classList.add('show');
-        const rules = await loadCollectedRules(state.inputEmotionCode);
-        let html = '';
-        const isAuto = !state.pickedRule;
-        html += `<div class="qx2-collect-item qx2-collect-item-auto ${isAuto ? 'active' : ''}" data-rule="__auto__">
-            <div class="qx2-collect-item-name">${t('使用自动组曲', 'Use Auto Playlist')}</div>
-            <div class="qx2-collect-item-meta">${t('由系统自动随机生成', 'Auto generated')}</div>
-        </div>`;
-        if (!rules || rules.length === 0) {
-            html += `<div class="qx2-collect-empty">${t('当前情绪暂无收藏组曲', 'No collected playlist yet')}</div>`;
-        } else {
-            rules.forEach(r => {
-                const active = state.pickedRule && state.pickedRule.ruleid === r.ruleid;
-                html += `<div class="qx2-collect-item ${active ? 'active' : ''}" data-rule="${r.ruleid}">
-                    <div class="qx2-collect-item-name">${escapeHtml(r.rulename || '(未命名)')}</div>
-                    <div class="qx2-collect-item-meta">${t('收藏人', 'by')}：${escapeHtml(r.createdbyname || '—')}</div>
-                </div>`;
-            });
+        const works = await loadWorks();
+        if (!works || works.length === 0) {
+            list.innerHTML = `<div class="qx2-collect-empty">${t('暂无经典作品', 'No classic works yet')}</div>`;
+            return;
         }
-        list.innerHTML = html;
-        list.querySelectorAll('.qx2-collect-item').forEach(el => {
+        const lang = getLang();
+        list.innerHTML = works.map(w => {
+            const dur = w.total_duration ? Math.floor(w.total_duration / 60) + ':' + String(w.total_duration % 60).padStart(2, '0') : '--';
+            const cover = w.cover_url ? `style="background-image:url('${escapeHtml(w.cover_url)}')"` : '';
+            const title = lang === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
+            
+            return `<div class="qx2-work-item" data-workid="${escapeHtml(w.workid)}">
+                <div class="qx2-work-cover" ${cover}></div>
+                <div class="qx2-work-info">
+                    <div class="qx2-work-title">${escapeHtml(title)}</div>
+                    <div class="qx2-work-meta">${escapeHtml(w.composer || '')} · ${dur}${w.era ? ' · ' + escapeHtml(w.era) : ''}</div>
+                </div>
+            </div>`;
+        }).join('');
+        list.querySelectorAll('.qx2-work-item').forEach(el => {
             el.onclick = () => {
-                const rid = el.dataset.rule;
-                if (rid === '__auto__') clearPickedRule();
-                else {
-                    const r = rules.find(x => String(x.ruleid) === String(rid));
-                    if (r) setPickedRule(r);
-                }
+                const wid = el.dataset.workid;
+                const work = works.find(w => w.workid === wid);
+                if (!work) return;
                 modal.classList.remove('show');
+                enterAdjustStepForWork(work);
             };
         });
     }
-    function escapeHtml(s) {
-        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-    function closeCollectModal() {
-        const modal = document.getElementById('qx2_collect_modal');
-        if (modal) modal.classList.remove('show');
-    }
-
-    async function onCollect() {
-        if (state.isGuest) { toast(t('访客不能收藏', 'Guest cannot collect'), 'warning'); return; }
-        if (state.pickedRule) { toast(t('这条已是收藏组曲', 'Already collected'), 'warning'); return; }
-        if (!state.playlist.length) { toast(t('没有可收藏的组曲', 'No playlist'), 'warning'); return; }
-        const defaultName = `${getUserName()}${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${Date.now().toString().slice(-4)}`;
-        const name = prompt(t('请为这个组曲命名：', 'Name this playlist:'), defaultName);
-        if (!name) return;
-        try {
-            const sequence = state.playlist.map(tr => ({ musictypecode: tr.musictypecode, mode: 'fixed', trackid: tr.trackid }));
-            const seqStr = JSON.stringify(sequence);
-            const existing = await restGet(`emobao_regulationrule?emotioncode=eq.${state.inputEmotionCode}&ruletype=eq.user_collected&isactive=eq.true`);
-            if (existing && existing.length) {
-                for (const r of existing) {
-                    if (JSON.stringify(r.sequence) === seqStr) {
-                        toast(t(`这套组曲已被“${r.createdbyname || 'someone'}”收藏`, `Already collected`), 'warning');
-                        return;
-                    }
-                }
-            }
-            const resp = await fetch(`${SUPABASE_URL}/rest/v1/emobao_regulationrule`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-                body: JSON.stringify({
-                    emotioncode: state.inputEmotionCode,
-                    rulename: name,
-                    ruletype: 'user_collected',
-                    sequence: sequence,
-                    createdby: getUserId(),
-                    createdbyname: getUserName(),
-                    isactive: true,
-                }),
-            });
-            if (!resp.ok) throw new Error(await resp.text());
-            toast(t('已收藏', 'Collected'), 'success');
-        } catch (e) {
-            console.error(e);
-            toast(t('收藏失败：', 'Collect failed: ') + e.message, 'error');
-        }
-    }
 
     function onRestart() {
+        state.isWorkMode = false;
+        state.lastSpokenText = '';
+        state.lastSpokenTime = 0;
+        hideWorkInfo();
         if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
-        if (state.audio) { try { state.audio.pause(); } catch (e) {} state.audio.src = ''; }
+        if (state.audio) {
+            try {
+                state.audio.pause();
+                state.audio.src = '';
+                state.audio.load();
+            } catch (e) {}
+        }
         try { qxHrvCapture.stop(); } catch (e) {}
         try { qxHrvCapture.release(); } catch (e) {}
         state.outputEmotionCode = 0;
@@ -725,7 +1048,9 @@
         state.hfSeries = [];
         state.latestHint = '';
         state.latestQuality = 'unknown';
-        clearPickedRule();
+        _timelineCache = {};
+        
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
 
         if (mirrorBeforeId) {
             try { qxMoodMirror.setDoIt('qx2_wheel_before', '做'); } catch (e) {}
@@ -736,11 +1061,6 @@
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
         const body = document.getElementById('qx2_analysis_body');
         if (body) body.innerHTML = '<div class="qx2-analysis-placeholder">' + t('进第 4 步，自动给出分析', 'Analysis at step 4') + '</div>';
-        const hintEl = document.getElementById('qx2_camera_hint');
-        if (hintEl) {
-            hintEl.innerText = t('请把干净的手指放在摄像头上', 'Put your finger on the camera');
-            hintEl.style.color = '#5A6B87';
-        }
         setStep(1);
         document.querySelectorAll('input[name="qx2_feedback"]').forEach(r => r.checked = false);
         renderTrendMini();
@@ -749,6 +1069,8 @@
 
     function onExit() {
         if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        
         if (state.started && !state.finished) {
             if (!confirm(t('正在调整中，确定退出吗？', 'Regulating. Exit?'))) return;
         }
@@ -773,11 +1095,14 @@
         state.finished = false;
         state.hrvResult = null;
         state.hrvAborted = false;
-        state.pickedRule = null;
         state.hrvSeries = [];
         state.hfSeries = [];
         state.latestHint = '';
         state.latestQuality = 'unknown';
+        state.isWorkMode = false;
+        state.lastSpokenText = '';
+        state.lastSpokenTime = 0;
+        _timelineCache = {};
 
         if (!document.getElementById('qx2_hrv_wave_hidden')) {
             const hid = document.createElement('div');
@@ -788,6 +1113,10 @@
             hid.style.overflow = 'hidden';
             hid.style.opacity = '0';
             document.body.appendChild(hid);
+        }
+
+        if (window.qx0ApplyDataI18n) {
+            window.qx0ApplyDataI18n();
         }
 
         let inputCode = 0;
@@ -805,7 +1134,6 @@
         bindFeedbackRadios();
 
         document.getElementById('qx2_btn_restart').onclick = onRestart;
-        document.getElementById('qx2_btn_collect').onclick = onCollect;
         document.getElementById('qx2_btn_exit').onclick = onExit;
         document.getElementById('qx2_btn_collection').onclick = onPickCollection;
         const btnStart = document.getElementById('qx2_btn_start');
@@ -824,7 +1152,6 @@
             });
         });
 
-        clearPickedRule();
         setStep(1);
         renderTrendMini();
         updateAllButtonsState();
@@ -836,6 +1163,8 @@
     function qx2_destroy() {
         console.log('qx2_destroy');
         state.initialized = false;
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        
         if (state.audio) { try { state.audio.pause(); } catch (e) {} state.audio.src = ''; state.audio = null; }
         try { qxHrvCapture.stop(); } catch (e) {}
         try { qxHrvCapture.release(); } catch (e) {}
@@ -843,6 +1172,11 @@
         if (mirrorAfterId) { qxMoodMirror.destroy('qx2_wheel_after'); mirrorAfterId = null; }
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
         closeCollectModal();
+        hideWorkInfo();
+        const mid = document.querySelector('.qx2-mid-row');
+        if (mid) mid.classList.remove('step2-mode');
+        const container = document.getElementById('qx2_container');
+        if (container) container.classList.remove('work-mode');
         const hid = document.getElementById('qx2_hrv_wave_hidden');
         if (hid) hid.remove();
         state.playlist = [];
@@ -851,9 +1185,11 @@
         state.finished = false;
         state.hrvResult = null;
         state.hrvAborted = false;
-        state.pickedRule = null;
         state.hrvSeries = [];
         state.hfSeries = [];
+        state.lastSpokenText = '';
+        state.lastSpokenTime = 0;
+        _timelineCache = {};
     }
 
     window.qx2_init = qx2_init;

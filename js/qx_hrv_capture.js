@@ -1,20 +1,15 @@
 /* ================================================================
-   js/qx_hrv_capture.js   v60-slim（完整版）
-   日期：2026-10-13
-   结构：
-     DEFAULTS  参数
-     t/median/getById  小工具
-     Cam       摄像头申请/就绪/释放
-     PPG       帧 → mean/variance/redness
-     DSP       滤波/峰值/RR/SDNN/RMSSD/BPM/LFHF
-     Session   状态机 + UI + RAF + 数据出口（唯一持有 state）
-     quickTest 独立快速评测
-     Draw      4 个绘图函数
-   导出：start / stop / release / quickTest / getResult / 4 个 draw
+   js/qx_hrv_capture.js   v63
+   日期：2026-10-14
+   改动（v62 → v63）：
+   - loop()：valid 帧即 push 到 samples（原为仅 good 帧），修复波形不显示
+     · _realtime() 和 _computeResult() 的 good 过滤保持原样
+   - _dotColor()：too_light / weak / too_hard 由 #F39C12 改为 #FFC107（更亮）
+   - 其余（英文化、采集逻辑、DSP、绘图）同 v62
    ================================================================ */
    (function () {
     'use strict';
-    
+
     /* ========== 1. 默认参数 ========== */
     const DEFAULTS = {
       duration: 120, warmupSec: 10, warmupSampleSec: 3, roiRatio: 0.30,
@@ -28,13 +23,14 @@
       lfBand: [0.04, 0.15], hfBand: [0.15, 0.40],
       minRRForHF: 30, minRRForLiveHF: 20,
       redMidUpdateSec: 5, redMidWindowSec: 5,
+      dotFlashIntervalSec: 0.3,
     };
-    
+
     /* ========== 2. 小工具 ========== */
     const t = (cn, en) => ((window.mQxb && window.mQxb.Language) || 1) === 1 ? cn : en;
     const median = (a) => { if (!a || !a.length) return 0; const s = a.slice().sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
     const getById = (id) => document.getElementById(id);
-    
+
     /* ========== 3. Cam：摄像头生命周期 ========== */
     const Cam = {
       getDeviceId() {
@@ -47,10 +43,10 @@
         return 'environment';
       },
       async open(video) {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('浏览器不支持摄像头');
-        if (!video) throw new Error('视频元素未初始化');
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error(t('浏览器不支持摄像头', 'Browser does not support camera'));
+        if (!video) throw new Error(t('视频元素未初始化', 'Video element not initialized'));
         this.release(video);
-    
+
         const wantId = this.getDeviceId();
         const facing = this.getFacing();
         const list = wantId
@@ -61,17 +57,17 @@
               { video: { width: { ideal: 320 }, height: { ideal: 240 } }, audio: false },
               { video: true, audio: false },
             ];
-    
+
         let stream = null, lastErr = null;
         for (const c of list) {
           try { stream = await navigator.mediaDevices.getUserMedia(c); break; } catch (e) { lastErr = e; }
         }
-        if (!stream) throw new Error((wantId ? '指定摄像头不可用：' : '无法打开摄像头：') + (lastErr && lastErr.message));
-    
+        if (!stream) throw new Error((wantId ? t('指定摄像头不可用：', 'Selected camera unavailable: ') : t('无法打开摄像头：', 'Cannot open camera: ')) + (lastErr && lastErr.message));
+
         video.srcObject = stream;
         await this.waitReady(video);
         try { await video.play(); } catch (e) {}
-        if (!(await this.waitFrame(video))) { this.release(video); throw new Error('摄像头已打开但没有画面'); }
+        if (!(await this.waitFrame(video))) { this.release(video); throw new Error(t('摄像头已打开但没有画面', 'Camera opened but no frames')); }
         return stream;
       },
       waitReady(video) {
@@ -82,7 +78,7 @@
           video.addEventListener('loadedmetadata', check, { once: true });
           video.addEventListener('canplay', check, { once: true });
           check();
-          setTimeout(() => { if (!done) { done = true; reject(new Error('摄像头就绪超时')); } }, 2000);
+          setTimeout(() => { if (!done) { done = true; reject(new Error(t('摄像头就绪超时', 'Camera ready timeout'))); } }, 2000);
         });
       },
       waitFrame(video) {
@@ -113,7 +109,7 @@
         });
       },
     };
-    
+
     /* ========== 4. PPG：帧 → 指标 ========== */
     const PPG = {
       read(video, canvas, ctx, roiRatio) {
@@ -144,11 +140,16 @@
         return 'good';
       },
       hint(flag) {
-        return { no_press: '手指离开了，请放回摄像头', too_light: '手指压太轻，请稍微用力',
-                 too_hard: '手指压太重，请放松一点', weak: '信号太弱，请稳住手指', good: '采集中，很好' }[flag] || '采集中…';
+        return {
+          no_press:  t('手指离开了，请放回摄像头', 'Finger removed, please put it back'),
+          too_light: t('手指压太轻，请稍微用力', 'Too light, press a bit harder'),
+          too_hard:  t('手指压太重，请放松一点', 'Too hard, relax a little'),
+          weak:      t('信号太弱，请稳住手指', 'Weak signal, hold your finger steady'),
+          good:      t('采集中，很好', 'Capturing, good'),
+        }[flag] || t('采集中…', 'Capturing…');
       },
     };
-    
+
     /* ========== 5. DSP：纯数组 → 数值 ========== */
     const DSP = {
       movingAverage(sig, w) {
@@ -235,7 +236,7 @@
         return { lf: Math.round(lf * freqRes * 100) / 100, hf: Math.round(hf * freqRes * 100) / 100 };
       },
     };
-    
+
     /* ========== 6. Session：状态机 + UI + RAF + 数据出口 ========== */
     const Session = {
       state: null,
@@ -252,6 +253,8 @@
           result: null, container: null,
           statusText: null, idleHintEl: null, btnStart: null, btnStop: null,
           videoWrap: null, dotA: null, dotB: null,
+          qx2DotA: null, qx2DotB: null,
+          dotToggle: 0, lastDotAt: 0,
           onComplete: null, onProgress: null, onState: null, onAbort: null,
           onWarmupTick: null, onWarmupEnd: null,
         };
@@ -267,8 +270,36 @@
         try { s.onState({ capturing: s.capturing, phase: s.phase, elapsed: Math.min(Math.floor(s.elapsed), s.durationSec),
           total: s.durationSec, sampleCount: s.samples.length, quality: quality || 'unknown', hint: hint || '', source: s.source }); } catch (e) {}
       },
-    
-      /* ▶ 按钮就在这里生成，只要 render 被调用就必然出现 */
+
+      /* 小绿灯颜色映射：good 绿、轻/弱/重 黄、离开/丢失 红、其它 灰 */
+      _dotColor(flag) {
+        if (flag === 'good') return '#2ECC71';
+        if (flag === 'too_light' || flag === 'weak' || flag === 'too_hard') return '#FFC107';
+        if (flag === 'no_press' || flag === 'lost' || flag === 'noisy') return '#E74C3C';
+        return '#96A3B8';
+      },
+
+      _flashDots(flag) {
+        const s = this.state;
+        s.dotToggle = 1 - s.dotToggle;
+        const on = this._dotColor(flag);
+        const off = '#E1E8F0';
+        if (s.dotA && s.dotB) {
+          s.dotA.style.background = s.dotToggle === 0 ? on : off;
+          s.dotB.style.background = s.dotToggle === 0 ? off : on;
+        }
+        if (s.qx2DotA && s.qx2DotB) {
+          s.qx2DotA.style.background = s.dotToggle === 0 ? on : off;
+          s.qx2DotB.style.background = s.dotToggle === 0 ? off : on;
+        }
+      },
+
+      _resetDots() {
+        const s = this.state;
+        if (s.dotA && s.dotB) { s.dotA.style.background = '#E1E8F0'; s.dotB.style.background = '#E1E8F0'; }
+        if (s.qx2DotA && s.qx2DotB) { s.qx2DotA.style.background = '#E1E8F0'; s.qx2DotB.style.background = '#E1E8F0'; }
+      },
+
       render(container) {
         container.innerHTML = '';
         const wrap = document.createElement('div'); wrap.className = 'qx-hrv-wrap';
@@ -277,28 +308,31 @@
         video.setAttribute('autoplay', ''); video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
         vWrap.appendChild(video);
         const sWrap = document.createElement('div'); sWrap.className = 'qx-hrv-status-wrap';
-        const sText = document.createElement('div'); sText.className = 'qx-hrv-status-text'; sText.innerText = '未开始';
+        const sText = document.createElement('div'); sText.className = 'qx-hrv-status-text';
+        sText.innerText = t('未开始', 'Not started');
         sWrap.appendChild(sText);
         const hWrap = document.createElement('div'); hWrap.className = 'qx-hrv-hint-wrap';
         const idle = document.createElement('div'); idle.className = 'qx-hrv-idle-hint';
         idle.innerText = t('完善情绪记录需要测量 HRV，请将干净手指轻按在摄像头上…', 'Please put a clean finger on the camera to capture HRV…');
         hWrap.appendChild(idle);
         const bWrap = document.createElement('div'); bWrap.className = 'qx-hrv-btns qx-hrv-btns-compact';
-        const bStart = document.createElement('button'); bStart.className = 'qx-hrv-btn qx-hrv-btn-start'; bStart.innerText = '▶'; bStart.title = '开始采集';
-        const bStop = document.createElement('button'); bStop.className = 'qx-hrv-btn qx-hrv-btn-stop'; bStop.innerText = '■'; bStop.title = '停止采集'; bStop.disabled = true;
+        const bStart = document.createElement('button'); bStart.className = 'qx-hrv-btn qx-hrv-btn-start'; bStart.innerText = '▶';
+        bStart.title = t('开始采集', 'Start capture');
+        const bStop = document.createElement('button'); bStop.className = 'qx-hrv-btn qx-hrv-btn-stop'; bStop.innerText = '■';
+        bStop.title = t('停止采集', 'Stop capture'); bStop.disabled = true;
         bWrap.appendChild(bStart); bWrap.appendChild(bStop);
         wrap.appendChild(vWrap); wrap.appendChild(sWrap); wrap.appendChild(hWrap); wrap.appendChild(bWrap);
         container.appendChild(wrap);
-    
+
         const s = this.state;
         s.video = video; s.videoWrap = vWrap; s.statusText = sText; s.idleHintEl = idle;
         s.btnStart = bStart; s.btnStop = bStop;
         s.canvas = document.createElement('canvas');
         s.ctx = s.canvas.getContext('2d', { willReadFrequently: true });
         s.dotA = getById('qx1_dot_a'); s.dotB = getById('qx1_dot_b');
+        s.qx2DotA = getById('qx2_dot_a'); s.qx2DotB = getById('qx2_dot_b');
       },
-    
-      /* ★ 固定单元：先渲染 → 再绑按钮 → 等用户点 ▶ 才申请摄像头 */
+
       async startCameraSession(container, options) {
         this.init();
         const s = this.state;
@@ -312,33 +346,34 @@
         s.onAbort = options.onAbort || null;
         s.onWarmupTick = options.onWarmupTick || null;
         s.onWarmupEnd = options.onWarmupEnd || null;
-    
+
         this.render(container);
         s.btnStart.onclick = () => this.startCapture();
         s.btnStop.onclick = () => this.stopCapture('user');
-        this.setHint('未开始', '#5A6B87');
-        this.emit('unknown', '未开始');
+        this._resetDots();
+        this.setHint(t('未开始', 'Not started'), '#5A6B87');
+        this.emit('unknown', t('未开始', 'Not started'));
         return true;
       },
-    
+
       async startCapture() {
         const s = this.state;
         if (!s || s.phase === 'warmup' || s.phase === 'running') return;
         s.btnStart.disabled = true; s.btnStop.disabled = true;
-        this.setHint('正在打开摄像头…', '#B9770E');
+        this.setHint(t('正在打开摄像头…', 'Opening camera…'), '#B9770E');
         try {
           const stream = await Cam.open(s.video);
           s.stream = stream;
           Cam.bindSmall(s.video);
         } catch (e) {
           console.error('[HRV] 摄像头申请失败：', e);
-          this.setHint('无法打开摄像头：' + e.message, '#C0392B');
+          this.setHint(t('无法打开摄像头：', 'Cannot open camera: ') + e.message, '#C0392B');
           s.btnStart.disabled = false; s.btnStop.disabled = true;
           return;
         }
         this._enterWarmup();
       },
-    
+
       _enterWarmup() {
         const s = this.state;
         s.phase = 'warmup'; s.capturing = true; s.rafAlive = true;
@@ -348,12 +383,13 @@
         s.totalFrames = 0; s.validFrames = 0; s.lastProgressAt = 0;
         s.bucketIndex = 0; s.bucketGood = 0; s.bucketTotal = 0; s.bucketList = [];
         s.result = null;
+        s.dotToggle = 0; s.lastDotAt = 0;
         s.btnStart.disabled = true; s.btnStop.disabled = false;
-        this.setHint(`预备中… ${s.warmupSec} 秒 · 请调整手指轻重`, '#B9770E');
+        this.setHint(t(`预备中… ${s.warmupSec} 秒 · 请调整手指轻重`, `Preparing… ${s.warmupSec}s · adjust your finger pressure`), '#B9770E');
         if (s.idleHintEl) s.idleHintEl.style.display = 'none';
         s.rafId = requestAnimationFrame((ts) => this.loop(ts));
       },
-    
+
       loop(ts) {
         const s = this.state;
         if (!s || !s.rafAlive || (s.phase !== 'warmup' && s.phase !== 'running')) { if (s) s.rafAlive = false; return; }
@@ -361,15 +397,15 @@
         let dt = s.lastTs ? tsSec - s.lastTs : 1 / DEFAULTS.targetFps;
         if (dt < 0) dt = 0; if (dt > 0.2) dt = 0.2;
         s.lastTs = tsSec;
-    
+
         const video = s.video;
         const videoReady = video && video.readyState >= 2 && video.videoWidth > 0 && s.stream;
-    
+
         if (!videoReady) {
           s.cameraLostStreak++;
           if (s.cameraLostStreak >= DEFAULTS.cameraLostFrames) { this.stopCapture('lost'); return; }
         } else { s.cameraLostStreak = 0; }
-    
+
         let frame = null, flag = 'no_press', valid = false;
         if (videoReady) {
           try {
@@ -378,50 +414,58 @@
             flag = PPG.classify(frame.variance, frame.mean, frame.redness, s.redMid);
           } catch (e) { valid = false; }
         }
-    
+
         if (valid) {
           s.totalFrames++;
           if (flag === 'good') s.validFrames++;
         }
-    
+
         if (s.phase === 'warmup') { this._warmupTick(dt, frame, flag, valid); return; }
-    
+
         s.elapsed += dt;
         if (s.elapsed >= s.durationSec) { this.stopCapture('done'); return; }
         const shown = Math.min(Math.floor(s.elapsed), s.durationSec);
-    
+
         if (!videoReady) {
-          this.setHint('摄像头未就绪…', '#B9770E');
+          this.setHint(t('摄像头未就绪…', 'Camera not ready…'), '#B9770E');
           this._updateTimers(shown);
-          this.emit('unknown', '摄像头未就绪…');
+          this.emit('unknown', t('摄像头未就绪…', 'Camera not ready…'));
           s.rafId = requestAnimationFrame((x) => this.loop(x)); return;
         }
         if (!valid) {
-          this.setHint('摄像头启动中…', '#B9770E');
+          this.setHint(t('摄像头启动中…', 'Camera starting…'), '#B9770E');
           this._updateTimers(shown);
-          this.emit('unknown', '摄像头启动中…');
+          this.emit('unknown', t('摄像头启动中…', 'Camera starting…'));
           s.rafId = requestAnimationFrame((x) => this.loop(x)); return;
         }
-    
+
         s.recentFrames.push({ t: s.elapsed, flag });
         if (s.recentFrames.length > 400) s.recentFrames.splice(0, 200);
         if (flag === 'no_press') {
           s.noPressStreak++;
           if (s.noPressStreak >= DEFAULTS.noPressAbortFrames) { this.stopCapture('no_finger'); return; }
         } else { s.noPressStreak = 0; }
-    
+
+        /* 波形数据源：所有 valid 帧都 push，不再只收 good */
+        s.samples.push(frame.mean);
+        s.timestamps.push(s.elapsed);
+
         if (flag === 'good') {
-          s.samples.push(frame.mean); s.timestamps.push(s.elapsed);
-          this.setHint('采集中，很好', '#1E8449');
+          this.setHint(t('采集中，很好', 'Capturing, good'), '#1E8449');
         } else {
           this.setHint(PPG.hint(flag), flag === 'no_press' ? '#C0392B' : '#B9770E');
         }
-    
+
+        if (s.elapsed - s.lastDotAt >= DEFAULTS.dotFlashIntervalSec) {
+          s.lastDotAt = s.elapsed;
+          this._flashDots(flag);
+        }
+
         this._updateWave();
         this._updateTimers(shown);
         const pf = getById('qx1_heal_modal_progress');
         if (pf) pf.style.width = Math.min(100, (s.elapsed / s.durationSec) * 100) + '%';
-    
+
         if (s.elapsed - s.lastProgressAt >= DEFAULTS.progressIntervalSec) {
           s.lastProgressAt = s.elapsed;
           try {
@@ -435,7 +479,7 @@
         this.emit(flag, PPG.hint(flag));
         s.rafId = requestAnimationFrame((x) => this.loop(x));
       },
-    
+
       _warmupTick(dt, frame, flag, valid) {
         const s = this.state;
         s.warmupRemain -= dt;
@@ -444,23 +488,27 @@
           s.samples = []; s.timestamps = []; s.recentFrames = [];
           s.noPressStreak = 0; s.totalFrames = 0; s.validFrames = 0;
           s.bucketIndex = 0; s.bucketGood = 0; s.bucketTotal = 0; s.bucketList = [];
+          s.dotToggle = 0; s.lastDotAt = 0;
           this._updateTimers(0);
-          this.setHint('采集中，很好', '#1E8449');
-          this.emit('unknown', '采集中，很好');
+          this.setHint(t('采集中，很好', 'Capturing, good'), '#1E8449');
+          this.emit('unknown', t('采集中，很好', 'Capturing, good'));
           if (s.onWarmupEnd) { try { s.onWarmupEnd(); } catch (e) {} }
         } else {
           const remain = Math.max(0, Math.ceil(s.warmupRemain));
-          this.setHint(`预备中… ${remain} 秒 · ${valid ? PPG.hint(flag) : '摄像头启动中'}`, '#B9770E');
-          this.emit('unknown', valid ? PPG.hint(flag) : '摄像头启动中');
+          const sub = valid ? PPG.hint(flag) : t('摄像头启动中', 'Camera starting');
+          this.setHint(t(`预备中… ${remain} 秒 · ${sub}`, `Preparing… ${remain}s · ${sub}`), '#B9770E');
+          this.emit('unknown', sub);
         }
         this._updateTimers(Math.max(0, Math.ceil(s.warmupRemain)));
         s.rafId = requestAnimationFrame((x) => this.loop(x));
       },
-    
+
       _updateTimers(sec) {
         const s = this.state;
-        const a = getById('qx1_hrv_timer'); if (a) a.innerText = `${sec} / ${s.durationSec} 秒`;
-        const b = getById('qx1_heal_modal_timer'); if (b) b.innerText = `${sec} / ${s.durationSec} 秒`;
+        const a = getById('qx1_hrv_timer');
+        if (a) a.innerText = t(`${sec} / ${s.durationSec} 秒`, `${sec} / ${s.durationSec} s`);
+        const b = getById('qx1_heal_modal_timer');
+        if (b) b.innerText = t(`${sec} / ${s.durationSec} 秒`, `${sec} / ${s.durationSec} s`);
       },
       _updateWave() {
         const el = getById('qx1_heal_modal_wave_line'); if (!el) return;
@@ -469,7 +517,7 @@
         const min = Math.min(...v), max = Math.max(...v), rng = max - min || 1;
         el.setAttribute('points', v.map((x, i) => `${((i / (v.length - 1)) * W).toFixed(1)},${(BASE - ((x - min) / rng) * 30 - 2).toFixed(1)}`).join(' '));
       },
-    
+
       _realtime() {
         const s = this.state;
         if (s.samples.length < DEFAULTS.hardMinSamples) return { bpm: 0, rmssd: 0, sdnn: 0, hf: 0, lf: 0, rrList: [] };
@@ -487,7 +535,7 @@
         return { bpm: Math.round(DSP.bpm(rr)), rmssd: Math.round(DSP.rmssd(rr) * 10) / 10,
                  sdnn: Math.round(DSP.sdnn(rr) * 10) / 10, hf, lf, rrList: rr.slice(-20).map(Math.round) };
       },
-    
+
       stopCapture(reason) {
         const s = this.state;
         if (!s || s.phase === 'idle' || s.phase === 'done') return;
@@ -496,42 +544,43 @@
         if (s.rafId) { cancelAnimationFrame(s.rafId); s.rafId = null; }
         if (s.btnStart) s.btnStart.disabled = false;
         if (s.btnStop) s.btnStop.disabled = true;
-    
+
         Cam.release(s.video);
-    
+        this._resetDots();
+
         if (reason === 'no_finger') {
           s.samples = []; s.timestamps = []; s.result = null;
-          this.setHint('手指离开了，本次作废，请重新开始', '#C0392B');
+          this.setHint(t('手指离开了，本次作废，请重新开始', 'Finger removed, this session is void, please restart'), '#C0392B');
           if (s.idleHintEl) s.idleHintEl.style.display = 'flex';
           if (s.onAbort) { try { s.onAbort({ reason: 'no_finger' }); } catch (e) {} }
           return;
         }
         if (reason === 'lost') {
           s.samples = []; s.timestamps = []; s.result = null;
-          this.setHint('摄像头连接中断，请重新开始', '#C0392B');
+          this.setHint(t('摄像头连接中断，请重新开始', 'Camera disconnected, please restart'), '#C0392B');
           if (s.idleHintEl) s.idleHintEl.style.display = 'flex';
           if (s.onAbort) { try { s.onAbort({ reason: 'camera_lost' }); } catch (e) {} }
           return;
         }
         if (reason === 'user' && wasWarmup) {
-          this.setHint('已停止', '#5A6B87');
+          this.setHint(t('已停止', 'Stopped'), '#5A6B87');
           if (s.idleHintEl) s.idleHintEl.style.display = 'flex';
           this._updateTimers(0);
           return;
         }
-    
+
         this._computeResult();
         if (s.result) {
-          this.setHint(reason === 'done' ? '采集完成' : '已停止', '#2C7BE5');
+          this.setHint(reason === 'done' ? t('采集完成', 'Capture complete') : t('已停止', 'Stopped'), '#2C7BE5');
           if (s.onComplete) { try { s.onComplete(s.result, { ok: true, level: 'ok', reason: 'OK' }); } catch (e) {} }
         } else {
-          this.setHint('有效数据不足，请重测', '#C0392B');
+          this.setHint(t('有效数据不足，请重测', 'Not enough valid data, please retry'), '#C0392B');
           if (s.onAbort) { try { s.onAbort({ reason: 'LOW_DATA' }); } catch (e) {} }
         }
         if (s.idleHintEl) s.idleHintEl.style.display = 'flex';
-        this.emit(s.result ? 'good' : 'unknown', s.result ? '采集完成' : '有效数据不足');
+        this.emit(s.result ? 'good' : 'unknown', s.result ? t('采集完成', 'Capture complete') : t('有效数据不足', 'Not enough valid data'));
       },
-    
+
       _computeResult() {
         const s = this.state;
         if (s.samples.length < DEFAULTS.hardMinSamples) { s.result = null; return; }
@@ -556,22 +605,22 @@
         };
       },
     };
-    
+
     /* ========== 7. quickTest ========== */
     async function quickTest(deviceId, options) {
       options = options || {};
       const durationSec = options.durationSec || 10;
       const onTick = options.onTick || null;
-      if (!deviceId) throw new Error('quickTest: 缺少 deviceId');
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error('浏览器不支持摄像头');
-    
+      if (!deviceId) throw new Error(t('quickTest: 缺少 deviceId', 'quickTest: missing deviceId'));
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error(t('浏览器不支持摄像头', 'Browser does not support camera'));
+
       let stream = null;
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { deviceId: { exact: deviceId }, width: { ideal: 640 }, height: { ideal: 480 } }, audio: false,
         });
-      } catch (e) { throw new Error('无法打开指定摄像头：' + e.message); }
-    
+      } catch (e) { throw new Error(t('无法打开指定摄像头：', 'Cannot open selected camera: ') + e.message); }
+
       const video = document.createElement('video');
       video.setAttribute('autoplay', ''); video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
       video.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;';
@@ -583,7 +632,7 @@
         setTimeout(res, 1500);
       });
       try { await video.play(); } catch (e) {}
-    
+
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       const samples = [], timestamps = [];
@@ -591,7 +640,7 @@
       const start = performance.now();
       let lastTick = -1;
       const redMid = 60;
-    
+
       return await new Promise((resolve) => {
         function loop() {
           const elapsed = (performance.now() - start) / 1000;
@@ -631,8 +680,8 @@
         requestAnimationFrame(loop);
       });
     }
-    
-    /* ========== 8. 绘图函数（与 v58 一致，此处完整保留） ========== */
+
+    /* ========== 8. 绘图函数 ========== */
     function getCanvasHost(host) {
       if (typeof host === 'string') return document.getElementById(host);
       return host;
@@ -656,7 +705,7 @@
       if (!el) return { w: defW, h: defH };
       return { w: Math.max(120, Math.floor(el.clientWidth || defW)), h: Math.max(120, Math.floor(el.clientHeight || defH)) };
     }
-    
+
     function drawRadarChart(host, r) {
       const sz = hostSize(host, 420, 320);
       const c = prepCanvas(host, sz.w, sz.h);
@@ -675,7 +724,7 @@
       ctx.fillStyle = '#FAFAFA'; ctx.fillRect(0, 0, w, h);
       ctx.fillStyle = '#1A2B4A'; ctx.font = 'bold 13px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
       ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-      ctx.fillText(t('HRV 雷达（越大越偏副交感）', 'HRV Radar'), 12, 10);
+      ctx.fillText(t('HRV 雷达（越大越偏副交感）', 'HRV Radar (larger = more parasympathetic)'), 12, 10);
       const lines = [`${t('平均心率', 'HR')}  ${r.bpm} bpm`, `RMSSD  ${r.rmssd} ms`, `SDNN  ${r.sdnn} ms`, `HF  ${r.hf} ms²`];
       ctx.font = '11px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
       ctx.fillStyle = '#5A6B87'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
@@ -717,7 +766,7 @@
         ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fillStyle = '#2C7BE5'; ctx.fill();
       }
     }
-    
+
     function drawTrendChart(host, r) {
       const sz = hostSize(host, 420, 320);
       const c = prepCanvas(host, sz.w, sz.h);
@@ -783,7 +832,7 @@
       ctx.fillStyle = '#2C7BE5'; ctx.fillRect(padL + 70, h - 18, 14, 3);
       ctx.fillStyle = '#5A6B87'; ctx.fillText('RMSSD', padL + 90, h - 12);
     }
-    
+
     function drawScatterChart(host, r) {
       const sz = hostSize(host, 420, 320);
       const c = prepCanvas(host, sz.w, sz.h);
@@ -797,7 +846,7 @@
       ctx.fillText(t('RR 间期 Poincaré 散点', 'Poincaré Scatter'), 12, 10);
       ctx.fillStyle = '#96A3B8'; ctx.font = '11px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
       ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-      ctx.fillText(t('越集中越紧张，越散越放松', 'Tight=tense, loose=relaxed'), w - 12, 12);
+      ctx.fillText(t('越集中越紧张，越散越放松', 'Tight = tense, loose = relaxed'), w - 12, 12);
       const rr = r.rrIntervals || [];
       if (rr.length < 4) {
         ctx.fillStyle = '#96A3B8'; ctx.font = '13px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
@@ -827,7 +876,7 @@
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText('RRn+1', 8, padT + 8);
     }
-    
+
     function drawCardChart(host, r) {
       const hostEl = getCanvasHost(host);
       if (!hostEl) return;
@@ -837,13 +886,13 @@
       const lfHf = r.hf > 0 ? (r.lf / r.hf) : 0;
       const rrCount = (r.rrIntervals || []).length;
       const items = [
-        { name: '平均心率', en: 'HR', value: r.bpm, unit: 'bpm', min: 40, max: 130 },
+        { name: t('平均心率', 'HR'), en: 'HR', value: r.bpm, unit: 'bpm', min: 40, max: 130 },
         { name: 'RMSSD', en: 'RMSSD', value: r.rmssd, unit: 'ms', min: 0, max: 120 },
         { name: 'SDNN', en: 'SDNN', value: r.sdnn, unit: 'ms', min: 0, max: 200 },
-        { name: 'HF 高频', en: 'HF', value: r.hf, unit: 'ms²', min: 0, max: 1000 },
-        { name: 'LF 低频', en: 'LF', value: r.lf, unit: 'ms²', min: 0, max: 2000 },
+        { name: t('HF 高频', 'HF'), en: 'HF', value: r.hf, unit: 'ms²', min: 0, max: 1000 },
+        { name: t('LF 低频', 'LF'), en: 'LF', value: r.lf, unit: 'ms²', min: 0, max: 2000 },
         { name: 'LF/HF', en: 'LF/HF', value: lfHf, unit: '', min: 0, max: 5 },
-        { name: 'RR 数', en: 'RR count', value: rrCount, unit: '条', min: 0, max: 300 },
+        { name: t('RR 数', 'RR count'), en: 'RR count', value: rrCount, unit: t('条', ''), min: 0, max: 300 },
       ];
       const hostW = Math.max(420, Math.floor(hostEl.clientWidth || 480));
       const rowCount = items.length;
@@ -931,9 +980,9 @@
       ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       ctx.fillText(t('整体', 'Overall'), colNameX, overallMidY);
       let overallText;
-      if (relaxScore > 0.66) overallText = t('偏副交感 · 恢复良好', 'Parasympathetic');
-      else if (relaxScore > 0.33) overallText = t('自主神经平衡', 'Balanced');
-      else overallText = t('偏交感 · 应激偏高', 'Sympathetic');
+      if (relaxScore > 0.66) overallText = t('偏副交感 · 恢复良好', 'Parasympathetic · good recovery');
+      else if (relaxScore > 0.33) overallText = t('自主神经平衡', 'Autonomic balance');
+      else overallText = t('偏交感 · 应激偏高', 'Sympathetic · high stress');
       ctx.fillStyle = '#1A2B4A'; ctx.font = 'bold 12px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif';
       ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
       ctx.fillText(overallText, w - PAD_RIGHT - 4, overallMidY);
@@ -951,7 +1000,7 @@
       ctx.fillText(t('正常', 'Normal'), xAt(0.50), rulerMidY + 6);
       ctx.fillText(t('高', 'High'), xAt(0.95), rulerMidY + 6);
     }
-    
+
     function drawDashboard(host, r) {
       const el = getCanvasHost(host);
       if (!el) return;
@@ -973,7 +1022,7 @@
       drawScatterChart('dash-bl', r);
       drawCardChart('dash-br', r);
     }
-    
+
     /* ========== 9. 导出 ========== */
     window.qxHrvCapture = {
       start(containerId, options) {
@@ -995,5 +1044,5 @@
       drawDashboard: drawDashboard,
       DEFAULTS: DEFAULTS,
     };
-    
+
     })();

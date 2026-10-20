@@ -1,9 +1,7 @@
 /* ================================================================
    情绪宝 - qx4 知识问答
-   依赖：
-   - window.mQxb（用户、语言）
-   - qxHelpCard.show({ title, body })
-   - Supabase REST
+   v3（2026-10-18）：
+   - 引入自动朗读功能，调用全局 window.qxSpeak
    ================================================================ */
    (function () {
     'use strict';
@@ -12,6 +10,18 @@
     const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
 
     const ENGINE = 'QX4_KNOWLEDGE';
+
+    const DIMENSION_EN = {
+        '积极心理学与健康促进':          'Positive Psychology & Health',
+        '基础认知与心身关联':            'Mind-Body Basics',
+        '生活方式与情绪健康':            'Lifestyle & Emotional Health',
+        '人际关系与社会情绪健康':        'Relationships & Social Health',
+        '情绪障碍与躯体化症状':          'Mood Disorders & Somatization',
+        '负面情绪与器官影响':            'Negative Emotions & Organs',
+        '特殊人群与生命阶段':            'Special Groups & Life Stages',
+        '干预、治疗与自我调适':          'Intervention & Self-Regulation',
+        '积极心理学前沿：从分子到家族':  'Frontiers: Molecules to Family',
+    };
 
     const state = {
         initialized: false,
@@ -181,11 +191,8 @@
     }
 
     function renderTitle() {
-        const titleEl = document.getElementById('qx4_title');
         const hintEl  = document.getElementById('qx4_hint');
         const userEl  = document.getElementById('qx4_user');
-
-        if (titleEl) titleEl.innerText = t('知识问答', 'Knowledge Q&A');
 
         if (hintEl) {
             const n = state.todayEventCodes.length;
@@ -277,18 +284,34 @@
         const lang = getLang();
         const cat = state.categories.find(c => state.assessmentByCat[c.categorycode] === q.assessmentid);
         if (cat) return lang === 1 ? cat.name_cn : cat.name_en;
-        return q.dimension || '';
+        const dim = q.dimension || '';
+        if (!dim) return '';
+        return lang === 1 ? dim : (DIMENSION_EN[dim] || dim);
     }
 
     function showQuestion(questionid) {
         const q = state.questionById[questionid];
         if (!q) { toast(t('题目未找到', 'Question not found'), 'error'); return; }
+        
         const title = buildTitle(q);
         const body = buildBody(q);
+
+        // 1. 打开卡片
         if (window.qxHelpCard && typeof qxHelpCard.show === 'function') {
             qxHelpCard.show({ title: title, body: body });
         } else {
             alert(title + '\n\n' + body);
+        }
+
+        // 2. 自动朗读
+        if (window.qxSpeak) {
+            const lang = getLang();
+            // 文本清洗：把换行替换成逗号，读起来更顺畅
+            const cleanText = body.replace(/\n+/g, lang === 1 ? '。' : '. ');
+            const prefix = lang === 1 ? '您的问题是关于：' : 'Your question is about: ';
+            const fullText = prefix + title + (lang === 1 ? '。' : '. ') + cleanText;
+            
+            window.qxSpeak(fullText);
         }
     }
 
@@ -307,6 +330,7 @@
         const btnExit = document.getElementById('qx4_btn_exit');
         if (btnExit) {
             btnExit.onclick = () => {
+                if (window.qxSpeak) window.speechSynthesis.cancel(); // 退出时停止语音
                 if (window.returnToMain) window.returnToMain();
             };
         }
@@ -350,6 +374,8 @@
         state.todayEmotionCode = null;
         state.todayEvents = [];
         state.todayEventCodes = [];
+
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
 
         const tree = document.getElementById('qx4_tree');
         if (tree) tree.innerHTML = '';

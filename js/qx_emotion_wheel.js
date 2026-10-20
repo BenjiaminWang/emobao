@@ -1,8 +1,8 @@
 /* ================================================================
    情绪宝 - 九情绪旋钮组件（公共）
-   v10：
-   - 新增 verticalShift 选项（默认 0.06）
-   - 魔镜传 0，实现同心
+   v11 改动：
+   - code 7 英文 Depressed → Down（"压抑"的准确对应）
+   - 其余同 v10
    ================================================================ */
 
    (function () {
@@ -27,7 +27,7 @@
         { code: 4, cn: '轻快', en: 'Lively' },
         { code: 5, cn: '明朗', en: 'Bright' },
         { code: 6, cn: '平静', en: 'Calm' },
-        { code: 7, cn: '压抑', en: 'Depressed' },
+        { code: 7, cn: '压抑', en: 'Down' },
         { code: 8, cn: '忧伤', en: 'Melancholy' },
         { code: 9, cn: '悲伤', en: 'Sad' },
     ];
@@ -43,7 +43,6 @@
     const POINTER_IN_RATIO  = 0.80;
     const RING_PADDING = 22;
 
-    /* 垂直偏移：默认 0.06（qx1 用），魔镜传 0 实现同心 */
     const DEFAULT_VERTICAL_SHIFT = 0.06;
 
     function angleToCode(angle) {
@@ -76,6 +75,7 @@
     function getEmotionFace(code) {
         const e = EMOTION_LIST.find(x => x.code === code);
         if (!e) return '';
+        /* 图片文件名用中文名，与语言无关，不能改 */
         return `picture/${e.code}_${e.cn}.png`;
     }
 

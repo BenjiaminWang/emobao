@@ -1,9 +1,6 @@
 /* ================================================================
    情绪宝 - qx1 情绪感知
-   v24：
-   - 从 Setting（localStorage / mQxb.Sensor）读采样源
-   - Polar 未连接时降级摄像头并提示
-   - 采集区按钮位置、提示文字、波形图由 qx_hrv_capture.js 统一
+   v30 强制修复版：使用 pointerdown 替代 click
    ================================================================ */
    (function () {
     'use strict';
@@ -78,7 +75,6 @@
     function getUserType() { return (window.mQxb && parseInt(window.mQxb.user_id_Type)) || 1; }
     function getLang() { return (window.mQxb && window.mQxb.Language) || 1; }
 
-    /* ============ 读 Setting 里的采样源 ============ */
     function getHrvSourceFromSetting() {
         if (typeof window.qx6GetHrvSource === 'function') {
             try { return window.qx6GetHrvSource(); } catch (e) {}
@@ -93,7 +89,6 @@
         return 'camera';
     }
 
-    /* ============ 网络工具 ============ */
     async function fetchWithTimeout(url, options, timeoutMs) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs || FETCH_TIMEOUT_MS);
@@ -180,22 +175,21 @@
         throw lastErr;
     }
 
-    /* ============ 标题、Toast ============ */
     function refreshEmotionTitle() {
         const area = document.querySelector('.qx1-emotion-area .qx1-section-title');
         if (!area) return;
         const code = state.emotionCode;
         const lang = getLang();
         if (!code) {
-            area.innerText = t('今日情绪', 'Today Emotion');
+            area.innerText = t('今日情绪', 'Today');
             return;
         }
         const info = (window.qxEmotionWheel && window.qxEmotionWheel.EMOTION_LIST || [])
             .find(x => x.code === code);
         const name = info ? (lang === 1 ? info.cn : info.en) : '';
         area.innerText = name
-            ? t('今日情绪 · ', 'Today Emotion · ') + name
-            : t('今日情绪', 'Today Emotion');
+            ? t('今日情绪 · ', 'Today · ') + name
+            : t('今日情绪', 'Today');
     }
 
     let _toastTimer = null;
@@ -217,7 +211,6 @@
         }, 3000);
     }
 
-    /* ============ 布局 ============ */
     function applyLayout() {
         const container = document.getElementById('qx1_container');
         if (!container) return;
@@ -244,7 +237,6 @@
         }, 120);
     }
 
-    /* ============ 事件列表 ============ */
     function renderEventList() {
         const list = document.getElementById('qx1_event_list');
         const detail = document.getElementById('qx1_event_detail');
@@ -253,7 +245,7 @@
         list.innerHTML = '';
 
         if (titleEl) {
-            titleEl.innerHTML = `${t('当日生活事件', 'Today Events')} <span class="qx1-events-count">${state.events.length} 条</span>`;
+            titleEl.innerHTML = `${t('当日生活事件', "Today's Events")} <span class="qx1-events-count">${state.events.length} ${t('条', '')}</span>`;
         }
 
         if (state.events.length === 0) {
@@ -273,7 +265,7 @@
             div.dataset.index = idx;
 
             const name = lang === 1 ? ev.eventname_cn : ev.eventname_en;
-            const natureStr = ev.eventnature || '';
+            const natureStr = ev.eventnature ? t(ev.eventnature, ev.eventnature === '好事' ? 'Good' : 'Bad') : '';
             const impactStr = ev.impactlevel ? `L${ev.impactlevel}` : '';
 
             div.innerHTML = `
@@ -360,7 +352,6 @@
         }
     }
 
-    /* ============ 类别加载 ============ */
     async function loadCategories() {
         const tree = document.getElementById('qx1_tree');
         if (!tree) return;
@@ -406,7 +397,8 @@
             titleDiv.className = 'qx1-tree-cat-title';
             const expanded = state.treeExpanded[c.eventcode];
             titleDiv.innerHTML = `<span class="qx1-tree-arrow">${expanded ? '▼' : '▶'}</span> <span>${lang === 1 ? c.eventname_cn : c.eventname_en}</span>`;
-            titleDiv.addEventListener('click', () => {
+            
+            titleDiv.addEventListener('click', function(e) {
                 state.treeExpanded[c.eventcode] = !state.treeExpanded[c.eventcode];
                 renderTree();
             });
@@ -424,12 +416,14 @@
                     item.dataset.nameEn = ch.eventname_en;
                     item.innerText = lang === 1 ? ch.eventname_cn : ch.eventname_en;
 
-                    item.addEventListener('click', () => {
-                        tree.querySelectorAll('.qx1-tree-item.selected').forEach(x => x.classList.remove('selected'));
+                    // 使用底层的 pointerdown 事件，绕过 click 穿透问题
+                    item.addEventListener('pointerdown', function(e) {
+                        // 清除其他选中
+                        const allItems = tree.querySelectorAll('.qx1-tree-item');
+                        allItems.forEach(el => el.classList.remove('selected'));
                         item.classList.add('selected');
-                    });
 
-                    item.addEventListener('dblclick', () => {
+                        // 直接加入到右列表
                         addEventFromTree(item.dataset.eventcode, item.dataset.nameCn, item.dataset.nameEn);
                     });
 
@@ -447,10 +441,14 @@
             toast(t('一天内最多 10 个生活事件', 'Max 10 life events per day'), 'warning');
             return;
         }
-        if (state.events.some(e => e.eventcode === eventcode)) {
-            toast(t('该事件已加入', 'Event already added'), 'warning');
+        const existingIdx = state.events.findIndex(e => e.eventcode === eventcode);
+        if (existingIdx >= 0) {
+            state.selectedEventIndex = existingIdx;
+            renderEventList();
+            showEventDetail();
             return;
         }
+        
         state.events.push({
             eventcode,
             eventname_cn: nameCn,
@@ -458,6 +456,7 @@
             eventnature: '',
             impactlevel: 0,
         });
+        
         state.selectedEventIndex = state.events.length - 1;
         markDirty();
         renderEventList();
@@ -494,7 +493,6 @@
         state.canExit = eventsOk && hrvOk;
     }
 
-    /* ============ 存入 ============ */
     async function onSave() {
         if (state.isGuest) {
             toast(t('欢迎体验情绪宝，成为 VIP 可保存您的记录 🌹',
@@ -693,11 +691,11 @@
             modal.innerHTML = `
                 <div class="qx1-chart-modal-inner">
                     <div class="qx1-chart-modal-tabs">
-                        <button class="qx1-chart-modal-tab active" data-key="radar">HRV 雷达</button>
-                        <button class="qx1-chart-modal-tab" data-key="trend">心率趋势</button>
-                        <button class="qx1-chart-modal-tab" data-key="scatter">RR 散点</button>
-                        <button class="qx1-chart-modal-tab" data-key="cards">指标卡</button>
-                        <button class="qx1-chart-modal-help" id="qx1_chart_modal_help" title="说明">⤢</button>
+                        <button class="qx1-chart-modal-tab active" data-key="radar">${t('HRV 雷达', 'HRV Radar')}</button>
+                        <button class="qx1-chart-modal-tab" data-key="trend">${t('心率趋势', 'HR Trend')}</button>
+                        <button class="qx1-chart-modal-tab" data-key="scatter">${t('RR 散点', 'RR Scatter')}</button>
+                        <button class="qx1-chart-modal-tab" data-key="cards">${t('指标卡', 'Metrics')}</button>
+                        <button class="qx1-chart-modal-help" id="qx1_chart_modal_help" title="${t('说明', 'Help')}">⤢</button>
                     </div>
                     <div class="qx1-chart-modal-body" id="qx1_chart_modal_body"></div>
                 </div>
@@ -739,7 +737,7 @@
 
     function getShortDesc(key) {
         const map = {
-            radar: [
+            radar: t([
                 '四轴分别是：平均心率、RMSSD、SDNN、HF。',
                 '',
                 '它们共同反映一件事——你的自主神经此刻偏"松弛"，还是偏"紧绷"。',
@@ -747,9 +745,17 @@
                 '四轴围成的面积越大，说明副交感神经越占上风，身体越处于放松、修复、恢复的状态。',
                 '',
                 '（副交感神经：负责"休息与消化"的那一半神经系统。）',
-            ].join('\n'),
+            ].join('\n'), [
+                'Four axes: average heart rate, RMSSD, SDNN, HF.',
+                '',
+                'Together they reflect one thing — whether your autonomic nervous system is relaxed or tense right now.',
+                '',
+                'The larger the area, the more the parasympathetic side dominates, and the more your body is in rest, repair and recovery mode.',
+                '',
+                '(Parasympathetic: the "rest and digest" half of the nervous system.)',
+            ].join('\n')),
 
-            trend: [
+            trend: t([
                 '红线是心率（每分钟心跳次数），蓝虚线是 RMSSD（相邻两次心跳间隔的波动幅度）。',
                 '',
                 '红线平稳、蓝线抬高 → 说明你正在放松；',
@@ -758,9 +764,18 @@
                 '看整体趋势就好，别被一两个尖峰吓到。',
                 '',
                 '（RMSSD 是心率变异性里最常用的短时指标，反映副交感活性。）',
-            ].join('\n'),
+            ].join('\n'), [
+                'Red line is heart rate (beats per minute); blue dashed line is RMSSD (variation between adjacent beat intervals).',
+                '',
+                'Red line steady, blue line rising → you are relaxing.',
+                'Red line swinging, blue line dropping → you are still tense.',
+                '',
+                'Look at the overall trend; don\'t be scared by one or two spikes.',
+                '',
+                '(RMSSD is the most common short-term HRV index, reflecting parasympathetic activity.)',
+            ].join('\n')),
 
-            scatter: [
+            scatter: t([
                 'RR 间期，是"两次心跳之间的间隔时间"。',
                 '',
                 '这张图把所有 RR 配对画成点：',
@@ -770,7 +785,17 @@
                 '点越分散 → 心跳有弹性 → 人越放松、恢复越好。',
                 '',
                 '（这类图叫 Poincaré 散点，是看 HRV 混沌程度的一种直观方法。）',
-            ].join('\n'),
+            ].join('\n'), [
+                'RR interval is the time between two heartbeats.',
+                '',
+                'This chart pairs every RR and plots them as points:',
+                'X-axis is the current interval, Y-axis is the next one.',
+                '',
+                'Tighter cluster → more regular heartbeat → more tense.',
+                'More scattered → more elastic heartbeat → more relaxed and recovered.',
+                '',
+                '(This is a Poincaré scatter, an intuitive way to see HRV chaos.)',
+            ].join('\n')),
 
             cards: t('关键 HRV 指标一览。', 'Key HRV metrics.'),
         };
@@ -778,7 +803,7 @@
     }
 
     function getLongDesc() {
-        return [
+        return t([
             'HF 高频：与呼吸同步，副交感活性可靠指标，越低越紧张',
             'LF 低频：交感+副交感混合，压力参考',
             'RMSSD：相邻心跳间隔差值的均方根，越大副交感越强',
@@ -797,20 +822,39 @@
             '个人基线偏移',
             '  - 如果长期记录，能看出"本次整体球体比平时大还是小？"',
             '  - 大 → 今天恢复好；小 → 今天压力大',
-        ].join('\n');
+        ].join('\n'), [
+            'HF (high freq): synced with breathing, reliable parasympathetic index. Lower = more tense.',
+            'LF (low freq): mixed sympathetic + parasympathetic, a stress reference.',
+            'RMSSD: root mean square of successive beat interval differences. Higher = more parasympathetic.',
+            'SDNN: standard deviation of beat intervals, overall HRV. Lower = worse autonomic regulation.',
+            '',
+            'Average HR + RMSSD combo: the most practical read of emotional state.',
+            '  High HR + low RMSSD = tense',
+            '  Low HR + high RMSSD = relaxed',
+            '  ⚠️ Trend is usable once a personal HRV baseline is built over days.',
+            '',
+            'Personal HRV baseline: the normal range of RMSSD and average HR at rest, under no stress.',
+            '  - A baseline is not "a fixed value", it is "a range" (e.g. RMSSD 45–65 ms).',
+            '  - Baselines are personal; do not compare across people.',
+            '  - Baselines drift slowly over time, not permanent.',
+            '',
+            'Personal baseline shift',
+            '  - With long-term records, you can see "is today\'s sphere bigger or smaller than usual?"',
+            '  - Bigger → better recovery today; smaller → more stress today',
+        ].join('\n'));
     }
 
     function openHelpCard(key) {
         const body = (key === 'cards') ? getLongDesc() : getShortDesc(key);
         const titleMap = {
-            radar: 'HRV 雷达 · 怎么看',
-            trend: '心率趋势 · 怎么看',
-            scatter: 'RR 散点 · 怎么看',
-            cards: 'HRV 指标说明',
+            radar:   t('HRV 雷达 · 怎么看', 'HRV Radar · How to read'),
+            trend:   t('心率趋势 · 怎么看', 'HR Trend · How to read'),
+            scatter: t('RR 散点 · 怎么看', 'RR Scatter · How to read'),
+            cards:   t('HRV 指标说明', 'HRV Metrics'),
         };
         if (window.qxHelpCard && typeof qxHelpCard.show === 'function') {
             qxHelpCard.show({
-                title: titleMap[key] || '说明',
+                title: titleMap[key] || t('说明', 'Help'),
                 body: body,
                 size: 'frame',
             });
@@ -850,9 +894,8 @@
         if (!modal) return;
         modal.classList.add('show');
         const timer = document.getElementById('qx1_heal_modal_timer');
-        if (timer) timer.innerText = '0 / 120 秒';
+        if (timer) timer.innerText = t('0 / 120 秒', '0 / 120 s');
 
-        /* 按 source 区分提示 */
         const src = qxHrvCapture.getSource ? qxHrvCapture.getSource() : 'camera';
         const hint = document.getElementById('qx1_heal_modal_hint');
         if (hint) {
@@ -878,15 +921,31 @@
         }
     }
 
-    /* ============ 采集启动（Polar 未连时走摄像头） ============ */
     function startHrvCapture() {
-        if (!window.qxHrvCapture) return;
+        if (!window.qxHrvCapture) {
+            console.error('[qx1] window.qxHrvCapture 未加载，请检查 qx_hrv_capture.js 是否在 qx1 之前引入');
+            toast(t('HRV 模块未加载，请刷新页面', 'HRV module not loaded, please refresh'), 'error');
+            return;
+        }
+
+        let host = document.getElementById('qx1_hrv_capture');
+        if (!host) {
+            console.warn('[qx1] 找不到 #qx1_hrv_capture，自动创建容器');
+            host = document.createElement('div');
+            host.id = 'qx1_hrv_capture';
+            host.className = 'qx1-hrv-capture';
+            const anchor = document.getElementById('qx1_hrv_timer');
+            const parent = anchor ? (anchor.closest('.qx1-hrv-capture-area') || anchor.parentElement) : null;
+            if (parent) parent.insertBefore(host, parent.firstChild);
+            else document.body.appendChild(host);
+        }
 
         let src = getHrvSourceFromSetting();
         const polarReady = !!(window.qxPolarH10
                           && typeof window.qxPolarH10.isConnected === 'function'
                           && window.qxPolarH10.isConnected());
-        console.log('[qx1] Setting 采样源 =', src, '| Polar 已连接 =', polarReady);
+        console.log('[qx1] Setting 采样源 =', src, '| Polar 已连接 =', polarReady,
+                    '| 容器存在 =', !!host);
 
         if (src === 'polar' && !polarReady) {
             console.warn('[qx1] Polar 未连接，降级为摄像头 PPG');
@@ -934,7 +993,6 @@
         });
     }
 
-    /* ============ 初始化 ============ */
     async function qx1_init() {
         console.log('qx1_init 开始');
         if (state.initialized) return;
@@ -954,7 +1012,6 @@
         window.addEventListener('resize', onResizeDebounced);
         window.addEventListener('orientationchange', onResizeDebounced);
 
-        /* 1. 先渲染 UI */
         qxMoodMirror.create('qx1_emotion_wheel', {
             mode: '今日情绪',
             initialCode: 0,
@@ -967,10 +1024,16 @@
             }
         });
 
-        /* 2. 启动采集 */
-        startHrvCapture();
+        (function waitAndStart(remainMs) {
+            if (window.qxHrvCapture) { startHrvCapture(); return; }
+            if (remainMs <= 0) {
+                console.error('[qx1] 等待 qxHrvCapture 超时，仍未加载');
+                toast(t('HRV 模块加载超时，请检查脚本引入', 'HRV module load timeout'), 'error');
+                return;
+            }
+            setTimeout(() => waitAndStart(remainMs - 100), 100);
+        })(3000);
 
-        /* 3. 监听 ▶ 按钮，打开浮层 */
         const hrvRoot = document.getElementById('qx1_hrv_capture');
         if (hrvRoot) {
             hrvRoot.addEventListener('click', (ev) => {
@@ -1012,10 +1075,8 @@
         delBtn.onclick = onDeleteCurrentEvent;
         exitBtn.onclick = onExit;
 
-        /* 4. 异步加载类别 */
         loadCategories();
 
-        /* 5. 加载当日记录 */
         if (state.isGuest) {
             renderEventList();
         } else {

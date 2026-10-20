@@ -2,13 +2,16 @@
    情绪宝 - 生活事件影响图（公共）
    用途：qx1 / qx2 共用
    暴露：window.qxLifeEventChart
-   v3 改动：
-   - draw / renderSummary 增加容器判空与宽高为 0 的容错
-   - 其余 v2 不变
+   v4 改动：
+   - renderSummary() 走 t()，英文模式显示 Good total / Bad total
+   - NATURE_GOOD / NATURE_BAD 加注释说明这是数据库字段比对值，不能翻译
+   - 其余同 v3
    ================================================================ */
    (function () {
     'use strict';
 
+    /* 注意：这两个常量是数据库 eventnature 字段的比对值，必须保持中文字符串，
+       翻译它们会导致与后端数据不匹配，汇总永远算出 0 */
     const NATURE_GOOD = '好事';
     const NATURE_BAD = '坏事';
 
@@ -162,8 +165,8 @@
         if (!el) return;
         const { good, bad } = getSummary(events);
         el.innerHTML = `
-            <div class="qx1-sum-good">好事合计：${good}</div>
-            <div class="qx1-sum-bad">坏事合计：${bad}</div>
+            <div class="qx1-sum-good">${t('好事合计：', 'Good total: ')}${good}</div>
+            <div class="qx1-sum-bad">${t('坏事合计：', 'Bad total: ')}${bad}</div>
         `;
     }
 

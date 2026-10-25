@@ -127,58 +127,90 @@
    };
    
    /* ================================================================
-      全局语音合成引擎
-      ================================================================ */
-   let _globalSpeechLock = false;
-   window.qxIsMuted = false;
-   
-   window.qxSpeak = function(text, onEnd) {
-       if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
-       if (window.qxIsMuted) { if (onEnd) onEnd(); return; }
-       if (_globalSpeechLock && !onEnd) { return; }
-   
-       window.speechSynthesis.cancel();
-       _globalSpeechLock = true;
-   
-       const utterance = new SpeechSynthesisUtterance(text);
-       const lang = (window.mQxb && window.mQxb.Language) || 1;
-       const isZh = (lang === 1);
-       utterance.lang = isZh ? 'zh-CN' : 'en-US';
-       utterance.rate = 0.9;
-   
-       const voices = window.speechSynthesis.getVoices();
-       let selectedVoice = null;
-   
-       if (isZh) {
-           const keywords = ['Ting-Ting', 'Tingting', 'Mei-Jia', 'Xiaoxiao', 'Huihui', 'Female', '女'];
-           for (let k of keywords) {
-               selectedVoice = voices.find(v => (v.lang.includes('zh') || v.lang.includes('CN')) && v.name.includes(k));
-               if (selectedVoice) break;
-           }
-           if (!selectedVoice) selectedVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN'));
-       } else {
-           const keywords = ['Guy', 'Daniel', 'Alex', 'Male', 'Google US English'];
-           for (let k of keywords) {
-               selectedVoice = voices.find(v => (v.lang.includes('en') || v.lang.includes('US') || v.lang.includes('GB')) && v.name.includes(k));
-               if (selectedVoice) break;
-           }
-           if (!selectedVoice) selectedVoice = voices.find(v => v.lang.includes('en'));
-       }
-   
-       if (selectedVoice) utterance.voice = selectedVoice;
-   
-       utterance.onend = () => { _globalSpeechLock = false; if (onEnd) onEnd(); };
-       
-       utterance.onerror = (e) => {
-           if (e.error === 'interrupted' || e.error === 'canceled') {
-               _globalSpeechLock = false; if (onEnd) onEnd(); return;
-           }
-           console.warn('[qxSpeak] 语音播报失败', e);
-           _globalSpeechLock = false; if (onEnd) onEnd();
-       };
-       
-       window.speechSynthesis.speak(utterance);
-   };
+   全局语音合成引擎 (V2 - 接入微软 Azure 神经语音)
+   ================================================================ */
+let _globalSpeechLock = false;
+window.qxIsMuted = false;
+let _currentTTSAudio = null; // 用于保存当前正在播放的云端音频，方便随时掐断
+
+window.qxSpeak = function(text, onEnd) {
+    // 1. 兜底检查：如果处于静音状态，直接跳过并触发回调
+    if (window.qxIsMuted) { if (onEnd) onEnd(); return; }
+    if (_globalSpeechLock && !onEnd) { return; }
+
+    // 2. 停止上一次可能还在播的语音，解除锁定
+    if (_currentTTSAudio) {
+        _currentTTSAudio.pause();
+        _currentTTSAudio = null;
+    }
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel(); // 同时掐断浏览器自带的语音
+    }
+    _globalSpeechLock = true;
+
+    // 3. 读取当前语言（1=中文，2=英文）和用户在设置里选的音色
+    const lang = (window.mQxb && window.mQxb.Language) || 1;
+    const isZh = (lang === 1);
+    
+    // 默认音色：中文用“云希”，英文用“Aria”（微软英语女声，非常自然）
+    let defaultVoice = isZh ? 'zh-CN-YunxiNeural' : 'en-US-AriaNeural';
+    const userVoice = localStorage.getItem('qx_tts_voice') || defaultVoice;
+
+    // 4. 向 Supabase 代理发送请求，获取音频流
+    fetch('https://lmmnwmueppkdbzvufxar.supabase.co/functions/v1/azure-tts', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: text, voice: userVoice })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('TTS API 请求失败');
+        return res.blob();
+    })
+    .then(blob => {
+        // 5. 拿到音频流，直接播放
+        const audioUrl = URL.createObjectURL(blob);
+        _currentTTSAudio = new Audio(audioUrl);
+
+        // 6. 语音自然结束，释放锁并触发回调（这是驱动音乐播放的“发令枪”）
+        _currentTTSAudio.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+            _currentTTSAudio = null;
+            _globalSpeechLock = false;
+            if (onEnd) onEnd();
+        };
+
+        // 7. 播放（如果浏览器拦截了自动播放，静默失败）
+        _currentTTSAudio.play().catch(e => {
+            console.warn('[qxSpeak] 播放被拦截或失败', e);
+            _globalSpeechLock = false; 
+            if (onEnd) onEnd();
+        });
+    })
+    .catch(err => {
+        console.warn('[qxSpeak] 云端请求失败，自动回退到本地语音', err);
+        // 8. 兜底机制：如果网络断了，自动用回你之前的浏览器本地语音，保证不断播
+        fallbackToBrowserTTS(text, onEnd);
+    });
+};
+
+// 兜底方案：利用你原有的浏览器本地 TTS 逻辑
+function fallbackToBrowserTTS(text, onEnd) {
+    if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    const lang = (window.mQxb && window.mQxb.Language) || 1;
+    utterance.lang = (lang === 1) ? 'zh-CN' : 'en-US';
+    utterance.rate = 0.9;
+
+    utterance.onend = () => { _globalSpeechLock = false; if (onEnd) onEnd(); };
+    utterance.onerror = () => { _globalSpeechLock = false; if (onEnd) onEnd(); };
+    
+    window.speechSynthesis.speak(utterance);
+}
    
    // ============ 极简素雅版静音按钮 ============
    function initMuteButton() {

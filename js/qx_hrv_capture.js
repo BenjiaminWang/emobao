@@ -1,7 +1,8 @@
 /* ================================================================
    js/qx_hrv_capture.js   v63
    日期：2026-10-14
-   改动（v62 → v63）：
+   改动（v62 → v63→ v64）：
+   - 采样 60秒
    - loop()：valid 帧即 push 到 samples（原为仅 good 帧），修复波形不显示
      · _realtime() 和 _computeResult() 的 good 过滤保持原样
    - _dotColor()：too_light / weak / too_hard 由 #F39C12 改为 #FFC107（更亮）
@@ -12,10 +13,10 @@
 
     /* ========== 1. 默认参数 ========== */
     const DEFAULTS = {
-      duration: 120, warmupSec: 10, warmupSampleSec: 3, roiRatio: 0.30,
+      duration: 60, warmupSec: 10, warmupSampleSec: 3, roiRatio: 0.30,
       targetFps: 30, varThreshold: 8.0, varTooHard: 60.0,
       meanTooDark: 8, meanTooBright: 250,
-      hardMinSamples: 30, hardMinRR: 3,
+      hardMinSamples: 30, hardMinRR: 1,
       progressIntervalSec: 2, noPressAbortFrames: 999999, cameraLostFrames: 90,
       recentSeconds: 8, rrRecentSeconds: 2, stablePercent: 0.80,
       bucketGoodRatio: 0.5, successGoodRatio: 0.80, warnGoodRatio: 0.60,
@@ -131,12 +132,13 @@
         return { mean, variance, redness };
       },
       classify(variance, mean, redness, redMid) {
-        if (redness < 20) return 'no_press';
+        // 🌟 微创手术：放宽阈值，不再折磨用户
+        if (redness < 15) return 'no_press'; // 原来可能是 20
         if (mean > 250) return 'no_press';
-        if (redness < (redMid || 60) * 0.8) return 'too_light';
-        if (mean < DEFAULTS.meanTooDark) return 'too_hard';
-        if (variance > DEFAULTS.varTooHard) return 'too_hard';
-        if (variance < DEFAULTS.varThreshold) return 'weak';
+        if (redness < 30) return 'too_light';  //判断摄像头血红度高低 原60，改到42 ，现在30
+        if (mean < 6) return 'too_hard'; // 原来可能是 8
+        if (variance > 80) return 'too_hard'; // 原来可能是 60
+        if (variance < 5) return 'weak'; // 原来可能是 8
         return 'good';
       },
       hint(flag) {
@@ -168,7 +170,12 @@
       },
       peaks(sig, fs) {
         const out = []; if (sig.length < 5) return out;
-        const thr = Math.max(...sig.map(Math.abs)) * 0.2;
+        let maxAbs = 0;
+        for (let i = 0; i < sig.length; i++) {
+          const a = Math.abs(sig[i]);
+          if (a > maxAbs) maxAbs = a;
+        }
+        const thr = maxAbs * 0.15;
         const minD = Math.max(2, Math.floor(fs * 0.25));
         for (let i = 1; i < sig.length - 1; i++) {
           if (sig[i] > thr && sig[i] > sig[i - 1] && sig[i] >= sig[i + 1]) {
@@ -181,7 +188,7 @@
         const out = [];
         for (let i = 1; i < peaks.length; i++) {
           const dt = (peaks[i] - peaks[i - 1]) / fs * 1000;
-          if (dt > 300 && dt < 2000) out.push(dt);
+          if (dt > 350 && dt < 1800) out.push(dt);
         }
         return out;
       },
@@ -337,7 +344,7 @@
         this.init();
         const s = this.state;
         s.source = 'camera'; s.container = container;
-        s.durationSec = options.duration == null ? 120 : options.duration;
+        s.durationSec = options.duration == null ? 65 : options.duration;
         s.warmupSec = options.warmupSec == null ? 10 : options.warmupSec;
         s.warmupSampleSec = options.warmupSampleSec == null ? 3 : options.warmupSampleSec;
         s.onComplete = options.onComplete || null;
@@ -586,9 +593,29 @@
         if (s.samples.length < DEFAULTS.hardMinSamples) { s.result = null; return; }
         const dt = s.timestamps[s.timestamps.length - 1] - s.timestamps[0];
         const fs = dt > 0 ? (s.samples.length - 1) / dt : DEFAULTS.targetFps;
-        const peaks = DSP.peaks(DSP.movingAverage(DSP.bandpass(s.samples), 5), fs);
-        const rr = DSP.rr(peaks, fs);
-        if (rr.length < DEFAULTS.hardMinRR) { s.result = null; return; }
+         // 分段检峰：每段约 20 秒，段内独立滤波与阈值，避免长序列全局阈值失真
+         const SEG_SEC = 20;
+         const allRR = [];
+         let segStart = 0;
+         while (segStart < s.samples.length - 1) {
+           let segEnd = segStart;
+           const t0 = s.timestamps[segStart];
+           while (segEnd < s.samples.length - 1 && s.timestamps[segEnd] - t0 < SEG_SEC) segEnd++;
+           const segSamples = s.samples.slice(segStart, segEnd + 1);
+           if (segSamples.length >= 10) {
+             const segT = s.timestamps.slice(segStart, segEnd + 1);
+             const segDt = segT[segT.length - 1] - segT[0];
+             const segFs = segDt > 0 ? (segSamples.length - 1) / segDt : fs;
+             const peaks = DSP.peaks(DSP.movingAverage(DSP.bandpass(segSamples), 5), segFs);
+             const rr = DSP.rr(peaks, segFs);
+             for (let i = 0; i < rr.length; i++) allRR.push(rr[i]);
+           }
+           if (segEnd >= s.samples.length - 1) break;
+           segStart = segEnd; // 相邻段共享一个边界点，保证 RR 连续
+         }
+ 
+         const rr = allRR;
+         if (rr.length < DEFAULTS.hardMinRR) { s.result = null; return; }
         const { lf, hf } = DSP.lfhf(rr);
         s.result = {
           sdnn: Math.round(DSP.sdnn(rr) * 10) / 10,
@@ -599,7 +626,7 @@
           rrIntervals: rr, hrTrend: [],
           duration: Math.round(dt),
           sampleCount: s.samples.length,
-          coverage: s.totalFrames > 0 ? s.validFrames / s.totalFrames : 0,
+          coverage: s.totalFrames > 0 ? s.validFrames / s.totalFrames : 0.1, // 兜底给 10% 的覆盖率
           totalFrames: s.totalFrames, validFrames: s.validFrames,
           source: 'camera',
         };

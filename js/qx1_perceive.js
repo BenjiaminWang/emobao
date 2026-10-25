@@ -1,6 +1,7 @@
 /* ================================================================
    情绪宝 - qx1 情绪感知
-   v30 强制修复版：使用 pointerdown 替代 click
+   v31 强制修复版：使用 pointerdown 替代 click
+   采样 60秒
    ================================================================ */
    (function () {
     'use strict';
@@ -66,11 +67,16 @@
         hrvSaved: false,
         eventsSaved: true,
     };
-
-    function t(cn, en) {
+     // 🌟 全局语音导航词
+     function t(cn, en) {
         const lang = (window.mQxb && window.mQxb.Language) || 1;
         return lang === 1 ? cn : en;
     }
+     const QX1_GUIDE_TEXT = t(
+        "朋友，欢迎来到情绪感知。接下来我会为您导航，帮您熟悉如何记录自己的情绪日记，为您的心身健康积累有用数据。如果嫌我啰嗦，随时点右上角小喇叭让我闭嘴。第一步，用左上角的魔镜。触碰魔镜的镜框它会根据您的表情帮您识别情绪。注意旁边的情绪温度计，颜色变暖代表有活力，变冷代表平静或低落。如果光线不好或魔镜猜错，您可以触摸魔镜下方的小黄点，自己转动旋钮定义最真实的感受。第二步，看下方的生活事件。情绪不是凭空来的，请选今天影响情绪的主要事情，区分每件事的好坏、影响大小。第三步，测 HRV。这是您情绪的生理体温。切记，找个光线亮的地方，最好有光照在手指上，这样测得更准。把干净的手指轻按在摄像头上保持 60 秒，绿灯亮起就成功了。测完后右上方的小红心被点亮，点击即可查看雷达图和报告。",
+        "Friend, welcome to Emotion Perceive. I will guide you through how to record your emotional diary and accumulate data for your health. First, use the magic mirror. Touch its frame to identify your emotion. Note the thermometer: warmer colors mean energetic, cooler means calm or low. If the lighting is poor or the mirror guesses wrong, touch the small yellow dot below to turn the knob and define your true feeling. Second, look at the life events below. Emotions don't come from nowhere; select the main events that affected you today, and rate their impact. Third, test HRV. This is your emotion's 'physical temperature.' Remember, find a bright place, ideally with light shining on your finger. Place a clean finger on the camera for 60 seconds. Once the green light appears, it's successful. After testing, the red heart in the top right will light up; click it to see your radar chart and report."
+    );
+    
     function getUserId() { return window.mQxb && window.mQxb.user_id; }
     function getUserType() { return (window.mQxb && parseInt(window.mQxb.user_id_Type)) || 1; }
     function getLang() { return (window.mQxb && window.mQxb.Language) || 1; }
@@ -418,6 +424,8 @@
 
                     // 使用底层的 pointerdown 事件，绕过 click 穿透问题
                     item.addEventListener('pointerdown', function(e) {
+                        if (window.speechSynthesis) window.speechSynthesis.cancel(); // 🌟 闭嘴
+
                         // 清除其他选中
                         const allItems = tree.querySelectorAll('.qx1-tree-item');
                         allItems.forEach(el => el.classList.remove('selected'));
@@ -707,6 +715,23 @@
                     modal.querySelectorAll('.qx1-chart-modal-tab').forEach(x => x.classList.remove('active'));
                     tab.classList.add('active');
                     renderHrvModal(tab.dataset.key);
+                    
+                    // 🌟 点击 Tab 时的语音播报
+                    if (window.qxSpeak) {
+                        let speakText = '';
+                        if (tab.dataset.key === 'radar') {
+                            speakText = "这是 HRV 雷达图。四个轴代表不同的身体指标。圈里面涂色的面积越大，说明您此刻越放松，身体的恢复状态越好。";
+                        } else if (tab.dataset.key === 'trend') {
+                            speakText = "这是心率趋势图。红色的实线是心跳速度，蓝色的虚线是心跳的弹性。蓝线如果抬高，说明您正在放松；如果蓝线压低，说明您还有点紧张。";
+                        } else if (tab.dataset.key === 'scatter') {
+                            speakText = "这是 RR 散点图。图上的点越分散，说明您的心跳越有弹性，人越放松；如果点挤成一团，说明心跳很规律，人可能有些紧绷。";
+                        } else if (tab.dataset.key === 'cards') {
+                            speakText = "这是关键指标卡。您看中间的蓝色方块，如果它落在两侧的灰色区域里，说明指标完全正常。上方还为您给出了综合的放松评分。";
+                        }
+                        if (speakText) {
+                            window.qxSpeak(speakText, () => {});
+                        }
+                    }
                 });
             });
 
@@ -890,11 +915,12 @@
     }
 
     function openHealModal() {
+        if (window.speechSynthesis) window.speechSynthesis.cancel(); // 🌟 闭嘴，别再念总介绍了
         const modal = document.getElementById('qx1_heal_modal');
         if (!modal) return;
         modal.classList.add('show');
         const timer = document.getElementById('qx1_heal_modal_timer');
-        if (timer) timer.innerText = t('0 / 120 秒', '0 / 120 s');
+        if (timer) timer.innerText = t('0 / 60 秒', '0 / 60 s');
 
         const src = qxHrvCapture.getSource ? qxHrvCapture.getSource() : 'camera';
         const hint = document.getElementById('qx1_heal_modal_hint');
@@ -956,7 +982,7 @@
 
         qxHrvCapture.start('qx1_hrv_capture', {
             source: src,
-            duration: 120,
+            duration: 60,
             onProgress: (rt) => {
                 if (!rt) return;
                 if (window.qxHealChart) {
@@ -966,9 +992,7 @@
             onAbort: (info) => {
                 if (!info) return;
                 if (info.reason === 'no_finger') {
-                    state.hrvResult = null;
-                    state.hrvSaved = false;
-                    toast(t('手指离开，本次采集作废，请重新开始', 'Finger removed. Capture aborted, please restart.'), 'warning');
+                    toast(t('手指松开了，请把手指轻轻放回摄像头，数据正在保留…', 'Finger removed. Please place it back gently. Data is being preserved...'), 'warning');
                 } else if (info.reason === 'unsupported') {
                     toast(info.message || t('本机不支持蓝牙心率带', 'Bluetooth not supported'), 'error');
                 } else if (info.reason === 'LOW_RR') {
@@ -976,7 +1000,7 @@
                 }
             },
             onComplete: (result) => {
-                if (result) {
+                if (result && (result.coverage === undefined || result.coverage >= 0.10)) {
                     state.hrvResult = result;
                     state.hrvSaved = false;
                     markDirty();
@@ -1007,17 +1031,22 @@
         state.eventsSaved = true;
         state.hrvResult = null;
         state.hrvSaved = false;
-
+        // 🌟 抢跑：不等加载，立刻开口说话！
+        setTimeout(() => {
+            if (window.qxSpeak) {
+                window.qxSpeak(QX1_GUIDE_TEXT, () => {});
+            }
+        }, 100); // 改成了100毫秒
         applyLayout();
         window.addEventListener('resize', onResizeDebounced);
         window.addEventListener('orientationchange', onResizeDebounced);
-
         qxMoodMirror.create('qx1_emotion_wheel', {
             mode: '今日情绪',
             initialCode: 0,
             doIt: '做',
             thermometerSide: 'right',
             onChange: (code) => {
+                if (window.speechSynthesis) window.speechSynthesis.cancel(); // 🌟 闭嘴
                 state.emotionCode = (code == null || code === 0) ? null : code;
                 refreshEmotionTitle();
                 markDirty();

@@ -3789,3 +3789,38 @@ body.lang-en .qx2-flow-name {
     pointer-events: auto !important;
     cursor: pointer !important;
 }
+/* 🌟 针对左侧事件列表容器的滚动条美化与高度限制 */
+.qx1-tree-children { 
+    max-height: 250px !important; /* 加上 !important 强行覆盖，你可以根据手机屏幕大小改成 300px 或 200px */
+    overflow-y: auto !important; 
+    padding-right: 4px; /* 留点空间给滚动条 */
+}
+
+/* 滚动条轨道 */
+.qx1-tree-children::-webkit-scrollbar {
+    width: 8px !important;
+}
+.qx1-tree-children::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+    border-radius: 4px;
+}
+
+/* 滚动条滑块（蓝色显眼） */
+.qx1-tree-children::-webkit-scrollbar-thumb {
+    background: #2C7BE5 !important;
+    border-radius: 4px;
+    border: 2px solid #fff; /* 增加一点白边，显得更精致 */
+}/* 🌟 缩小 HRV 治愈主图弹窗，上下留白，露出上下操作区 */
+#qx1_heal_modal .modal-content, 
+#qx1_heal_modal > div {
+    height: 60vh !important; /* 高度只占屏幕 60%（上下都缩小） */
+    margin-top: 20vh !important; /* 往下推 20%，居中，上方露出生活事件 */
+    border-radius: 12px; 
+    overflow: hidden;
+}
+
+#qx1_heal_canvas {
+    width: 100% !important;
+    height: 100% !important; /* 让画布严格贴合 60vh 的容器 */
+    object-fit: contain;
+}

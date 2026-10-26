@@ -424,9 +424,23 @@
                     item.innerText = fullName;
                     item.setAttribute('title', fullName);
 
-                    // 使用底层的 pointerdown 事件，绕过 click 穿透问题
+                    // 🌟 改用 click，并加入防滑动误触逻辑
+                    let startX = 0, startY = 0;
                     item.addEventListener('pointerdown', function(e) {
-                        if (window.speechSynthesis) window.speechSynthesis.cancel(); // 🌟 闭嘴
+                        // 记录按下的位置
+                        startX = e.clientX;
+                        startY = e.clientY;
+                    });
+
+                    item.addEventListener('click', function(e) {
+                        // 如果手指滑动距离超过 10 像素，说明用户是在滚动列表，拦截点击
+                        const moveX = Math.abs(e.clientX - startX);
+                        const moveY = Math.abs(e.clientY - startY);
+                        if (moveX > 10 || moveY > 10) {
+                            return; // 判定为滑动，直接退出，不执行选中
+                        }
+
+                        if (window.speechSynthesis) window.speechSynthesis.cancel();
 
                         // 清除其他选中
                         const allItems = tree.querySelectorAll('.qx1-tree-item');
@@ -937,6 +951,12 @@
         const pf = document.getElementById('qx1_heal_modal_progress');
         if (pf) pf.style.width = '0%';
         if (window.qxHealChart) {
+            // 🌟 关键补丁：强制画布重新适应缩小后的容器尺寸
+            const canvasEl = document.getElementById('qx1_heal_canvas');
+            if (canvasEl) {
+                canvasEl.width = canvasEl.clientWidth;
+                canvasEl.height = canvasEl.clientHeight;
+            }
             try { qxHealChart.start('qx1_heal_canvas'); } catch (e) { console.error('[qx1] heal start 失败', e); }
         }
     }

@@ -420,7 +420,9 @@
                     item.dataset.eventcode = ch.eventcode;
                     item.dataset.nameCn = ch.eventname_cn;
                     item.dataset.nameEn = ch.eventname_en;
-                    item.innerText = lang === 1 ? ch.eventname_cn : ch.eventname_en;
+                    const fullName = lang === 1 ? ch.eventname_cn : ch.eventname_en;
+                    item.innerText = fullName;
+                    item.setAttribute('title', fullName);
 
                     // 使用底层的 pointerdown 事件，绕过 click 穿透问题
                     item.addEventListener('pointerdown', function(e) {
@@ -1169,6 +1171,27 @@
         }
 
         applyLayout();
+
+        const styleId = 'qx1_senior_css';
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.innerHTML = `
+                /* 左侧树形菜单分类 */
+                .qx1-tree-cat-title { font-size: 16px !important; font-weight: bold !important; color: #111 !important; padding: 10px 0; }
+                /* 左侧树形菜单具体事件 */
+                .qx1-tree-item { font-size: 16px !important; font-weight: 500 !important; color: #222 !important; padding: 8px 12px; }
+                
+                /* 右侧已选生活事件列表 */
+                .qx1-event-name { font-size: 16px !important; font-weight: bold !important; color: #111 !important; }
+                .qx1-event-meta { font-size: 14px !important; color: #444 !important; }
+                
+                /* 空状态和合计文字 */
+                .qx1-event-empty { font-size: 15px !important; color: #666 !important; }
+                .qx1-sum-good, .qx1-sum-bad { font-size: 14px !important; font-weight: bold !important; }
+            `;
+            document.head.appendChild(style);
+        }
 
         state.initialized = true;
         console.log('qx1_init 完成');

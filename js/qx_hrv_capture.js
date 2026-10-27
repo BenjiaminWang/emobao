@@ -176,7 +176,7 @@
           if (a > maxAbs) maxAbs = a;
         }
         const thr = maxAbs * 0.15;
-        const minD = Math.max(2, Math.floor(fs * 0.25));
+        const minD = Math.max(3, Math.floor(fs * 0.35));
         for (let i = 1; i < sig.length - 1; i++) {
           if (sig[i] > thr && sig[i] > sig[i - 1] && sig[i] >= sig[i + 1]) {
             if (!out.length || i - out[out.length - 1] >= minD) out.push(i);
@@ -431,8 +431,7 @@
 
         s.elapsed += dt;
         if (s.elapsed >= s.durationSec) { this.stopCapture('done'); return; }
-        const shown = Math.min(Math.floor(s.elapsed), s.durationSec);
-
+        const shown = Math.min(Math.round(s.elapsed), s.durationSec);
         if (!videoReady) {
           this.setHint(t('摄像头未就绪…', 'Camera not ready…'), '#B9770E');
           this._updateTimers(shown);

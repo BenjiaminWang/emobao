@@ -176,19 +176,34 @@
           if (a > maxAbs) maxAbs = a;
         }
         const thr = maxAbs * 0.15;
-        const minD = Math.max(3, Math.floor(fs * 0.35));
+        const minD = Math.max(4, Math.floor(fs * 0.4));
         for (let i = 1; i < sig.length - 1; i++) {
-          if (sig[i] > thr && sig[i] > sig[i - 1] && sig[i] >= sig[i + 1]) {
-            if (!out.length || i - out[out.length - 1] >= minD) out.push(i);
+            if (sig[i] > thr && sig[i] > sig[i - 1] && sig[i] >= sig[i + 1]) {
+              
+              // 🌟 引入抛物线插值，计算亚帧级峰值位置，消除竖线排列
+              const y0 = sig[i - 1], y1 = sig[i], y2 = sig[i + 1];
+              const denom = 2 * (2 * y1 - y0 - y2);
+              let offset = 0;
+              if (Math.abs(denom) > 0.0001) {
+                  offset = (y0 - y2) / denom;
+                  if (offset < -0.5) offset = -0.5;
+                  if (offset > 0.5) offset = 0.5;
+              }
+              const truePeakIndex = i + offset;
+  
+              // 用精准的小数位置代替原来的整数位置
+              if (!out.length || truePeakIndex - out[out.length - 1] >= minD) {
+                  out.push(truePeakIndex); 
+              }
+            }
           }
-        }
         return out;
       },
       rr(peaks, fs) {
         const out = [];
         for (let i = 1; i < peaks.length; i++) {
           const dt = (peaks[i] - peaks[i - 1]) / fs * 1000;
-          if (dt > 350 && dt < 1800) out.push(dt);
+          if (dt > 400 && dt < 1600) out.push(dt);
         }
         return out;
       },
@@ -615,22 +630,35 @@
  
          const rr = allRR;
          if (rr.length < DEFAULTS.hardMinRR) { s.result = null; return; }
-        const { lf, hf } = DSP.lfhf(rr);
-        s.result = {
-          sdnn: Math.round(DSP.sdnn(rr) * 10) / 10,
-          rmssd: Math.round(DSP.rmssd(rr) * 10) / 10,
-          pnn50: 0,
-          bpm: Math.round(DSP.bpm(rr)),
-          lf, hf, lfHf: 0,
-          rrIntervals: rr, hrTrend: [],
-          duration: Math.round(dt),
-          sampleCount: s.samples.length,
-          coverage: s.totalFrames > 0 ? s.validFrames / s.totalFrames : 0.1, // 兜底给 10% 的覆盖率
-          totalFrames: s.totalFrames, validFrames: s.validFrames,
-          source: 'camera',
-        };
-      },
-    };
+       
+         // 🌟 终极清洗：去除个别极其离谱的“假间隔”
+         // 1. 先算出中位数
+         const sortedRR = [...rr].sort((a, b) => a - b);
+         const medianRR = sortedRR[Math.floor(sortedRR.length / 2)] || 800;
+         
+         // 2. 只有落在中位数正负 30% 范围内的 RR 才是真实的
+         const cleanRR = rr.filter(val => val > medianRR * 0.7 && val < medianRR * 1.3);
+         
+         // 如果清洗后数据太少，则退回到原始数据
+         const finalRR = cleanRR.length > 10 ? cleanRR : rr;
+       
+         // 用清洗后的 finalRR 来计算所有指标
+         const { lf, hf } = DSP.lfhf(finalRR);
+         s.result = {
+             sdnn: Math.round(DSP.sdnn(finalRR) * 10) / 10,
+             rmssd: Math.round(DSP.rmssd(finalRR) * 10) / 10,
+             pnn50: 0,
+             bpm: Math.round(DSP.bpm(finalRR)),
+             lf, hf, lfHf: 0,
+             rrIntervals: finalRR, hrTrend: [],
+             duration: Math.round(dt),
+             sampleCount: s.samples.length,
+             coverage: s.totalFrames > 0 ? s.validFrames / s.totalFrames : 0.1,
+             totalFrames: s.totalFrames, validFrames: s.validFrames,
+             source: 'camera',
+         };
+      }, // 🌟 1. 闭合 _computeResult
+    }; // 🌟 2. 闭合 Session (关键句号！)
 
     /* ========== 7. quickTest ========== */
     async function quickTest(deviceId, options) {

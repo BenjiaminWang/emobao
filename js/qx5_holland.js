@@ -164,4 +164,5 @@
     window._hollandStart = function(hostEl) {
         startHolland(hostEl);
     };
+    console.log('霍兰德 JS 已加载！'); // 👈 加上这一句
 })();

@@ -62,6 +62,65 @@
             return;
         }
 
+        // ================= 新增：主打精选推荐区 =================
+        const featuredGames = games.filter(g => g.isFeatured);
+        if (featuredGames.length > 0) {
+            const featuredWrap = document.createElement('div');
+            featuredWrap.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;';
+            
+            // 给精选区加个小标题
+            featuredWrap.innerHTML = `<div style="font-size: 13px; font-weight: bold; color: #64748B; letter-spacing: 1px; margin-bottom: 4px;">⭐ ${t('精选主打测评', 'Featured Assessments')}</div>`;
+
+            featuredGames.forEach(g => {
+                const card = document.createElement('div');
+                // 使用醒目的渐变色背景，区别于普通游戏卡片
+                card.style.cssText = `
+                    background: linear-gradient(135deg, #2C7BE5 0%, #1A56B8 100%);
+                    border-radius: 16px;
+                    padding: 24px 20px;
+                    color: #fff;
+                    cursor: pointer;
+                    box-shadow: 0 8px 20px rgba(44, 123, 229, 0.25);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                    position: relative;
+                    overflow: hidden;
+                `;
+                
+                // 添加一点背景装饰
+                card.innerHTML = `
+                    <div style="position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg);">🧠</div>
+                    <div style="font-size: 22px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
+                        <span>${t(g.title.cn, g.title.en)}</span>
+                        <span style="font-size: 14px; font-weight: normal; opacity: 0.8; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">${t('立即测试', 'Start')} →</span>
+                    </div>
+                    <div style="font-size: 14px; opacity: 0.9; line-height: 1.5; position: relative; z-index: 1;">
+                        ${t(g.subtitle.cn, g.subtitle.en)}
+                    </div>
+                `;
+
+                card.onmouseenter = () => {
+                    card.style.transform = 'translateY(-2px)';
+                    card.style.boxShadow = '0 12px 24px rgba(44, 123, 229, 0.35)';
+                };
+                card.onmouseleave = () => {
+                    card.style.transform = 'translateY(0)';
+                    card.style.boxShadow = '0 8px 20px rgba(44, 123, 229, 0.25)';
+                };
+
+                card.onclick = function () { startGame(g.id); };
+                featuredWrap.appendChild(card);
+            });
+            
+            grid.appendChild(featuredWrap);
+
+            // 加一条分割线
+            const divider = document.createElement('div');
+            divider.style.cssText = 'height: 1px; background: #E2E8F0; margin: 0 0 24px 0;';
+            grid.appendChild(divider);
+        }
+        // ================= 新增结束 =================
+
+        // 下面是原有的树形列表渲染逻辑
         const byCollection = {};
         games.forEach(g => {
             const cid = g.collectionId || 'misc';

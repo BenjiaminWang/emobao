@@ -99,10 +99,31 @@
                     const card = document.createElement('div');
                     card.className = 'qx5-game-card';
                     card.dataset.gameId = g.id;
+                    
+                    // 把副标题（也就是玩法简介）用来做语音导引
+                    const voiceText = t(g.subtitle.cn, g.subtitle.en);
+                    
                     card.innerHTML = `
-                        <div class="qx5-game-card-title">${t(g.title.cn, g.title.en)}</div>
+                        <div class="qx5-game-card-title" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>${t(g.title.cn, g.title.en)}</span>
+                            <span class="qx5-voice-btn" style="cursor:pointer; font-size:16px; padding:4px; opacity:0.6; transition:opacity 0.2s;" title="${t('语音导引', 'Voice Guide')}">🔊</span>
+                        </div>
                         <div class="qx5-game-card-sub">${t(g.subtitle.cn, g.subtitle.en)}</div>
                     `;
+                    
+                    // 绑定语音点击事件（阻止冒泡，防止触发进入游戏）
+                    const voiceBtn = card.querySelector('.qx5-voice-btn');
+                    voiceBtn.onmouseenter = () => voiceBtn.style.opacity = '1';
+                    voiceBtn.onmouseleave = () => voiceBtn.style.opacity = '0.6';
+                    voiceBtn.onclick = function (e) {
+                        e.stopPropagation(); 
+                        if (window.qxSpeak) {
+                            // 播放语音：游戏名字 + 玩法简介
+                            const speakContent = t(`欢迎来到 ${g.title.cn}。${g.subtitle.cn}`, `Welcome to ${g.title.en}. ${g.subtitle.en}`);
+                            window.qxSpeak(speakContent);
+                        }
+                    };
+                    
                     card.onclick = function () { startGame(g.id); };
                     childrenEl.appendChild(card);
                 });

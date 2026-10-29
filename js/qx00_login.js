@@ -7,8 +7,8 @@
    - mQxb 新增 BrandLogoUrl 字段
    - 其余（登录/注册/密码/访客/Toast）与 v8 完全一致
    ================================================================ */
+   const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co';
 
-   const SUPABASE_URL = 'https://api.emobao.com';
    const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
    
    const MQXB_VERSION = 1;

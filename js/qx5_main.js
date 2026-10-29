@@ -82,7 +82,17 @@
                 isFeatured: true
             });
         }        
-
+        // 👇 新增：强制塞入 OH卡 👇
+        const hasOh = featuredGames.some(g => g.id === 'ohcard_test');
+        if (!hasOh) {
+            featuredGames.push({
+                id: 'ohcard_test',
+                title: { cn: '心理扑克（OH卡）', en: 'OH Cards' },
+                subtitle: { cn: '潜意识投射，遇见未知的自己', en: 'Subconscious projection' },
+                isFeatured: true
+            });
+        }
+        // 👆 新增结束 👆
         if (featuredGames.length > 0) {
             const featuredWrap = document.createElement('div');
             featuredWrap.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;';
@@ -226,6 +236,17 @@
             if (window._hollandStart) window._hollandStart(hostEl);
             return;
         }
+        // 👇 新增：如果是 OH 卡 👇
+        if (gameId === 'ohcard_test') {
+            const hostEl = getEl('qx5_play_host');
+            getEl('qx5_list_view').style.display = 'none';
+            getEl('qx5_play_view').style.display = 'flex';
+            getEl('qx5_play_title').innerText = t('心理扑克（OH卡）', 'OH Cards');
+            hostEl.innerHTML = '';
+            if (window._ohStart) window._ohStart(hostEl);
+            return;
+        }
+        // 👆 新增结束 👆        
         const game = window.qx5Engine.getGame(gameId);
         if (!game) {
             console.error('[qx5] 找不到游戏', gameId);

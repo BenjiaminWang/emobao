@@ -72,6 +72,16 @@
                 isFeatured: true
             });
         }
+        // 强制塞入 霍兰德
+        const hasHolland = featuredGames.some(g => g.id === 'holland_test');
+        if (!hasHolland) {
+            featuredGames.push({
+                id: 'holland_test',
+                title: { cn: '霍兰德职业兴趣测试', en: 'Holland Career Interest' },
+                subtitle: { cn: '测测你最适合什么工作', en: 'Find your ideal career path' },
+                isFeatured: true
+            });
+        }        
 
         if (featuredGames.length > 0) {
             const featuredWrap = document.createElement('div');
@@ -206,7 +216,16 @@
             if (window._mbtiStart) window._mbtiStart(hostEl);
             return;
         }
-
+        // 【核心修复】如果是霍兰德，绕过引擎直接启动
+        if (gameId === 'holland_test') {
+            const hostEl = getEl('qx5_play_host');
+            getEl('qx5_list_view').style.display = 'none';
+            getEl('qx5_play_view').style.display = 'flex';
+            getEl('qx5_play_title').innerText = t('霍兰德职业兴趣测试', 'Holland Career Interest');
+            hostEl.innerHTML = '';
+            if (window._hollandStart) window._hollandStart(hostEl);
+            return;
+        }
         const game = window.qx5Engine.getGame(gameId);
         if (!game) {
             console.error('[qx5] 找不到游戏', gameId);

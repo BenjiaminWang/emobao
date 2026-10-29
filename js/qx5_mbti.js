@@ -176,6 +176,7 @@
             window.qx5Engine.registerGame({
                 id: 'mbti_test',
                 collectionId: 'emotion',
+                isFeatured: true,
                 title: { cn: '16型人格测试', en: '16 Personalities' },
                 subtitle: { cn: '测测你是哪种稀有物种', en: 'Discover your personality type' },
                 generateTrials: () => [],

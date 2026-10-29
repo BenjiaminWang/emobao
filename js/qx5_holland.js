@@ -1,9 +1,5 @@
 /* ================================================================
    情绪宝 - qx5 霍兰德职业兴趣测试（RIASEC）
-   v1 (2026-10-29)
-   - 18题极速版，是/否二选一
-   - 支持中英双语，支持语音播报
-   - 结果展示主导代码及解读
    ================================================================ */
    (function () {
     'use strict';
@@ -13,7 +9,6 @@
         return lang === 1 ? cn : en;
     };
 
-    // 18道题题库（每维度3题）
     const QUESTIONS = [
         { q_cn: '我喜欢修理机器或组装零件。', q_en: 'I like to repair machines or assemble parts.', type: 'R' },
         { q_cn: '我喜欢使用工具或体力劳动。', q_en: 'I like using tools or doing physical labor.', type: 'R' },
@@ -24,7 +19,7 @@
         { q_cn: '我喜欢画画、写作或设计。', q_en: 'I like drawing, writing, or designing.', type: 'A' },
         { q_cn: '我喜欢用音乐或艺术表达自己。', q_en: 'I like expressing myself through music or art.', type: 'A' },
         { q_cn: '我喜欢自由自在、没有固定规则的工作。', q_en: 'I like free, unstructured work.', type: 'A' },
-        { q_cn: '我喜欢倾听别人的烦恼并安慰他们。', q_en: 'I like listening to others\' problems and comforting them.', type: 'S' },
+        { q_cn: '我喜欢倾听别人的烦恼并安慰他们。', q_en: 'I like listening to others problems and comforting them.', type: 'S' },
         { q_cn: '我喜欢教导或培训别人。', q_en: 'I like teaching or training others.', type: 'S' },
         { q_cn: '我喜欢团队合作，大家一起完成任务。', q_en: 'I like teamwork and completing tasks together.', type: 'S' },
         { q_cn: '我喜欢说服别人接受我的观点。', q_en: 'I like persuading others to accept my views.', type: 'E' },
@@ -36,12 +31,12 @@
     ];
 
     const RESULTS = {
-        'R': { name_cn: '现实型', name_en: 'Realistic', desc_cn: '喜欢动手实践，擅长操作工具，适合工程师、机械师、运动员等职业。', desc_en: 'Prefers hands-on practice and tools. Suitable for engineers, mechanics, athletes, etc.', color: '#E67E22' },
-        'I': { name_cn: '研究型', name_en: 'Investigative', desc_cn: '喜欢观察思考，善于逻辑推理，适合科学家、医生、程序员等职业。', desc_en: 'Enjoys observing and thinking. Suitable for scientists, doctors, programmers, etc.', color: '#2C7BE5' },
-        'A': { name_cn: '艺术型', name_en: 'Artistic', desc_cn: '富有想象力，追求个性和美感，适合设计师、作家、艺术家等职业。', desc_en: 'Imaginative and creative. Suitable for designers, writers, artists, etc.', color: '#9B59B6' },
-        'S': { name_cn: '社会型', name_en: 'Social', desc_cn: '乐于助人，擅长沟通和教导，适合教师、心理咨询师、社会工作者等。', desc_en: 'Helpful and good at communicating. Suitable for teachers, counselors, social workers.', color: '#2ECC71' },
-        'E': { name_cn: '企业型', name_en: 'Enterprising', desc_cn: '喜欢冒险和领导，精力充沛，适合创业者、销售、管理者等职业。', desc_en: 'Loves adventure and leadership. Suitable for entrepreneurs, sales, managers, etc.', color: '#E74C3C' },
-        'C': { name_cn: '常规型', name_en: 'Conventional', desc_cn: '做事严谨细心，擅长整理和规划，适合会计、行政、数据分析等职业。', desc_en: 'Rigorous and detail-oriented. Suitable for accounting, administration, data analysis.', color: '#95A5A6' }
+        'R': { name_cn: '现实型', name_en: 'Realistic', desc_cn: '喜欢动手实践，擅长操作工具，适合工程师、机械师、运动员等职业。', desc_en: 'Prefers hands-on practice and tools.', color: '#E67E22' },
+        'I': { name_cn: '研究型', name_en: 'Investigative', desc_cn: '喜欢观察思考，善于逻辑推理，适合科学家、医生、程序员等职业。', desc_en: 'Enjoys observing and thinking.', color: '#2C7BE5' },
+        'A': { name_cn: '艺术型', name_en: 'Artistic', desc_cn: '富有想象力，追求个性和美感，适合设计师、作家、艺术家等职业。', desc_en: 'Imaginative and creative.', color: '#9B59B6' },
+        'S': { name_cn: '社会型', name_en: 'Social', desc_cn: '乐于助人，擅长沟通和教导，适合教师、心理咨询师、社会工作者等。', desc_en: 'Helpful and good at communicating.', color: '#2ECC71' },
+        'E': { name_cn: '企业型', name_en: 'Enterprising', desc_cn: '喜欢冒险和领导，精力充沛，适合创业者、销售、管理者等职业。', desc_en: 'Loves adventure and leadership.', color: '#E74C3C' },
+        'C': { name_cn: '常规型', name_en: 'Conventional', desc_cn: '做事严谨细心，擅长整理和规划，适合会计、行政、数据分析等职业。', desc_en: 'Rigorous and detail-oriented.', color: '#95A5A6' }
     };
 
     let currentIdx = 0;
@@ -76,7 +71,7 @@
                     ${t('是的，我喜欢', 'Yes, I like it')}
                 </button>
                 <button class="qx5-btn qx5-btn-secondary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #F1F5F9; color: #475569; border: none; cursor: pointer;" onclick="window._hollandAnswer('no')">
-                    ${t('不，我不喜欢', 'No, I don\\'t')}
+                    ${t('不，我不喜欢', 'No')}
                 </button>
             </div>
         `;
@@ -99,17 +94,14 @@
         const q = QUESTIONS[currentIdx];
         if (choice === 'yes') scores[q.type]++;
         currentIdx++;
-        
         renderQuestion(document.getElementById('qx5_play_host'));
     };
 
     function renderResult(hostEl) {
-        // 找出得分最高的三个类型
         const sortedTypes = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
         const topThree = sortedTypes.slice(0, 3);
         const mainType = topThree[0];
         const res = RESULTS[mainType];
-
         const resName = t(res.name_cn, res.name_en);
         const resDesc = t(res.desc_cn, res.desc_en);
 
@@ -120,15 +112,11 @@
                 <div style="background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; border: 1px solid #E2E8F0;">
                     <div style="background: ${res.color}; padding: 40px 20px; color: #fff; position: relative;">
                         <span id="qx5_holland_result_voice" style="position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; opacity: 0.8;" title="听结果">🔊</span>
-                        
                         <div style="font-size: 40px; font-weight: 900; letter-spacing: 4px; margin-bottom: 10px;">${topThree.join(' - ')}</div>
                         <div style="font-size: 20px; font-weight: bold; opacity: 0.9;">${resName}</div>
                     </div>
                     <div style="padding: 30px 20px; font-size: 15px; color: #334155; line-height: 1.8; text-align: left;">
                         ${resDesc}
-                        <div style="margin-top: 15px; font-size: 13px; color: #64748B;">
-                            ${t('主要倾向：', 'Main inclinations: ')} ${topThree.map(k => t(RESULTS[k].name_cn, RESULTS[k].name_en)).join(' / ')}
-                        </div>
                     </div>
                 </div>
 
@@ -142,11 +130,8 @@
         `;
 
         const speakText = t(`测试完成。您的霍兰德职业兴趣代码是${topThree.join('、')}，主要属于${res.name_cn}。${res.desc_cn}`, 
-                            `Assessment complete. Your Holland code is ${topThree.join(', ')}. Main type: ${res.name_en}. ${res.desc_en}`);
-
-        if (window.qxSpeak) {
-            window.qxSpeak(speakText);
-        }
+                            `Assessment complete. Your Holland code is ${topThree.join(', ')}.`);
+        if (window.qxSpeak) window.qxSpeak(speakText);
 
         const voiceBtn = hostEl.querySelector('#qx5_holland_result_voice');
         if (voiceBtn) {
@@ -160,9 +145,7 @@
         startHolland(document.getElementById('qx5_play_host'));
     };
 
-    // 暴露给主界面强行调用
     window._hollandStart = function(hostEl) {
         startHolland(hostEl);
     };
-    console.log('霍兰德 JS 已加载！'); // 👈 加上这一句
 })();

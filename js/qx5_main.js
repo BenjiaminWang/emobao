@@ -195,6 +195,18 @@
     }
 
     async function startGame(gameId) {
+        // 【核心修复】如果是 MBTI，绕过引擎字典，直接启动
+        if (gameId === 'mbti_test') {
+            const hostEl = getEl('qx5_play_host');
+            getEl('qx5_list_view').style.display = 'none';
+            getEl('qx5_play_view').style.display = 'flex';
+            getEl('qx5_play_title').innerText = t('16型人格测试', '16 Personalities');
+            hostEl.innerHTML = '';
+            // 直接调 MBTI 模块内部渲染
+            if (window._mbtiStart) window._mbtiStart(hostEl);
+            return;
+        }
+
         const game = window.qx5Engine.getGame(gameId);
         if (!game) {
             console.error('[qx5] 找不到游戏', gameId);

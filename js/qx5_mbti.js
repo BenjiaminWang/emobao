@@ -189,5 +189,8 @@
             });
         }
     };
-
+    // 暴露给 qx5_main.js 强制调用
+    window._mbtiStart = function(hostEl) {
+        startMbti(hostEl);
+    };
 })();

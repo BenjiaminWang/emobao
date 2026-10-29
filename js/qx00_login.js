@@ -1,5 +1,11 @@
 /* ================================================================
-   情绪宝 - qx00 登录前逻辑（v8，含登录/注册 + 密码登录 + 强制设密码 + 契约 + Toast）
+   情绪宝 - qx00 登录前逻辑
+   v9（2026-10-27）：
+   - 新增二维码入口：URL 带 ?qrcode_id=xxx 时查合作方、记扫码、预填码
+   - 激活成功后双归因（扫码 + 手输码都调 emo_link_activation_to_user）
+   - 二维码过期/无效时静默降级，不阻塞用户
+   - mQxb 新增 BrandLogoUrl 字段
+   - 其余（登录/注册/密码/访客/Toast）与 v8 完全一致
    ================================================================ */
 
    const SUPABASE_URL = 'https://api.emobao.com';
@@ -8,12 +14,16 @@
    const MQXB_VERSION = 1;
    const PASSWORD_SALT = 'emobao_salt_2026';
    
+   const SCAN_SESSION_KEY = 'emo_current_scanid';
+   const QRCODE_PARAM_KEY = 'emo_current_qrcode_id';
+   
    window.mQxb = {
        user_id: null,
        user_id_Type: null,
        Language: 1,
        Username: null,
        UserImage: null,
+       BrandLogoUrl: null,
        IsGuest: false,
        ExpiryDate: null,
        IsTeamLeader: false,
@@ -21,6 +31,7 @@
    };
    
    let _pendingUser = null;
+   let _currentQrcodeInfo = null;
    
    /* ================================================================
       密码哈希（SHA-256 + salt）
@@ -161,6 +172,15 @@
            strength2: "中",
            strength3: "强",
            strength4: "很强",
+   
+           qrcodeChecking: "正在校验二维码...",
+           qrcodeInvalid: "二维码无效",
+           qrcodeExpired: "入口已过期，可继续使用兑换码",
+           qrcodeNotYetValid: "入口尚未生效，可继续使用兑换码",
+           qrcodeInactive: "入口已停用，可继续使用兑换码",
+           qrcodeNotFound: "入口不存在",
+           qrcodePartnerWelcome: "欢迎来自「{name}」的朋友",
+           qrcodeCodePrefilled: "已为您填入兑换码",
        },
        2: {
            welcome: "Emo Treasure helps you record, understand, and improve your emotions.\nAs a tool, Emo Treasure does not replace any professional medical diagnosis or medical treatment.\nEmo Treasure follows the principle that privacy is above all. Your emotional data belongs to you.\nThe system will not upload any of your personal sensitive information.",
@@ -211,8 +231,29 @@
            strength2: "Medium",
            strength3: "Strong",
            strength4: "Very strong",
+   
+           qrcodeChecking: "Verifying QR code...",
+           qrcodeInvalid: "Invalid QR code",
+           qrcodeExpired: "Entry expired, you can still use the code",
+           qrcodeNotYetValid: "Entry not yet valid, you can still use the code",
+           qrcodeInactive: "Entry inactive, you can still use the code",
+           qrcodeNotFound: "Entry not found",
+           qrcodePartnerWelcome: "Welcome from \"{name}\"",
+           qrcodeCodePrefilled: "Activation code pre-filled",
        }
    };
+   
+   function tr(key, vars) {
+       const lang = window.mQxb.Language || 1;
+       const dict = TEXT[lang] || TEXT[1];
+       let s = dict[key] || key;
+       if (vars) {
+           Object.keys(vars).forEach(k => {
+               s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), vars[k]);
+           });
+       }
+       return s;
+   }
    
    /* ================================================================
       页面切换
@@ -291,6 +332,15 @@
            `<div>${t.passwordRules1}</div><div>${t.passwordRules2}</div>`;
        document.getElementById('btn_password_confirm').innerText = t.passwordComplete;
    
+       const banner = document.getElementById('activation_partner_banner');
+       const bannerName = document.getElementById('activation_partner_name');
+       if (banner && bannerName && _currentQrcodeInfo) {
+           const name = lang === 1
+               ? (_currentQrcodeInfo.partner_name_cn || _currentQrcodeInfo.partner_name_en || '')
+               : (_currentQrcodeInfo.partner_name_en || _currentQrcodeInfo.partner_name_cn || '');
+           bannerName.innerText = tr('qrcodePartnerWelcome', { name: name });
+       }
+   
        const langBtn = document.getElementById('lang_switch');
        if (langBtn) {
            langBtn.innerText = lang === 1 ? '中 / EN' : 'EN / 中';
@@ -368,35 +418,35 @@
    }
    
    /* ================================================================
+      密码框眼睛切换
+      ================================================================ */
+   function initPasswordEyes() {
+       document.querySelectorAll('.password-eye').forEach(btn => {
+           btn.addEventListener('click', () => {
+               const targetId = btn.dataset.target;
+               const input = document.getElementById(targetId);
+               if (!input) return;
+   
+               const eyeOpen = btn.querySelector('.eye-open');
+               const eyeClosed = btn.querySelector('.eye-closed');
+   
+               if (input.type === 'password') {
+                   input.type = 'text';
+                   eyeOpen.style.display = 'none';
+                   eyeClosed.style.display = 'block';
+               } else {
+                   input.type = 'password';
+                   eyeOpen.style.display = 'block';
+                   eyeClosed.style.display = 'none';
+               }
+           });
+       });
+   }
+   
+   /* ================================================================
       设置密码页
       ================================================================ */
-/* ================================================================
-   密码框眼睛切换
-   ================================================================ */
-   function initPasswordEyes() {
-    document.querySelectorAll('.password-eye').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetId = btn.dataset.target;
-            const input = document.getElementById(targetId);
-            if (!input) return;
-
-            const eyeOpen = btn.querySelector('.eye-open');
-            const eyeClosed = btn.querySelector('.eye-closed');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeOpen.style.display = 'none';
-                eyeClosed.style.display = 'block';
-            } else {
-                input.type = 'password';
-                eyeOpen.style.display = 'block';
-                eyeClosed.style.display = 'none';
-            }
-        });
-    });
-}
-
-      function initPasswordPage() {
+   function initPasswordPage() {
        const pwdInput = document.getElementById('input_new_password');
        const confirmBtn = document.getElementById('btn_password_confirm');
        const statusMsg = document.getElementById('password_status');
@@ -456,10 +506,13 @@
                    throw new Error('更新密码失败');
                }
    
+               const brandLogoUrl = _pendingUser.BrandLogoUrl || null;
+   
                window.mQxb.user_id = _pendingUser.user_id;
                window.mQxb.user_id_Type = _pendingUser.user_id_Type;
                window.mQxb.Username = _pendingUser.Username;
                window.mQxb.UserImage = _pendingUser.UserImage;
+               window.mQxb.BrandLogoUrl = brandLogoUrl;
                window.mQxb.IsGuest = false;
                window.mQxb.ExpiryDate = _pendingUser.ExpiryDate;
                window.mQxb.IsTeamLeader = _pendingUser.IsTeamLeader;
@@ -559,12 +612,15 @@
                    return;
                }
    
+               const brandLogoUrl = user.brand_logo_url || null;
+   
                if (user.mustchangepassword === true) {
                    _pendingUser = {
                        user_id: user.userid,
                        user_id_Type: user.usertypekey,
                        Username: user.username,
                        UserImage: getUserImage(user.usertypekey),
+                       BrandLogoUrl: brandLogoUrl,
                        ExpiryDate: user.expirydate,
                        IsTeamLeader: user.isteamleader || false,
                        TeamCode: user.teamcode || null,
@@ -588,6 +644,7 @@
                window.mQxb.user_id_Type = user.usertypekey;
                window.mQxb.Username = user.username;
                window.mQxb.UserImage = getUserImage(user.usertypekey);
+               window.mQxb.BrandLogoUrl = brandLogoUrl;
                window.mQxb.IsGuest = user.isguest || false;
                window.mQxb.ExpiryDate = user.expirydate;
                window.mQxb.IsTeamLeader = user.isteamleader || false;
@@ -773,11 +830,27 @@
                const usertype = parseInt(r.usertypekey);
                const isTeam = (codeData.maxactivations > 1);
    
+               let brandLogoUrl = null;
+               const scanid = sessionStorage.getItem(SCAN_SESSION_KEY);
+               try {
+                   const linkResult = await rpcEmo('emo_link_activation_to_user', {
+                       p_code: code,
+                       p_userid: r.new_userid,
+                       p_scanid: scanid || null,
+                   });
+                   if (linkResult && linkResult.success) {
+                       brandLogoUrl = linkResult.brand_logo_url || null;
+                   }
+               } catch (e) {
+                   console.warn('[qx00] 归因失败（不阻塞激活）', e);
+               }
+   
                _pendingUser = {
                    user_id: r.new_userid,
                    user_id_Type: usertype,
                    Username: r.final_username,
                    UserImage: getUserImage(usertype),
+                   BrandLogoUrl: brandLogoUrl,
                    ExpiryDate: calculateExpiryByDays(new Date(), codeData.validays),
                    IsTeamLeader: r.is_leader,
                    TeamCode: isTeam ? code : null,
@@ -851,6 +924,7 @@
            window.mQxb.user_id_Type = 14;
            window.mQxb.Username = name;
            window.mQxb.UserImage = 'qxbaouser1.jpg';
+           window.mQxb.BrandLogoUrl = null;
            window.mQxb.IsGuest = true;
            window.mQxb.ExpiryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
            window.mQxb.IsTeamLeader = false;
@@ -884,6 +958,152 @@
    }
    
    /* ================================================================
+      通用 RPC 封装（新 RPC 用）
+      ================================================================ */
+   async function rpcEmo(fnName, params) {
+       const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fnName}`, {
+           method: 'POST',
+           headers: {
+               'apikey': SUPABASE_KEY,
+               'Authorization': `Bearer ${SUPABASE_KEY}`,
+               'Content-Type': 'application/json',
+           },
+           body: JSON.stringify(params),
+       });
+       if (!resp.ok) {
+           const txt = await resp.text();
+           throw new Error(`RPC ${fnName}: ${resp.status} ${txt}`);
+       }
+       const arr = await resp.json();
+       return Array.isArray(arr) ? arr[0] : arr;
+   }
+   
+   /* ================================================================
+      设备信息提取
+      ================================================================ */
+   function getDeviceInfo() {
+       const ua = navigator.userAgent || '';
+       let device_type = 'desktop';
+       if (/iPhone|iPod|Android.*Mobile|Windows Phone/.test(ua)) device_type = 'mobile';
+       else if (/iPad|Android(?!.*Mobile)|Tablet/.test(ua)) device_type = 'tablet';
+   
+       let os_name = 'Other';
+       if (/iPhone|iPad|iPod/.test(ua)) os_name = 'iOS';
+       else if (/Android/.test(ua)) os_name = 'Android';
+       else if (/Windows/.test(ua)) os_name = 'Windows';
+       else if (/Macintosh|Mac OS X/.test(ua)) os_name = 'macOS';
+       else if (/Linux/.test(ua)) os_name = 'Linux';
+   
+       let browser_name = 'Other';
+       if (/MicroMessenger/.test(ua)) browser_name = 'WeChat';
+       else if (/Edg\//.test(ua)) browser_name = 'Edge';
+       else if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) browser_name = 'Chrome';
+       else if (/Safari/.test(ua) && !/Chrome/.test(ua)) browser_name = 'Safari';
+       else if (/Firefox\//.test(ua)) browser_name = 'Firefox';
+   
+       return { device_type, os_name, browser_name };
+   }
+   
+   /* ================================================================
+      扫码入口：URL 带 qrcode_id 时处理
+      ================================================================ */
+   async function handleUrlQrcode() {
+       const params = new URLSearchParams(window.location.search);
+       const qrcodeId = params.get('qrcode_id');
+       const preCode = params.get('code');
+   
+       if (!qrcodeId) return;
+   
+       const t = TEXT[window.mQxb.Language] || TEXT[1];
+   
+       showToast(t.qrcodeChecking, 'info', 2000);
+   
+       let info = null;
+       try {
+           info = await rpcEmo('emo_get_qrcode_info', { p_qrcode_id: qrcodeId });
+       } catch (e) {
+           console.warn('[qx00] 查二维码入口失败', e);
+       }
+   
+       if (!info || !info.success) {
+           if (info && info.message === 'QRCODE_EXPIRED') {
+               showToast(t.qrcodeExpired, 'warning', 3000);
+           } else if (info && info.message === 'QRCODE_NOT_YET_VALID') {
+               showToast(t.qrcodeNotYetValid, 'warning', 3000);
+           } else if (info && info.message === 'QRCODE_INACTIVE') {
+               showToast(t.qrcodeInactive, 'warning', 3000);
+           }
+   
+           if (preCode) {
+               sessionStorage.setItem(QRCODE_PARAM_KEY, qrcodeId);
+               gotoActivationWithCode(preCode);
+           }
+           history.replaceState(null, '', window.location.pathname);
+           return;
+       }
+   
+       _currentQrcodeInfo = info;
+       sessionStorage.setItem(QRCODE_PARAM_KEY, qrcodeId);
+   
+       showPartnerBanner(info);
+   
+       const dev = getDeviceInfo();
+       const ua = navigator.userAgent || '';
+       rpcEmo('emo_record_qrcode_scan', {
+           p_qrcode_id: qrcodeId,
+           p_code: preCode || null,
+           p_user_agent: ua,
+           p_device_type: dev.device_type,
+           p_os_name: dev.os_name,
+           p_browser_name: dev.browser_name,
+           p_scan_source: 'qrcode',
+       }).then(scanRes => {
+           if (scanRes && scanRes.success && scanRes.scanid) {
+               sessionStorage.setItem(SCAN_SESSION_KEY, scanRes.scanid);
+           }
+       }).catch(e => {
+           console.warn('[qx00] 记扫码失败', e);
+       });
+   
+       if (preCode) {
+           gotoActivationWithCode(preCode);
+       } else {
+           showLayer('activation_layer');
+       }
+   
+       history.replaceState(null, '', window.location.pathname);
+   }
+   
+   function showPartnerBanner(info) {
+       const banner = document.getElementById('activation_partner_banner');
+       const nameEl = document.getElementById('activation_partner_name');
+       if (!banner || !nameEl) return;
+   
+       const lang = window.mQxb.Language || 1;
+       const name = lang === 1
+           ? (info.partner_name_cn || info.partner_name_en || '')
+           : (info.partner_name_en || info.partner_name_cn || '');
+   
+       if (!name) return;
+   
+       nameEl.innerText = tr('qrcodePartnerWelcome', { name: name });
+       banner.style.display = 'block';
+   }
+   
+   function gotoActivationWithCode(code) {
+       showLayer('activation_layer');
+       const codeInput = document.getElementById('input_activation_code');
+       if (codeInput) codeInput.value = code;
+   
+       setTimeout(() => {
+           const nameInput = document.getElementById('input_activation_name');
+           if (nameInput) nameInput.focus();
+       }, 300);
+   
+       showToast(tr('qrcodeCodePrefilled'), 'success', 2500);
+   }
+   
+   /* ================================================================
       检查 mQxb 是否有效，有效直接进主屏
       ================================================================ */
    function checkMqxbAndRedirect() {
@@ -911,7 +1131,7 @@
       入口
       ================================================================ */
    document.addEventListener('DOMContentLoaded', () => {
-       console.log('qx00_login.js 已加载');
+       console.log('qx00_login.js v9 已加载');
    
        if (checkMqxbAndRedirect()) return;
    
@@ -940,4 +1160,8 @@
        initGuest();
    
        handleUrlReason();
+   
+       handleUrlQrcode().catch(e => {
+           console.warn('[qx00] handleUrlQrcode 异常', e);
+       });
    });

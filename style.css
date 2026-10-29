@@ -3824,3 +3824,44 @@ body.lang-en .qx2-flow-name {
     height: 100% !important; /* 让画布严格贴合 60vh 的容器 */
     object-fit: contain;
 }
+/* ================================================================
+   二维码卡片终极修复补丁
+   ================================================================ */
+   .qx-print-card {
+    width: 280px !important;
+    height: 380px !important;
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    margin: 10px !important;
+    overflow: hidden !important;
+}
+
+/* 强行给二维码容器分配空间并置顶 */
+[id^="qr_holder_"] {
+    position: absolute !important;
+    top: 110px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 160px !important;
+    height: 160px !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 10 !important;
+}
+
+/* 强行让里面的 canvas 或 img 显示出来 */
+[id^="qr_holder_"] canvas, 
+[id^="qr_holder_"] img {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 160px !important;
+    height: 160px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}

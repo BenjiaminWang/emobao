@@ -407,18 +407,26 @@ function fallbackToBrowserTTS(text, onEnd) {
    }
    
    async function updateBackground() {
-       const bgEl = document.getElementById('qx0_bg');
-       if (!bgEl) return;
-   
-       const teamcode = window.mQxb.TeamCode;
-       if (teamcode) {
-           const customUrl = await fetchTeamBgUrl(teamcode);
-           if (customUrl) { bgEl.src = customUrl; return; }
-       }
-   
-       const img = window.mQxb.UserImage || 'qxbaouser1.jpg';
-       bgEl.src = `picture/${img}`;
-   }
+    const bgEl = document.getElementById('qx0_bg');
+    if (!bgEl) return;
+
+    // 1. 优先：扫码激活带来的品牌底图（云端 URL）
+    if (window.mQxb.BrandLogoUrl) {
+        bgEl.src = window.mQxb.BrandLogoUrl;
+        return;
+    }
+
+    // 2. 其次：团队自定义底图
+    const teamcode = window.mQxb.TeamCode;
+    if (teamcode) {
+        const customUrl = await fetchTeamBgUrl(teamcode);
+        if (customUrl) { bgEl.src = customUrl; return; }
+    }
+
+    // 3. 兜底：身份默认图
+    const img = window.mQxb.UserImage || 'qxbaouser1.jpg';
+    bgEl.src = `picture/${img}`;
+}
    
    async function fetchTeamBgUrl(teamcode) {
        try {

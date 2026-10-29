@@ -1,11 +1,9 @@
 /* ================================================================
    情绪宝 - qx6 设置（壳）
    路径：js/qx6/qx6_settings.js
-   日期：2026-10-13
+   日期：2026-10-29
    说明：
-   - 只负责菜单渲染、面板切换、qx6_init / qx6_destroy
-   - 具体面板逻辑由 js/qx6/qx6_N_xxx.js 各自注册到 qx6Registry
-   - 必须在所有面板文件之后加载
+   - 优化菜单结构分组：将用户统计提取为“数据中心”，发卡中心归入“运营管理”
    ================================================================ */
 
    (function () {
@@ -31,6 +29,7 @@
     function buildMenuConfig() {
         const sections = [];
 
+        // ================= 1. 个人设置 =================
         const accountItems = [
             { id: 'account',  icon: '👤', cn: '账户',     en: 'Account' },
         ];
@@ -38,22 +37,33 @@
             accountItems.push({ id: 'password', icon: '🔑', cn: '修改口令', en: 'Change Password' });
         }
         accountItems.push({ id: 'device', icon: '📱', cn: '设备管理', en: 'Devices' });
-        sections.push({ title: '', items: accountItems });
+        sections.push({ title: { cn: '个人设置', en: 'Personal' }, items: accountItems });
 
+        // ================= 2. 运营管理 =================
         if (U.isAdmin()) {
             sections.push({
-                title: { cn: '管理', en: 'Admin' },
+                title: { cn: '运营管理', en: 'Operations' },
                 items: [
-                    { id: 'stats_users',   icon: '📊', cn: '用户总体情况',   en: 'User Overview' },
-                    { id: 'redeem',        icon: '🎫', cn: '兑换码管理',     en: 'Redeem Codes' },
-                    { id: 'manage_users',  icon: '👥', cn: '用户管理',       en: 'Manage Users' },
-                    { id: 'qa_engine',     icon: '📚', cn: '知识库维护',  en: 'Knowledge Base' },
+                    { id: 'redeem',        icon: '🎫', cn: '发卡中心',     en: 'Card Center' },
+                    { id: 'manage_users',  icon: '👥', cn: '用户管理',     en: 'Manage Users' },
                 ],
             });
         }
 
+        // ================= 3. 数据中心 =================
+        if (U.isAdmin()) {
+            sections.push({
+                title: { cn: '数据中心', en: 'Data Center' },
+                items: [
+                    { id: 'stats_users',   icon: '📊', cn: '用户总体情况',   en: 'User Overview' },
+                ],
+            });
+        }
+
+        // ================= 4. 内容管理 =================
         if (U.isAdmin() || U.isMusician()) {
             const contentItems = [
+                { id: 'qa_engine',        icon: '📚', cn: '知识库维护',     en: 'Knowledge Base' },
                 { id: 'music_lib',        icon: '🎵', cn: '音乐库管理',     en: 'Music Library' },
                 { id: 'music_workbench',  icon: '🎼', cn: '音乐导师工作台',  en: 'Music Workbench' },
             ];
@@ -61,11 +71,12 @@
                 contentItems.push({ id: 'rule_edit', icon: '🎼', cn: '组曲规则', en: 'Playlist Rules' });
             }
             sections.push({
-                title: { cn: '内容', en: 'Content' },
+                title: { cn: '内容管理', en: 'Content' },
                 items: contentItems,
             });
         }
 
+        // ================= 5. 财务 =================
         if (U.isAdmin() || U.isFinance()) {
             sections.push({
                 title: { cn: '财务', en: 'Finance' },
@@ -75,6 +86,7 @@
             });
         }
 
+        // ================= 6. 退出 =================
         sections.push({
             title: '',
             danger: true,
@@ -91,7 +103,7 @@
         password:        { cn: '修改口令',   en: 'Change Password' },
         device:          { cn: '设备管理',   en: 'Devices' },
         stats_users:     { cn: '用户总体情况', en: 'User Overview' },
-        redeem:          { cn: '兑换码管理', en: 'Redeem Codes' },
+        redeem:          { cn: '发卡中心', en: 'Card Center' },
         manage_users:    { cn: '用户管理',   en: 'User Management' },
         qa_engine:       { cn: '知识库维护', en: 'Knowledge Base' },
         music_lib:       { cn: '音乐库管理', en: 'Music Library' },
@@ -194,10 +206,6 @@
         if (panelView) panelView.style.display = 'none';
     }
 
-    /* ================================================================
-       外部调用（供面板内使用）：
-       切换语言后，通知壳刷新菜单和当前面板标题
-       ================================================================ */
     function refreshShell() {
         renderMenu();
         const titleEl = getEl('qx6_panel_title');

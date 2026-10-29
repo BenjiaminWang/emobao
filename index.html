@@ -1,6 +1,6 @@
 <!-- ================================================================
-     index.html   v26 (硬编码终极版)
-     日期：2026-10-19
+     index.html   v28 (二维码版)
+     日期：2026-10-28
      ================================================================ -->
      <!DOCTYPE html>
      <html lang="zh-CN">
@@ -10,7 +10,13 @@
          <title>情绪宝 · 身心互动</title>
          <link rel="icon" href="data:,">
          <link rel="stylesheet" href="style.css">
-     </head>
+         <link rel="manifest" href="manifest.json">
+         <meta name="theme-color" content="#E26A6A">
+         <meta name="mobile-web-app-capable" content="yes">
+         <meta name="apple-mobile-web-app-capable" content="yes">
+         <meta name="apple-mobile-web-app-status-bar-style" content="default">
+         <link rel="apple-touch-icon" href="picture/icon-192.png">
+        </head>
      <body class="main-page">
      
          <!-- ============ 状态栏（直接把静音键硬编码在这里） ============ -->
@@ -446,6 +452,8 @@
          <script src="js/qx6/qx6_2_password.js"></script>
          <script src="js/qx6/qx6_3_device.js"></script>
          <script src="js/qx6/qx6_4_stats_users.js"></script>
+         <script src="js/qrcode.min.js"></script>
+         <script src="js/qx6/qx6_5b_qrcode.js"></script>
          <script src="js/qx6/qx6_5_redeem.js"></script>
          <script src="js/qx6/qx6_6_manage_users.js"></script>
          <script src="js/qx6/qx6_7_qa_engine.js"></script>
@@ -455,5 +463,5 @@
          <script src="js/qx6/qx6_11_finance.js"></script>
          <script src="js/qx6/qx6_12_sys_exit.js"></script>
          <script src="js/qx6/qx6_settings.js"></script>
-     </body>
+
      </html>

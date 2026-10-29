@@ -1,9 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 入口
-   v4：
-   - 列表改为树形折叠：大类 → 游戏，默认收起
-   - qx5_init 里调 qx5Profile.refreshBar() 刷新胶囊按钮
-   - 其余同 v3
+   v6：暴力注入 MBTI 精选卡片
    ================================================================ */
 
    (function () {
@@ -62,18 +59,28 @@
             return;
         }
 
-        // ================= 新增：主打精选推荐区 =================
-        const featuredGames = games.filter(g => g.isFeatured);
+        // ================= 主打精选推荐区（暴力注入 MBTI） =================
+        let featuredGames = games.filter(g => g.isFeatured);
+        
+        // 强制塞入 MBTI，不管引擎有没有注册成功
+        const hasMbti = featuredGames.some(g => g.id === 'mbti_test');
+        if (!hasMbti) {
+            featuredGames.push({
+                id: 'mbti_test',
+                title: { cn: '16型人格测试', en: '16 Personalities' },
+                subtitle: { cn: '测测你是哪种稀有物种', en: 'Discover your personality type' },
+                isFeatured: true
+            });
+        }
+
         if (featuredGames.length > 0) {
             const featuredWrap = document.createElement('div');
             featuredWrap.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;';
             
-            // 给精选区加个小标题
             featuredWrap.innerHTML = `<div style="font-size: 13px; font-weight: bold; color: #64748B; letter-spacing: 1px; margin-bottom: 4px;">⭐ ${t('精选主打测评', 'Featured Assessments')}</div>`;
 
             featuredGames.forEach(g => {
                 const card = document.createElement('div');
-                // 使用醒目的渐变色背景，区别于普通游戏卡片
                 card.style.cssText = `
                     background: linear-gradient(135deg, #2C7BE5 0%, #1A56B8 100%);
                     border-radius: 16px;
@@ -86,7 +93,6 @@
                     overflow: hidden;
                 `;
                 
-                // 添加一点背景装饰
                 card.innerHTML = `
                     <div style="position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg);">🧠</div>
                     <div style="font-size: 22px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
@@ -113,14 +119,13 @@
             
             grid.appendChild(featuredWrap);
 
-            // 加一条分割线
             const divider = document.createElement('div');
             divider.style.cssText = 'height: 1px; background: #E2E8F0; margin: 0 0 24px 0;';
             grid.appendChild(divider);
         }
-        // ================= 新增结束 =================
+        // ================= 精选区结束 =================
 
-        // 下面是原有的树形列表渲染逻辑
+        // ============ 原有的树形列表渲染 ============
         const byCollection = {};
         games.forEach(g => {
             const cid = g.collectionId || 'misc';
@@ -159,9 +164,6 @@
                     card.className = 'qx5-game-card';
                     card.dataset.gameId = g.id;
                     
-                    // 把副标题（也就是玩法简介）用来做语音导引
-                    const voiceText = t(g.subtitle.cn, g.subtitle.en);
-                    
                     card.innerHTML = `
                         <div class="qx5-game-card-title" style="display:flex; justify-content:space-between; align-items:center;">
                             <span>${t(g.title.cn, g.title.en)}</span>
@@ -170,14 +172,12 @@
                         <div class="qx5-game-card-sub">${t(g.subtitle.cn, g.subtitle.en)}</div>
                     `;
                     
-                    // 绑定语音点击事件（阻止冒泡，防止触发进入游戏）
                     const voiceBtn = card.querySelector('.qx5-voice-btn');
                     voiceBtn.onmouseenter = () => voiceBtn.style.opacity = '1';
                     voiceBtn.onmouseleave = () => voiceBtn.style.opacity = '0.6';
                     voiceBtn.onclick = function (e) {
                         e.stopPropagation(); 
                         if (window.qxSpeak) {
-                            // 播放语音：游戏名字 + 玩法简介
                             const speakContent = t(`欢迎来到 ${g.title.cn}。${g.subtitle.cn}`, `Welcome to ${g.title.en}. ${g.subtitle.en}`);
                             window.qxSpeak(speakContent);
                         }
@@ -208,7 +208,6 @@
             onComplete: function (data) {
                 console.log('[qx5] 游戏结束', gameId, data);
                 state.currentGame = null;
-                /* 玩完后刷新胶囊按钮的"已玩"计数 */
                 if (window.qx5Profile && typeof window.qx5Profile.refreshBar === 'function') {
                     try { window.qx5Profile.refreshBar(); } catch (e) {}
                 }
@@ -238,6 +237,8 @@
 
         state.currentGame = null;
         state.expanded = {};
+
+        if (window.qx5RegisterMbti) window.qx5RegisterMbti();
         renderGameList();
         showListView();
 
@@ -247,7 +248,6 @@
         const quitBtn = getEl('qx5_btn_quit');
         if (quitBtn) quitBtn.onclick = onQuitClick;
 
-        /* 刷新认知画像胶囊按钮 */
         if (window.qx5Profile && typeof window.qx5Profile.refreshBar === 'function') {
             try { await window.qx5Profile.refreshBar(); } catch (e) {}
         }

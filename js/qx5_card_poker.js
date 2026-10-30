@@ -1,7 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 心理扑克（心象投射卡）
-   v5 (2026-10-30) 终极完美版
-   - 保证生成海报按钮存在且样式完美
+   v7 (2026-10-30) 天空蓝治愈海报最终版
    ================================================================ */
    (function () {
     'use strict';
@@ -124,39 +123,39 @@
         hostEl.innerHTML = `
             <div style="max-width: 500px; margin: 0 auto; padding: 40px 20px; text-align: center;">
                 
-                <!-- 用于生成海报的容器 -->
-                <div id="qx5_poster_box" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-radius: 20px; padding: 30px; color: #fff; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 30px; position: relative;">
+                <!-- 用于生成海报的容器（亮色治愈风） -->
+                <div id="qx5_poster_box" style="background: linear-gradient(180deg, #F0F9FF 0%, #E0F2FE 100%); border-radius: 24px; padding: 30px; color: #0F172A; text-align: left; box-shadow: 0 10px 30px rgba(44, 123, 229, 0.1); margin-bottom: 30px; position: relative; border: 1px solid #BAE6FD;">
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <div style="font-size: 14px; color: #94A3B8;">🔮 ${t('情绪宝·潜意识回声', 'Emo Treasure · Echo')}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <div style="font-size: 15px; font-weight: bold; color: #0284C7;">🔮 ${t('情绪宝 · 心象回声', 'Emo Treasure · Echo')}</div>
                         <div style="font-size: 20px;">✨</div>
                     </div>
 
-                    <!-- 迷你三卡展示 -->
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <!-- 迷你三卡展示（改成白底+浅色阴影） -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px;">
                         ${currentCards.map((c, i) => `
-                            <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; text-align: center;">
-                                <div style="font-size: 24px; margin-bottom: 4px;">${c.emoji}</div>
-                                <div style="font-size: 12px; color: #CBD5E1;">${t(c.word_cn, c.word_en)}</div>
+                            <div style="flex: 1; background: #ffffff; border-radius: 12px; padding: 15px 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                <div style="font-size: 32px; margin-bottom: 8px;">${c.emoji}</div>
+                                <div style="font-size: 13px; font-weight: bold; color: #334155;">${t(c.word_cn, c.word_en)}</div>
                             </div>
                         `).join('')}
                     </div>
 
-                    <div style="font-size: 15px; line-height: 1.8; white-space: pre-wrap; margin-bottom: 20px;">${insight}</div>
+                    <div style="font-size: 15px; line-height: 1.8; white-space: pre-wrap; margin-bottom: 25px; color: #1E293B; font-weight: 500;">${insight}</div>
 
                     <!-- 海报底部品牌标识 -->
-                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="border-top: 1px dashed #BAE6FD; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
                         <div style="font-size: 12px; color: #64748B;">${t('扫码开启你的情绪之旅', 'Scan to start your journey')}</div>
-                        <div style="font-size: 14px; font-weight: bold; color: #2C7BE5;">情绪宝</div>
+                        <div style="font-size: 15px; font-weight: bold; color: #0284C7;">情绪宝</div>
                     </div>
                 </div>
 
                 <!-- 海报生成按钮 -->
-                <button id="qx5_gen_poster_btn" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #E67E22; color: #fff; border: none; cursor: pointer; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <button id="qx5_gen_poster_btn" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: linear-gradient(135deg, #FF8C00 0%, #FF5722 100%); color: #fff; border: none; cursor: pointer; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);">
                     📸 ${t('生成专属心象海报', 'Generate Poster')}
                 </button>
 
-                <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px;" onclick="window._pokerRestart()">
+                <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(44, 123, 229, 0.2);" onclick="window._pokerRestart()">
                     ${t('再抽一次', 'Draw Again')}
                 </button>
                 <button class="qx5-btn qx5-btn-secondary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #F1F5F9; color: #475569; border: none; cursor: pointer;" onclick="window.qx5_onExit()">
@@ -183,11 +182,18 @@
             const btn = document.getElementById('qx5_gen_poster_btn');
             btn.innerText = t('海报生成中...', 'Generating...');
 
+            // 临时隐藏页面上的 video 元素，防止 html2canvas 截图报错
+            const hiddenVideos = document.querySelectorAll('video');
+            hiddenVideos.forEach(v => v.style.display = 'none');
+
             window.html2canvas(posterBox, {
                 scale: 2, 
                 backgroundColor: null,
-                useCORS: true
+                useCORS: true,
+                logging: false
             }).then(canvas => {
+                hiddenVideos.forEach(v => v.style.display = '');
+
                 const imgData = canvas.toDataURL('image/png');
                 
                 const overlay = document.createElement('div');
@@ -207,6 +213,7 @@
                 
                 btn.innerHTML = `📸 ${t('生成专属心象海报', 'Generate Poster')}`;
             }).catch(err => {
+                hiddenVideos.forEach(v => v.style.display = '');
                 console.error('海报生成失败', err);
                 alert(t('海报生成失败，请重试', 'Poster generation failed.'));
                 btn.innerHTML = `📸 ${t('生成专属心象海报', 'Generate Poster')}`;

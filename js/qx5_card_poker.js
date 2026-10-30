@@ -1,8 +1,7 @@
 /* ================================================================
    情绪宝 - qx5 心理扑克（心象投射卡）
-   v3 (2026-10-30)
-   - 扩展至完整 54 张牌库（4 大类花色 + 空白牌）
-   - 升级玩法：经典三抽（过去-现在-未来）沉浸式牌阵
+   v5 (2026-10-30) 终极完美版
+   - 保证生成海报按钮存在且样式完美
    ================================================================ */
    (function () {
     'use strict';
@@ -12,79 +11,43 @@
         return lang === 1 ? cn : en;
     };
 
-    // 完整 54 张牌库
     const DECK = [
-        // 情绪之海 (13)
-        { emoji: '🌊', word_cn: '涌动', word_en: 'Surge', suit: 'emotion' },
-        { emoji: '🌪️', word_cn: '烦躁', word_en: 'Restless', suit: 'emotion' },
-        { emoji: '🕳️', word_cn: '空洞', word_en: 'Emptiness', suit: 'emotion' },
-        { emoji: '🔥', word_cn: '愤怒', word_en: 'Anger', suit: 'emotion' },
-        { emoji: '🕯️', word_cn: '平静', word_en: 'Calm', suit: 'emotion' },
-        { emoji: '🌧️', word_cn: '悲伤', word_en: 'Sorrow', suit: 'emotion' },
-        { emoji: '🌸', word_cn: '喜悦', word_en: 'Joy', suit: 'emotion' },
-        { emoji: '🧊', word_cn: '麻木', word_en: 'Numbness', suit: 'emotion' },
-        { emoji: '🌫️', word_cn: '迷茫', word_en: 'Confusion', suit: 'emotion' },
-        { emoji: '⚡', word_cn: '焦虑', word_en: 'Anxiety', suit: 'emotion' },
-        { emoji: '🌅', word_cn: '希望', word_en: 'Hope', suit: 'emotion' },
-        { emoji: '🥀', word_cn: '失落', word_en: 'Loss', suit: 'emotion' },
-        { emoji: '🫧', word_cn: '释然', word_en: 'Relief', suit: 'emotion' },
-        
-        // 关系之境 (13)
-        { emoji: '🚪', word_cn: '界限', word_en: 'Boundary', suit: 'relation' },
-        { emoji: '🪞', word_cn: '投射', word_en: 'Projection', suit: 'relation' },
-        { emoji: '👥', word_cn: '拥挤', word_en: 'Crowded', suit: 'relation' },
-        { emoji: '🤝', word_cn: '联结', word_en: 'Connection', suit: 'relation' },
-        { emoji: '🧱', word_cn: '隔阂', word_en: 'Barrier', suit: 'relation' },
-        { emoji: '🕸️', word_cn: '纠缠', word_en: 'Entanglement', suit: 'relation' },
-        { emoji: '🕊️', word_cn: '自由', word_en: 'Freedom', suit: 'relation' },
-        { emoji: '👨‍👩‍👧', word_cn: '家庭', word_en: 'Family', suit: 'relation' },
-        { emoji: '🎭', word_cn: '伪装', word_en: 'Disguise', suit: 'relation' },
-        { emoji: '🫂', word_cn: '拥抱', word_en: 'Embrace', suit: 'relation' },
-        { emoji: '🗣️', word_cn: '沟通', word_en: 'Communication', suit: 'relation' },
-        { emoji: '🙈', word_cn: '逃避', word_en: 'Avoidance', suit: 'relation' },
-        { emoji: '🤲', word_cn: '接纳', word_en: 'Acceptance', suit: 'relation' },
-
-        // 信念之石 (13)
-        { emoji: '🔒', word_cn: '执念', word_en: 'Obsession', suit: 'belief' },
-        { emoji: '🗝️', word_cn: '释怀', word_en: 'Letting Go', suit: 'belief' },
-        { emoji: '⚖️', word_cn: '评判', word_en: 'Judgment', suit: 'belief' },
-        { emoji: '💡', word_cn: '觉醒', word_en: 'Awakening', suit: 'belief' },
-        { emoji: '🧭', word_cn: '方向', word_en: 'Direction', suit: 'belief' },
-        { emoji: '⏳', word_cn: '执着', word_en: 'Persistence', suit: 'belief' },
-        { emoji: '🔮', word_cn: '未知', word_en: 'Unknown', suit: 'belief' },
-        { emoji: '👁️', word_cn: '洞察', word_en: 'Insight', suit: 'belief' },
-        { emoji: '🎲', word_cn: '无常', word_en: 'Impermanence', suit: 'belief' },
-        { emoji: '🧩', word_cn: '意义', word_en: 'Meaning', suit: 'belief' },
-        { emoji: '🔇', word_cn: '沉默', word_en: 'Silence', suit: 'belief' },
-        { emoji: '📜', word_cn: '规则', word_en: 'Rules', suit: 'belief' },
-        { emoji: '🪶', word_cn: '轻盈', word_en: 'Lightness', suit: 'belief' },
-
-        // 行动之木 (13)
-        { emoji: '🏃', word_cn: '奔跑', word_en: 'Running', suit: 'action' },
-        { emoji: '🛑', word_cn: '停滞', word_en: 'Stagnation', suit: 'action' },
-        { emoji: '🌱', word_cn: '生长', word_en: 'Growth', suit: 'action' },
-        { emoji: '⚔️', word_cn: '对抗', word_en: 'Confrontation', suit: 'action' },
-        { emoji: '🏗️', word_cn: '重建', word_en: 'Rebuild', suit: 'action' },
-        { emoji: '🧘', word_cn: '蛰伏', word_en: 'Resting', suit: 'action' },
-        { emoji: '🚀', word_cn: '突破', word_en: 'Breakthrough', suit: 'action' },
-        { emoji: '🪁', word_cn: '放手', word_en: 'Let Go', suit: 'action' },
-        { emoji: '🔨', word_cn: '打磨', word_en: 'Polishing', suit: 'action' },
-        { emoji: '🏔️', word_cn: '攀登', word_en: 'Climbing', suit: 'action' },
-        { emoji: '🌊', word_cn: '顺流', word_en: 'Going with the flow', suit: 'action' },
-        { emoji: '🛡️', word_cn: '防御', word_en: 'Defense', suit: 'action' },
-        { emoji: '🤸', word_cn: '跃迁', word_en: 'Leap', suit: 'action' },
-        
-        // 特殊牌 (2)
-        { emoji: '⬛', word_cn: '空白', word_en: 'Blank', suit: 'joker' },
-        { emoji: '⬜', word_cn: '未知', word_en: 'Unknown', suit: 'joker' }
+        { emoji: '🌊', word_cn: '涌动', word_en: 'Surge' }, { emoji: '🌪️', word_cn: '烦躁', word_en: 'Restless' },
+        { emoji: '🕳️', word_cn: '空洞', word_en: 'Emptiness' }, { emoji: '🔥', word_cn: '愤怒', word_en: 'Anger' },
+        { emoji: '🕯️', word_cn: '平静', word_en: 'Calm' }, { emoji: '🌧️', word_cn: '悲伤', word_en: 'Sorrow' },
+        { emoji: '🌸', word_cn: '喜悦', word_en: 'Joy' }, { emoji: '🧊', word_cn: '麻木', word_en: 'Numbness' },
+        { emoji: '🌫️', word_cn: '迷茫', word_en: 'Confusion' }, { emoji: '⚡', word_cn: '焦虑', word_en: 'Anxiety' },
+        { emoji: '🌅', word_cn: '希望', word_en: 'Hope' }, { emoji: '🥀', word_cn: '失落', word_en: 'Loss' },
+        { emoji: '🫧', word_cn: '释然', word_en: 'Relief' }, { emoji: '🚪', word_cn: '界限', word_en: 'Boundary' },
+        { emoji: '🪞', word_cn: '投射', word_en: 'Projection' }, { emoji: '👥', word_cn: '拥挤', word_en: 'Crowded' },
+        { emoji: '🤝', word_cn: '联结', word_en: 'Connection' }, { emoji: '🧱', word_cn: '隔阂', word_en: 'Barrier' },
+        { emoji: '🕸️', word_cn: '纠缠', word_en: 'Entanglement' }, { emoji: '🕊️', word_cn: '自由', word_en: 'Freedom' },
+        { emoji: '👨‍👩‍👧', word_cn: '家庭', word_en: 'Family' }, { emoji: '🎭', word_cn: '伪装', word_en: 'Disguise' },
+        { emoji: '🫂', word_cn: '拥抱', word_en: 'Embrace' }, { emoji: '🗣️', word_cn: '沟通', word_en: 'Communication' },
+        { emoji: '🙈', word_cn: '逃避', word_en: 'Avoidance' }, { emoji: '🤲', word_cn: '接纳', word_en: 'Acceptance' },
+        { emoji: '🔒', word_cn: '执念', word_en: 'Obsession' }, { emoji: '🗝️', word_cn: '释怀', word_en: 'Letting Go' },
+        { emoji: '⚖️', word_cn: '评判', word_en: 'Judgment' }, { emoji: '💡', word_cn: '觉醒', word_en: 'Awakening' },
+        { emoji: '🧭', word_cn: '方向', word_en: 'Direction' }, { emoji: '⏳', word_cn: '执着', word_en: 'Persistence' },
+        { emoji: '🔮', word_cn: '未知', word_en: 'Unknown' }, { emoji: '👁️', word_cn: '洞察', word_en: 'Insight' },
+        { emoji: '🎲', word_cn: '无常', word_en: 'Impermanence' }, { emoji: '🧩', word_cn: '意义', word_en: 'Meaning' },
+        { emoji: '🔇', word_cn: '沉默', word_en: 'Silence' }, { emoji: '📜', word_cn: '规则', word_en: 'Rules' },
+        { emoji: '🪶', word_cn: '轻盈', word_en: 'Lightness' }, { emoji: '🏃', word_cn: '奔跑', word_en: 'Running' },
+        { emoji: '🛑', word_cn: '停滞', word_en: 'Stagnation' }, { emoji: '🌱', word_cn: '生长', word_en: 'Growth' },
+        { emoji: '⚔️', word_cn: '对抗', word_en: 'Confrontation' }, { emoji: '🏗️', word_cn: '重建', word_en: 'Rebuild' },
+        { emoji: '🧘', word_cn: '蛰伏', word_en: 'Resting' }, { emoji: '🚀', word_cn: '突破', word_en: 'Breakthrough' },
+        { emoji: '🪁', word_cn: '放手', word_en: 'Let Go' }, { emoji: '🔨', word_cn: '打磨', word_en: 'Polishing' },
+        { emoji: '🏔️', word_cn: '攀登', word_en: 'Climbing' }, { emoji: '🌊', word_cn: '顺流', word_en: 'Flow' },
+        { emoji: '🛡️', word_cn: '防御', word_en: 'Defense' }, { emoji: '🤸', word_cn: '跃迁', word_en: 'Leap' },
+        { emoji: '⬛', word_cn: '空白', word_en: 'Blank' }, { emoji: '⬜', word_cn: '未知', word_en: 'Unknown' }
     ];
 
     let currentCards = [];
+    let currentUserInput = '';
 
     function startPoker(hostEl) {
-        // 洗牌并随机抽 3 张不重复的牌
         const shuffled = [...DECK].sort(() => 0.5 - Math.random());
         currentCards = shuffled.slice(0, 3);
+        currentUserInput = '';
         
         if (window.qxSpeak) {
             setTimeout(() => {
@@ -96,7 +59,6 @@
     }
 
     function renderDraw(hostEl) {
-        // 过去、现在、未来的排列
         const labels = [
             { cn: '过去', en: 'Past', color: '#64748B' },
             { cn: '现在', en: 'Present', color: '#2C7BE5' },
@@ -140,12 +102,12 @@
                 alert(t('请写下你的故事', 'Please write your story'));
                 return;
             }
+            currentUserInput = input;
             renderResult(hostEl, input);
         };
     }
 
     function renderResult(hostEl, userInput) {
-        // 这里是将用户输入的故事，结合ABC理论，给出心理层面的反馈
         const pastWord = t(currentCards[0].word_cn, currentCards[0].word_en);
         const presentWord = t(currentCards[1].word_cn, currentCards[1].word_en);
         const futureWord = t(currentCards[2].word_cn, currentCards[2].word_en);
@@ -161,13 +123,38 @@
 
         hostEl.innerHTML = `
             <div style="max-width: 500px; margin: 0 auto; padding: 40px 20px; text-align: center;">
-                <div style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-radius: 20px; padding: 30px; color: #fff; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 30px; position: relative;">
-                    <div style="font-size: 14px; color: #94A3B8; margin-bottom: 15px;">🔮 ${t('潜意识回声', 'Subconscious Echo')}</div>
+                
+                <!-- 用于生成海报的容器 -->
+                <div id="qx5_poster_box" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-radius: 20px; padding: 30px; color: #fff; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-bottom: 30px; position: relative;">
                     
-                    <span id="qx5_poker_voice_result" style="position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; opacity: 0.8;" title="听结果">🔊</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="font-size: 14px; color: #94A3B8;">🔮 ${t('情绪宝·潜意识回声', 'Emo Treasure · Echo')}</div>
+                        <div style="font-size: 20px;">✨</div>
+                    </div>
 
-                    <div style="font-size: 15px; line-height: 1.8; white-space: pre-wrap;">${insight}</div>
+                    <!-- 迷你三卡展示 -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        ${currentCards.map((c, i) => `
+                            <div style="flex: 1; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; text-align: center;">
+                                <div style="font-size: 24px; margin-bottom: 4px;">${c.emoji}</div>
+                                <div style="font-size: 12px; color: #CBD5E1;">${t(c.word_cn, c.word_en)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="font-size: 15px; line-height: 1.8; white-space: pre-wrap; margin-bottom: 20px;">${insight}</div>
+
+                    <!-- 海报底部品牌标识 -->
+                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 12px; color: #64748B;">${t('扫码开启你的情绪之旅', 'Scan to start your journey')}</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #2C7BE5;">情绪宝</div>
+                    </div>
                 </div>
+
+                <!-- 海报生成按钮 -->
+                <button id="qx5_gen_poster_btn" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #E67E22; color: #fff; border: none; cursor: pointer; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    📸 ${t('生成专属心象海报', 'Generate Poster')}
+                </button>
 
                 <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px;" onclick="window._pokerRestart()">
                     ${t('再抽一次', 'Draw Again')}
@@ -184,6 +171,47 @@
                                   `Past: ${pastWord}, Present: ${presentWord}, Future: ${futureWord}. Hug yourself.`));
             }, 500);
         }
+
+        // 绑定生成海报按钮
+        document.getElementById('qx5_gen_poster_btn').onclick = () => {
+            const posterBox = document.getElementById('qx5_poster_box');
+            if (!window.html2canvas) {
+                alert(t('海报组件未加载，请刷新页面重试', 'Poster library not loaded, please refresh.'));
+                return;
+            }
+            
+            const btn = document.getElementById('qx5_gen_poster_btn');
+            btn.innerText = t('海报生成中...', 'Generating...');
+
+            window.html2canvas(posterBox, {
+                scale: 2, 
+                backgroundColor: null,
+                useCORS: true
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px);';
+                
+                overlay.innerHTML = `
+                    <div style="color: #fff; font-size: 16px; margin-bottom: 15px; font-weight: bold;">${t('长按图片保存到手机', 'Long press to save image')}</div>
+                    <img src="${imgData}" style="max-width: 100%; max-height: 75vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+                    <button id="qx5_close_poster" style="margin-top: 20px; padding: 12px 30px; border-radius: 20px; background: #fff; color: #1E293B; border: none; font-weight: bold; font-size: 16px; cursor: pointer;">${t('完成', 'Done')}</button>
+                `;
+                
+                document.body.appendChild(overlay);
+                
+                document.getElementById('qx5_close_poster').onclick = () => {
+                    document.body.removeChild(overlay);
+                };
+                
+                btn.innerHTML = `📸 ${t('生成专属心象海报', 'Generate Poster')}`;
+            }).catch(err => {
+                console.error('海报生成失败', err);
+                alert(t('海报生成失败，请重试', 'Poster generation failed.'));
+                btn.innerHTML = `📸 ${t('生成专属心象海报', 'Generate Poster')}`;
+            });
+        };
     }
 
     window._pokerRestart = function() {

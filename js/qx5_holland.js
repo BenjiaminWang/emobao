@@ -1,5 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 霍兰德职业兴趣测试（RIASEC）
+   v3 (2026-10-30) 带分享海报版
    ================================================================ */
    (function () {
     'use strict';
@@ -19,7 +20,7 @@
         { q_cn: '我喜欢画画、写作或设计。', q_en: 'I like drawing, writing, or designing.', type: 'A' },
         { q_cn: '我喜欢用音乐或艺术表达自己。', q_en: 'I like expressing myself through music or art.', type: 'A' },
         { q_cn: '我喜欢自由自在、没有固定规则的工作。', q_en: 'I like free, unstructured work.', type: 'A' },
-        { q_cn: '我喜欢倾听别人的烦恼并安慰他们。', q_en: 'I like listening to others problems and comforting them.', type: 'S' },
+        { q_cn: '我喜欢倾听别人的烦恼并安慰他们。', q_en: 'I like listening to others\' problems and comforting them.', type: 'S' },
         { q_cn: '我喜欢教导或培训别人。', q_en: 'I like teaching or training others.', type: 'S' },
         { q_cn: '我喜欢团队合作，大家一起完成任务。', q_en: 'I like teamwork and completing tasks together.', type: 'S' },
         { q_cn: '我喜欢说服别人接受我的观点。', q_en: 'I like persuading others to accept my views.', type: 'E' },
@@ -102,6 +103,7 @@
         const topThree = sortedTypes.slice(0, 3);
         const mainType = topThree[0];
         const res = RESULTS[mainType];
+
         const resName = t(res.name_cn, res.name_en);
         const resDesc = t(res.desc_cn, res.desc_en);
 
@@ -109,18 +111,26 @@
             <div style="max-width: 500px; margin: 0 auto; padding: 40px 20px; text-align: center;">
                 <div style="font-size: 16px; color: #64748B; margin-bottom: 10px;">${t('您的职业兴趣代码是', 'Your Career Interest Code is')}</div>
                 
-                <div style="background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; border: 1px solid #E2E8F0;">
-                    <div style="background: ${res.color}; padding: 40px 20px; color: #fff; position: relative;">
-                        <span id="qx5_holland_result_voice" style="position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; opacity: 0.8;" title="听结果">🔊</span>
+                <!-- 用于生成海报的容器 -->
+                <div id="qx5_holland_poster_box" style="background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; border: 1px solid #E2E8F0; text-align: left;">
+                    <div style="background: ${res.color}; padding: 40px 20px; color: #fff; text-align: center;">
                         <div style="font-size: 40px; font-weight: 900; letter-spacing: 4px; margin-bottom: 10px;">${topThree.join(' - ')}</div>
                         <div style="font-size: 20px; font-weight: bold; opacity: 0.9;">${resName}</div>
                     </div>
-                    <div style="padding: 30px 20px; font-size: 15px; color: #334155; line-height: 1.8; text-align: left;">
+                    <div style="padding: 30px 20px; font-size: 15px; color: #334155; line-height: 1.8;">
                         ${resDesc}
+                    </div>
+                    <div style="border-top: 1px solid #E2E8F0; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC;">
+                        <div style="font-size: 12px; color: #64748B;">${t('扫码开启你的情绪之旅', 'Scan to start your journey')}</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #2C7BE5;">情绪宝</div>
                     </div>
                 </div>
 
-                <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px;" onclick="window._hollandRestart()">
+                <button id="qx5_holland_gen_poster_btn" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: linear-gradient(135deg, #FF8C00 0%, #FF5722 100%); color: #fff; border: none; cursor: pointer; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);">
+                    📸 ${t('生成专属职业海报', 'Generate Poster')}
+                </button>
+
+                <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(44, 123, 229, 0.2);" onclick="window._hollandRestart()">
                     ${t('重新测试', 'Test Again')}
                 </button>
                 <button class="qx5-btn qx5-btn-secondary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #F1F5F9; color: #475569; border: none; cursor: pointer;" onclick="window.qx5_onExit()">
@@ -133,16 +143,70 @@
                             `Assessment complete. Your Holland code is ${topThree.join(', ')}.`);
         if (window.qxSpeak) window.qxSpeak(speakText);
 
-        const voiceBtn = hostEl.querySelector('#qx5_holland_result_voice');
-        if (voiceBtn) {
-            voiceBtn.onclick = () => {
-                if (window.qxSpeak) window.qxSpeak(speakText);
-            };
-        }
+        document.getElementById('qx5_holland_gen_poster_btn').onclick = () => {
+            const posterBox = document.getElementById('qx5_holland_poster_box');
+            if (!window.html2canvas) {
+                alert(t('海报组件未加载，请刷新页面重试', 'Poster library not loaded.'));
+                return;
+            }
+            
+            const btn = document.getElementById('qx5_holland_gen_poster_btn');
+            btn.innerText = t('海报生成中...', 'Generating...');
+
+            const hiddenVideos = document.querySelectorAll('video');
+            hiddenVideos.forEach(v => v.style.display = 'none');
+
+            window.html2canvas(posterBox, {
+                scale: 2, 
+                backgroundColor: null,
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                hiddenVideos.forEach(v => v.style.display = '');
+                const imgData = canvas.toDataURL('image/png');
+                
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px);';
+                
+                overlay.innerHTML = `
+                    <div style="color: #fff; font-size: 16px; margin-bottom: 15px; font-weight: bold;">${t('长按图片保存到手机', 'Long press to save image')}</div>
+                    <img src="${imgData}" style="max-width: 100%; max-height: 75vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+                    <button id="qx5_holland_close_poster" style="margin-top: 20px; padding: 12px 30px; border-radius: 20px; background: #fff; color: #1E293B; border: none; font-weight: bold; font-size: 16px; cursor: pointer;">${t('完成', 'Done')}</button>
+                `;
+                
+                document.body.appendChild(overlay);
+                document.getElementById('qx5_holland_close_poster').onclick = () => document.body.removeChild(overlay);
+                btn.innerHTML = `📸 ${t('生成专属职业海报', 'Generate Poster')}`;
+            }).catch(err => {
+                hiddenVideos.forEach(v => v.style.display = '');
+                console.error(err);
+                alert(t('海报生成失败，请重试', 'Poster generation failed.'));
+                btn.innerHTML = `📸 ${t('生成专属职业海报', 'Generate Poster')}`;
+            });
+        };
     }
 
     window._hollandRestart = function() {
         startHolland(document.getElementById('qx5_play_host'));
+    };
+
+    window.qx5RegisterHolland = function() {
+        if (window.qx5Engine) {
+            window.qx5Engine.registerGame({
+                id: 'holland_test',
+                collectionId: 'emotion',
+                isFeatured: true,
+                title: { cn: '霍兰德职业兴趣', en: 'Holland Career Interest' },
+                subtitle: { cn: '找到最适合你的职业方向', en: 'Find your ideal career path' },
+                generateTrials: () => [],
+                renderTrial: () => {},
+                computeScore: () => ({}),
+                renderResult: () => {},
+                customLaunch: function(hostEl) {
+                    startHolland(hostEl);
+                }
+            });
+        }
     };
 
     window._hollandStart = function(hostEl) {

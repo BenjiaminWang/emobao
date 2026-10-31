@@ -1,8 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 MBTI 16型人格极简版测评
-   v3 (2026-10-29)
-   - 新增：完整的中英文题干、选项、结果文案
-   - 优化：语音播报增加防抖与打断逻辑，防止多段语音打架
+   v4 (2026-10-30) 带分享海报版
    ================================================================ */
    (function () {
     'use strict';
@@ -12,7 +10,6 @@
         return lang === 1 ? cn : en;
     };
 
-    // 极简 12 题题库（全面补齐中英双语）
     const QUESTIONS = [
         { q_cn: '在聚会上，你更倾向于：', q_en: 'At a party, you tend to:', a_cn: '主动认识新朋友', a_en: 'Actively meet new people', b_cn: '等待别人来找你', b_en: 'Wait for others to approach you', aScore: 'E', bScore: 'I' },
         { q_cn: '当你做决定时，更看重：', q_en: 'When making decisions, you value:', a_cn: '逻辑与事实', a_en: 'Logic and facts', b_cn: '情感与和谐', b_en: 'Emotions and harmony', aScore: 'T', bScore: 'F' },
@@ -86,11 +83,9 @@
             </div>
         `;
 
-        // 动态组装语音播报内容
         const speakText = t(`第${currentIdx + 1}题。${q.q_cn} 选项A：${q.a_cn}。选项B：${q.b_cn}。`, 
                             `Question ${currentIdx + 1}. ${q.q_en} Option A: ${q.a_en}. Option B: ${q.b_en}.`);
 
-        // 绑定语音读题按钮
         const voiceBtn = hostEl.querySelector('#qx5_mbti_voice');
         if (voiceBtn) {
             voiceBtn.onclick = () => {
@@ -98,7 +93,6 @@
             };
         }
 
-        // 自动播报当前题目
         setTimeout(() => {
             if (window.qxSpeak) window.qxSpeak(speakText);
         }, 500);
@@ -128,19 +122,28 @@
             <div style="max-width: 500px; margin: 0 auto; padding: 40px 20px; text-align: center;">
                 <div style="font-size: 16px; color: #64748B; margin-bottom: 10px;">${t('您的专属人格是', 'Your Personality Type is')}</div>
                 
-                <div style="background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; border: 1px solid #E2E8F0;">
-                    <div style="background: ${res.color}; padding: 40px 20px; color: #fff; position: relative;">
-                        <span id="qx5_mbti_result_voice" style="position: absolute; top: 15px; right: 15px; cursor: pointer; font-size: 20px; opacity: 0.8;" title="听结果">🔊</span>
-                        
+                <!-- 用于生成海报的容器 -->
+                <div id="qx5_mbti_poster_box" style="background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; margin-bottom: 30px; border: 1px solid #E2E8F0; text-align: left;">
+                    <div style="background: ${res.color}; padding: 40px 20px; color: #fff; position: relative; text-align: center;">
                         <div style="font-size: 48px; font-weight: 900; letter-spacing: 4px; margin-bottom: 10px;">${mbtiType}</div>
                         <div style="font-size: 20px; font-weight: bold; opacity: 0.9;">${resName}</div>
                     </div>
-                    <div style="padding: 30px 20px; font-size: 15px; color: #334155; line-height: 1.8; text-align: left;">
+                    <div style="padding: 30px 20px; font-size: 15px; color: #334155; line-height: 1.8;">
                         ${resDesc}
+                    </div>
+                    <!-- 海报底部品牌标识 -->
+                    <div style="border-top: 1px solid #E2E8F0; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; background: #F8FAFC;">
+                        <div style="font-size: 12px; color: #64748B;">${t('扫码开启你的情绪之旅', 'Scan to start your journey')}</div>
+                        <div style="font-size: 14px; font-weight: bold; color: #2C7BE5;">情绪宝</div>
                     </div>
                 </div>
 
-                <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px;" onclick="window._mbtiRestart()">
+                <!-- 海报生成按钮 -->
+                <button id="qx5_mbti_gen_poster_btn" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: linear-gradient(135deg, #FF8C00 0%, #FF5722 100%); color: #fff; border: none; cursor: pointer; font-weight: bold; margin-bottom: 16px; display: flex; justify-content: center; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);">
+                    📸 ${t('生成专属人格海报', 'Generate Poster')}
+                </button>
+
+                <button class="qx5-btn qx5-btn-primary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #2C7BE5; color: #fff; border: none; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(44, 123, 229, 0.2);" onclick="window._mbtiRestart()">
                     ${t('重新测试', 'Test Again')}
                 </button>
                 <button class="qx5-btn qx5-btn-secondary" style="width: 100%; padding: 16px; border-radius: 12px; font-size: 16px; background: #F1F5F9; color: #475569; border: none; cursor: pointer;" onclick="window.qx5_onExit()">
@@ -149,22 +152,55 @@
             </div>
         `;
 
-        // 动态组装结果播报内容
         const speakText = t(`测试完成。您的专属人格是${mbtiType}，${res.name_cn}。${res.desc_cn}`, 
                             `Assessment complete. Your personality type is ${mbtiType}, ${res.name_en}. ${res.desc_en}`);
 
-        // 自动播报结果语音
         if (window.qxSpeak) {
             window.qxSpeak(speakText);
         }
 
-        // 手动播放按钮
-        const voiceBtn = hostEl.querySelector('#qx5_mbti_result_voice');
-        if (voiceBtn) {
-            voiceBtn.onclick = () => {
-                if (window.qxSpeak) window.qxSpeak(speakText);
-            };
-        }
+        // 绑定生成海报
+        document.getElementById('qx5_mbti_gen_poster_btn').onclick = () => {
+            const posterBox = document.getElementById('qx5_mbti_poster_box');
+            if (!window.html2canvas) {
+                alert(t('海报组件未加载，请刷新页面重试', 'Poster library not loaded.'));
+                return;
+            }
+            
+            const btn = document.getElementById('qx5_mbti_gen_poster_btn');
+            btn.innerText = t('海报生成中...', 'Generating...');
+
+            const hiddenVideos = document.querySelectorAll('video');
+            hiddenVideos.forEach(v => v.style.display = 'none');
+
+            window.html2canvas(posterBox, {
+                scale: 2, 
+                backgroundColor: null,
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                hiddenVideos.forEach(v => v.style.display = '');
+                const imgData = canvas.toDataURL('image/png');
+                
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px);';
+                
+                overlay.innerHTML = `
+                    <div style="color: #fff; font-size: 16px; margin-bottom: 15px; font-weight: bold;">${t('长按图片保存到手机', 'Long press to save image')}</div>
+                    <img src="${imgData}" style="max-width: 100%; max-height: 75vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+                    <button id="qx5_mbti_close_poster" style="margin-top: 20px; padding: 12px 30px; border-radius: 20px; background: #fff; color: #1E293B; border: none; font-weight: bold; font-size: 16px; cursor: pointer;">${t('完成', 'Done')}</button>
+                `;
+                
+                document.body.appendChild(overlay);
+                document.getElementById('qx5_mbti_close_poster').onclick = () => document.body.removeChild(overlay);
+                btn.innerHTML = `📸 ${t('生成专属人格海报', 'Generate Poster')}`;
+            }).catch(err => {
+                hiddenVideos.forEach(v => v.style.display = '');
+                console.error(err);
+                alert(t('海报生成失败，请重试', 'Poster generation failed.'));
+                btn.innerHTML = `📸 ${t('生成专属人格海报', 'Generate Poster')}`;
+            });
+        };
     }
 
     window._mbtiRestart = function() {
@@ -189,7 +225,7 @@
             });
         }
     };
-    // 暴露给 qx5_main.js 强制调用
+
     window._mbtiStart = function(hostEl) {
         startMbti(hostEl);
     };

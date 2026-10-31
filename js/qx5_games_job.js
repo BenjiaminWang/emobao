@@ -1,8 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 应聘挑战（P0：凌晨超售）
-   v3：
-   - 独立角色语音引擎（通过 rate/pitch 区分男女老少）
-   - 背景介绍、NPC对话、考官宣布全部语音化
+   v5：沉浸式场景背景 + 玻璃拟态UI + 智能语音分配 + 降门槛
    ================================================================ */
    (function () {
     'use strict';
@@ -13,39 +11,50 @@
   
     const E = window.qx5Engine;
   
-    // ================= 核心：角色音色引擎 =================
+    // ================= 图片资源（请确保 picture 文件夹里有这两张图） =================
+    const IMG_INTERVIEW = 'picture/hotel_lobby.jpg'; // 第一张：深色前台
+    const IMG_RESULT = 'picture/hotel_result.jpg';   // 第二张：白墙冷静
+  
+    // ================= 核心：角色音色引擎 v2 =================
     const VOICE_CONFIGS = {
-      narrator: { rate: 1.0, pitch: 1.0 },  // 旁白/背景介绍
-      lin_manager: { rate: 0.95, pitch: 0.9 }, // 林经理：沉稳，稍低
-      xiaozhou: { rate: 1.2, pitch: 1.4 },     // 小周：快、尖（像小孩/愣头青）
-      laok: { rate: 0.85, pitch: 1.3 },        // 老K：慢、高（假装专业）
-      wangjie: { rate: 0.9, pitch: 1.1 },      // 王姐：阴阳怪气
-      competitor: { rate: 1.05, pitch: 1.0 }   // 竞争者：正常
+      narrator:    { rate: 1.0, pitch: 1.0, preferGender: 'female' },
+      lin_manager: { rate: 0.95, pitch: 0.85, preferGender: 'female' },
+      xiaozhou:    { rate: 1.3, pitch: 1.5, preferGender: 'male' },
+      laok:        { rate: 0.8, pitch: 1.2, preferGender: 'male' },
+      wangjie:     { rate: 0.9, pitch: 1.1, preferGender: 'female' },
+      competitor:  { rate: 1.0, pitch: 1.0, preferGender: 'male' }
     };
   
     function speakRole(roleId, text) {
       if (!window.speechSynthesis || !text) return;
       try {
-        window.speechSynthesis.cancel(); // 打断上一句
+        window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'zh-CN';
         const cfg = VOICE_CONFIGS[roleId] || VOICE_CONFIGS.narrator;
         u.rate = cfg.rate;
         u.pitch = cfg.pitch;
   
-        // 尝试选个女声（如果有的话，通常中文语音包里有）
         const voices = window.speechSynthesis.getVoices();
-        const zhVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN'));
-        if (zhVoice) u.voice = zhVoice;
+        let selectedVoice = null;
+        const zhVoices = voices.filter(v => v.lang.includes('zh') || v.lang.includes('CN'));
+        
+        if (zhVoices.length > 0) {
+          if (cfg.preferGender === 'female') {
+            selectedVoice = zhVoices.find(v => v.name.includes('女') || v.name.includes('Xiaoxiao') || v.name.includes('Yaoyao')) || zhVoices[0];
+          } else if (cfg.preferGender === 'male') {
+            selectedVoice = zhVoices.find(v => v.name.includes('男') || v.name.includes('Yunxi') || v.name.includes('Kangkang')) || zhVoices[0];
+          }
+        }
+        if (selectedVoice) u.voice = selectedVoice;
   
         window.speechSynthesis.speak(u);
       } catch (e) { console.warn('语音播报失败', e); }
     }
-    // 兼容一下浏览器的 getVoices 异步加载
+    
     if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = () => {};
     }
-    // =======================================================
   
     function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     
@@ -53,8 +62,8 @@
       const out = {};
       for (const [dim, cfg] of Object.entries(evaluate)) {
         const hits = (cfg.keywords || []).filter(k => userText.includes(k)).length;
-        const raw = Math.min(hits * cfg.weight, 10);
-        out[dim] = Math.round((raw / 10) * 100);
+        // 只要有命中，直接给 85 分起步，确保玩家能过关
+        out[dim] = hits > 0 ? Math.min(85 + hits * 5, 100) : 0; 
       }
       return out;
     }
@@ -70,68 +79,100 @@
       title:    { cn: '应聘挑战', en: 'Job Challenge' },
       subtitle: { cn: SCENARIO.intro || '你能稳住局面吗？', en: 'Can you stay in control?' },
   
-      generateTrials: function () {
-        return [{ id: 'run_1', condition: 'interview', stimulus: {} }];
-      },
+      generateTrials: function () { return [{ id: 'run_1', condition: 'interview', stimulus: {} }]; },
   
       renderTrial: function (hostEl, trial, onAnswer, meta) {
         hostEl.innerHTML = '';
   
-        // ====== 1. 构建 UI 骨架 ======
+        // ====== 场景背景层 ======
         const stage = document.createElement('div');
-        stage.style.cssText = 'display:flex;flex-direction:column;gap:12px;padding:16px;max-width:520px;margin:0 auto;box-sizing:border-box;';
+        stage.style.cssText = `
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          padding: 16px;
+          min-height: 100vh;
+          box-sizing: border-box;
+          background-image: url('${IMG_INTERVIEW}');
+          background-size: cover;
+          background-position: center;
+          font-family: inherit;
+        `;
+        
+        // 暗色遮罩：保证文字清晰，增加沉浸感
+        const overlay = document.createElement('div');
+        overlay.style.cssText = 'position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.55); z-index: 1;';
+        stage.appendChild(overlay);
+  
+        // 交互内容层
+        const content = document.createElement('div');
+        content.style.cssText = 'position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; flex: 1;';
+        stage.appendChild(content);
         hostEl.appendChild(stage);
   
+        // ====== 顶部 HUD ======
         const top = document.createElement('div');
-        top.style.cssText = 'display:flex;justify-content:space-between;font-size:13px;color:#5A6B87;';
-        top.innerHTML = `<span>${SCENARIO.emoji} ${SCENARIO.name}</span><span id="qx5_job_progress">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
-        stage.appendChild(top);
+        top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#fff;font-weight:bold;text-shadow: 0 1px 2px rgba(0,0,0,0.8);';
+        top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
+        content.appendChild(top);
         const progressEl = top.querySelector('#qx5_job_progress');
   
-        // 背景介绍（加入语音）
+        // 场景介绍气泡
         const intro = document.createElement('div');
-        intro.style.cssText = 'font-size:13px;color:#5A6B87;line-height:1.6;background:#F7FAFD;border-radius:10px;padding:10px 12px;';
+        intro.style.cssText = 'font-size:13px;color:#fff;line-height:1.6;background:rgba(255,255,255,0.15);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;';
         intro.textContent = SCENARIO.intro;
-        stage.appendChild(intro);
-        speakRole('narrator', SCENARIO.intro); // 读背景
+        content.appendChild(intro);
   
+        // 对话框容器（自适应高度，超出滚动）
         const dialog = document.createElement('div');
-        dialog.style.cssText = 'display:flex;flex-direction:column;gap:8px;min-height:140px;';
-        stage.appendChild(dialog);
+        dialog.style.cssText = 'display:flex;flex-direction:column;gap:10px;flex:1;overflow-y:auto;padding-right:4px;';
+        content.appendChild(dialog);
+  
+        // 底部输入区
+        const inputWrap = document.createElement('div');
+        inputWrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:10px;';
+        content.appendChild(inputWrap);
   
         const ta = document.createElement('textarea');
-        ta.placeholder = '在这里输入你的回答……';
-        ta.style.cssText = 'width:100%;height:90px;padding:10px;border:1px solid #D0D7E0;border-radius:10px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:none;';
-        stage.appendChild(ta);
+        ta.placeholder = '听题后点击开始，再输入你的回答……';
+        ta.style.cssText = 'width:100%;height:80px;padding:12px;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.6);color:#fff;border-radius:10px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:none;backdrop-filter: blur(4px);';
+        inputWrap.appendChild(ta);
   
         const timerEl = document.createElement('div');
-        timerEl.style.cssText = 'font-size:12px;color:#C0392B;';
-        stage.appendChild(timerEl);
+        timerEl.style.cssText = 'font-size:13px;color:#FFD600;font-weight:bold;text-align:center;text-shadow: 0 1px 2px rgba(0,0,0,0.8);';
+        inputWrap.appendChild(timerEl);
   
         const btnRow = document.createElement('div');
         btnRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
+        inputWrap.appendChild(btnRow);
+  
+        // ====== 按钮组 ======
+        const startBtn = document.createElement('button');
+        startBtn.className = 'qx5-btn qx5-btn-primary';
+        startBtn.textContent = '▶ 开始作答（90秒）';
+        startBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:10px;background:#2ECC71;color:#fff;font-size:15px;cursor:pointer;display:none;box-shadow:0 4px 12px rgba(46,204,113,0.4);';
         
         const submitBtn = document.createElement('button');
         submitBtn.className = 'qx5-btn qx5-btn-primary';
         submitBtn.textContent = '提交回答';
-        submitBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:10px;background:#2C7BE5;color:#fff;font-size:15px;cursor:pointer;';
+        submitBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:10px;background:#2C7BE5;color:#fff;font-size:15px;cursor:pointer;display:none;box-shadow:0 4px 12px rgba(44,123,229,0.4);';
         
         const demoBtn = document.createElement('button');
         demoBtn.className = 'qx5-btn qx5-btn-secondary';
-        demoBtn.textContent = '听听示范回答';
-        demoBtn.style.cssText = 'padding:12px 16px;border:0;border-radius:10px;background:#F1F5F9;color:#475569;font-size:14px;cursor:pointer;';
+        demoBtn.textContent = '示范';
+        demoBtn.style.cssText = 'padding:12px 16px;border:0;border-radius:10px;background:rgba(255,255,255,0.2);color:#fff;font-size:14px;cursor:pointer;backdrop-filter:blur(4px);';
         
         const quitBtn = document.createElement('button');
         quitBtn.className = 'qx5-btn qx5-btn-secondary';
-        quitBtn.textContent = '退出（弃权）';
-        quitBtn.style.cssText = 'padding:12px 16px;border:0;border-radius:10px;background:#FBE9E7;color:#C0392B;font-size:14px;cursor:pointer;';
+        quitBtn.textContent = '弃权';
+        quitBtn.style.cssText = 'padding:12px 16px;border:0;border-radius:10px;background:rgba(231,76,60,0.3);color:#fff;font-size:14px;cursor:pointer;backdrop-filter:blur(4px);';
         
+        btnRow.appendChild(startBtn);
         btnRow.appendChild(submitBtn);
         btnRow.appendChild(demoBtn);
         btnRow.appendChild(quitBtn);
-        stage.appendChild(btnRow);
   
-        // ====== 2. 状态管理 ======
+        // ====== 状态 ======
         let roundIdx = 0;
         const mainScores = [];
         const interruptScores = [];
@@ -145,26 +186,36 @@
         let usedInterruptIds = [];
         let pendingInterruptImpact = null;
   
-        // ====== 3. 内部方法 ======
+        // ====== 气泡渲染 ======
         function addBubble(role, speaker, text) {
+          const isPlayer = role === 'player';
           const wrap = document.createElement('div');
-          wrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;';
+          wrap.style.cssText = `display:flex; flex-direction:column; gap:4px; align-items: ${isPlayer ? 'flex-end' : 'flex-start'};`;
           
           const name = document.createElement('div');
           name.textContent = speaker;
-          name.style.cssText = 'font-size:12px;font-weight:bold;color:' + (
-            role === 'npc' ? '#4A7C9B' :
-            role === 'interrupt' ? '#C77A1E' :
-            role === 'competitor' ? '#6B6B6B' : '#333'
-          ) + ';';
+          name.style.cssText = 'font-size:12px; font-weight:bold; color: rgba(255,255,255,0.8); margin: 0 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);';
           
           const bubble = document.createElement('div');
           bubble.textContent = text;
-          bubble.style.cssText = 'font-size:14px;line-height:1.6;padding:8px 10px;border-radius:8px;background:' + (
-            role === 'npc' ? '#EEF3F7' :
-            role === 'interrupt' ? '#FFF3E0' :
-            role === 'competitor' ? '#F0F0F0' : '#fff'
-          ) + ';';
+          
+          let bg = 'rgba(255,255,255,0.95)';
+          let color = '#333';
+          if (role === 'npc') {
+             bg = 'rgba(238,243,247,0.95)'; color = '#1A2B4A';
+          } else if (role === 'interrupt') {
+             bg = 'rgba(255,243,224,0.95)'; color = '#C77A1E';
+          } else if (role === 'competitor') {
+             bg = 'rgba(240,240,240,0.9)'; color = '#555';
+          }
+          
+          bubble.style.cssText = `
+            font-size:15px; line-height:1.6; padding:12px 16px; 
+            border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; 
+            background: ${bg}; color: ${color}; 
+            max-width: 88%; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            backdrop-filter: blur(8px);
+          `;
           
           wrap.appendChild(name);
           wrap.appendChild(bubble);
@@ -175,7 +226,6 @@
         function decideInterrupter(round) {
           const ir = round.interrupter;
           if (!ir) return null;
-          
           if (ir.trigger === 'fixed') return ir;
           if (ir.trigger === 'random') return pick(ir.options);
           if (ir.trigger === 'if_none_yet') {
@@ -198,10 +248,7 @@
           timerEl.textContent = '竞争者已抢答，你仍可回答（答得好可翻盘）';
           
           const rule = SCENARIO.judgeRule || { competitorBase: 55, competitorCap: 65 };
-          competitorScore = Math.max(45, Math.min(
-            rule.competitorCap,
-            rule.competitorBase + Math.round((Math.random() * 20 - 10))
-          ));
+          competitorScore = Math.max(45, Math.min(rule.competitorCap, rule.competitorBase + Math.round((Math.random() * 20 - 10))));
         }
   
         function startTimer(sec) {
@@ -225,37 +272,47 @@
           currentRound = SCENARIO.rounds[roundIdx];
           competitorDone = false;
           pendingInterruptImpact = null;
-  
           progressEl.textContent = `第 ${roundIdx + 1} / ${SCENARIO.rounds.length} 轮`;
+          
           ta.value = '';
+          ta.disabled = true;
+          submitBtn.style.display = 'none';
+          startBtn.style.display = 'block';
+          timerEl.textContent = '';
   
           const q = pick(currentRound.npcLineVariants);
           addBubble('npc', '面试官 · 林经理', q);
-          speakRole('lin_manager', q); // 考官发声
+          speakRole('lin_manager', q);
   
           const ir = decideInterrupter(currentRound);
           if (ir) {
             usedInterruptIds.push(ir.id);
             pendingInterruptImpact = ir.impact;
             setTimeout(() => {
-              const speakerName = ir.id === 'xiaozhou' ? '傻助理 小周'
-                : ir.id === 'laok' ? '总部观察员 老K'
-                : ir.id === 'wangjie' ? '隔壁部门 王姐' : '干扰者';
+              const speakerName = ir.id === 'xiaozhou' ? '傻助理 小周' : ir.id === 'laok' ? '总部观察员 老K' : '隔壁部门 王姐';
               addBubble('interrupt', speakerName, ir.line);
-              speakRole(ir.id, ir.line); // 干扰者发声
-            }, 1000); // 稍微延迟 1 秒插话，让考官先说完
+              speakRole(ir.id, ir.line);
+            }, 1500);
           }
-  
-          startTimer(currentRound.timeLimit || 60);
         }
+  
+        startBtn.onclick = function() {
+          startBtn.style.display = 'none';
+          submitBtn.style.display = 'block';
+          ta.disabled = false;
+          ta.focus();
+          startTimer(90); 
+        };
   
         function submitRound() {
           if (finished) return;
           const text = ta.value.trim();
-          if (!text) { alert('先写点什么，或者等着看竞争者抢答'); return; }
+          if (!text) { alert('请先输入你的回答'); return; }
   
           clearInterval(timerId);
           anyAnswer = true;
+          
+          addBubble('player', '你的回答', text); // 增加玩家回答回显
   
           const dimScores = normalizeScores(text, currentRound.evaluate);
           const mainAvg = avg(dimScores);
@@ -285,58 +342,44 @@
   
           let pass = false;
           let announce = '';
+          const rule = SCENARIO.judgeRule;
   
           if (!anyAnswer) {
             pass = false;
             announce = competitorScore >= 50 ? SCENARIO.judgeAnnounce.failByCompetitor : SCENARIO.judgeAnnounce.failAll;
           } else {
-            const rule = SCENARIO.judgeRule;
-            pass = main >= rule.mainThreshold && intr >= rule.interruptThreshold && main > competitorScore;
+            pass = main >= 50 && intr >= 40 && main > competitorScore;
             announce = pass ? SCENARIO.judgeAnnounce.pass
               : (competitorScore >= 50 ? SCENARIO.judgeAnnounce.failByCompetitor : SCENARIO.judgeAnnounce.failAll);
           }
   
           addBubble('npc', '面试官 · 林经理', announce);
-          speakRole('lin_manager', announce); // 考官宣布结果语音
+          speakRole('lin_manager', announce);
           submitBtn.disabled = true;
           demoBtn.disabled = true;
   
           setTimeout(() => {
             onAnswer(JSON.stringify({
-              main: main,
-              interrupt: intr,
-              competitor: competitorScore,
-              pass: pass,
-              announce: announce,
-              rounds: roundIdx
+              main: main, interrupt: intr, competitor: competitorScore,
+              pass: pass, announce: announce, rounds: roundIdx
             }), pass);
-          }, 2000);
+          }, 2500);
         }
   
-        // ====== 4. 按钮绑定 ======
         quitBtn.onclick = function () {
-          if (!confirm('确定退出吗？中途退出视为弃权，本局不通过。')) return;
+          if (!confirm('确定退出吗？中途退出视为弃权。')) return;
           finished = true;
           clearInterval(timerId);
-          const announce = '你提前离开了面试。';
-          addBubble('npc', '面试官 · 林经理', announce);
-          speakRole('lin_manager', announce);
-          onAnswer(JSON.stringify({
-            main: 0, interrupt: 0, competitor: competitorScore,
-            pass: false, announce: announce, quit: true
-          }), false);
+          onAnswer(JSON.stringify({ main: 0, interrupt: 0, competitor: competitorScore, pass: false, announce: '你提前离开了面试。', quit: true }), false);
         };
   
         demoBtn.onclick = function () {
           if (!currentRound) return;
           addBubble('npc', '（示范回答）', currentRound.demoAnswer);
-          speakRole('lin_manager', currentRound.demoAnswer); // 示范用考官声音
+          speakRole('lin_manager', currentRound.demoAnswer);
         };
   
         submitBtn.onclick = submitRound;
-        ta.focus();
-  
-        // ====== 5. 启动 ======
         runRound();
       },
   
@@ -346,44 +389,66 @@
         try { info = JSON.parse(rec.response); } catch (e) {}
         return {
           accuracy: 1, correctCount: 1, totalCount: 1,
-          mainScore: info.main || 0,
-          interruptScore: info.interrupt || 0,
-          competitorScore: info.competitor || 0,
-          pass: !!info.pass,
-          announce: info.announce || '',
-          quit: !!info.quit,
-          rounds: info.rounds || 0
+          mainScore: info.main || 0, interruptScore: info.interrupt || 0,
+          competitorScore: info.competitor || 0, pass: !!info.pass,
+          announce: info.announce || '', quit: !!info.quit, rounds: info.rounds || 0
         };
       },
   
       renderResult: function (hostEl, data) {
         const s = data.score;
         hostEl.innerHTML = '';
+        
+        // ====== 结果页也加背景！ ======
         const wrap = document.createElement('div');
         wrap.className = 'qx5-result';
+        wrap.style.cssText = `
+          min-height: 100vh;
+          background-image: url('${IMG_RESULT}');
+          background-size: cover;
+          background-position: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          box-sizing: border-box;
+          position: relative;
+        `;
         
-        // 处理空作答带来的奇怪显示
+        // 结果页的暗色遮罩，让结果看得清
+        const resOverlay = document.createElement('div');
+        resOverlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:0;';
+        wrap.appendChild(resOverlay);
+  
+        const card = document.createElement('div');
+        card.style.cssText = 'position:relative; z-index:1; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-radius:20px; padding:30px 20px; width:100%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.3); text-align:center;';
+        
         let noteHtml = '';
         if (s.mainScore === 0 && !s.quit) {
-          noteHtml = `<div class="qx5-result-note" style="color:#E74C3C;margin-top:12px;">你一言未发，遗憾离场。下一局试试接住考官的问题？</div>`;
+          noteHtml = `<div class="qx5-result-note" style="color:#E74C3C;margin-top:12px;">你一言未发，遗憾离场。</div>`;
         } else if (s.quit) {
-          noteHtml = `<div class="qx5-result-note" style="color:#E67E22;margin-top:12px;">中途弃权，视为未通过。</div>`;
+          noteHtml = `<div class="qx5-result-note" style="color:#E67E22;margin-top:12px;">中途弃权。</div>`;
         }
   
-        wrap.innerHTML = `
-          <div class="qx5-result-title">${E.t('应聘挑战 · 结果', 'Job Challenge · Result')}</div>
-          <div class="qx5-result-hero" style="color:${s.pass ? '#2ECC71' : '#E74C3C'}">${s.pass ? E.t('通过', 'Pass') : E.t('未通过', 'Fail')}</div>
-          <div class="qx5-result-sub">${s.announce || ''}</div>
-          <div class="qx5-result-row"><span>${E.t('主评分（专业发挥）', 'Main Score')}</span><b>${s.mainScore}</b></div>
-          <div class="qx5-result-row"><span>${E.t('干扰评分（稳住程度）', 'Interrupt Score')}</span><b>${s.interruptScore}</b></div>
-          <div class="qx5-result-row"><span>${E.t('竞争者评分', 'Competitor')}</span><b>${s.competitorScore}</b></div>
-          <div class="qx5-result-row"><span>${E.t('通关条件', 'Rule')}</span><b>${E.t('主≥65 且 干扰≥55 且 主>竞争者', 'Main≥65 & Interrupt≥55 & Main>Competitor')}</b></div>
+        card.innerHTML = `
+          <div style="font-size:18px;color:#64748B;margin-bottom:10px;">${E.t('应聘挑战 · 结果', 'Result')}</div>
+          <div style="font-size:40px;font-weight:900;margin-bottom:10px;color:${s.pass ? '#2ECC71' : '#E74C3C'}">${s.pass ? E.t('通过', 'Pass') : E.t('未通过', 'Fail')}</div>
+          <div style="font-size:16px;color:#1E293B;margin-bottom:20px;font-weight:bold;">${s.announce || ''}</div>
+          
+          <div style="text-align:left;background:#F8FAFC;border-radius:10px;padding:15px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>主评分</span><b>${s.mainScore}</b></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>干扰评分</span><b>${s.interruptScore}</b></div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;color:#475569;"><span>竞争者评分</span><b>${s.competitorScore}</b></div>
+          </div>
           ${noteHtml}
-          <div class="qx5-result-actions">
-            <button class="qx5-btn qx5-btn-primary" id="qx5_result_restart">${E.t('再刷一局', 'Play Again')}</button>
-            <button class="qx5-btn qx5-btn-secondary" id="qx5_result_exit">${E.t('返回大厅', 'Back')}</button>
+          <div style="display:flex;gap:10px;margin-top:20px;">
+            <button class="qx5-btn qx5-btn-primary" id="qx5_result_restart" style="flex:1;padding:12px;background:#2C7BE5;color:#fff;border:none;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer;">再刷一局</button>
+            <button class="qx5-btn qx5-btn-secondary" id="qx5_result_exit" style="flex:1;padding:12px;background:#F1F5F9;color:#475569;border:none;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer;">返回大厅</button>
           </div>
         `;
+        
+        wrap.appendChild(card);
         hostEl.appendChild(wrap);
         
         hostEl.querySelector('#qx5_result_restart').onclick = () => {

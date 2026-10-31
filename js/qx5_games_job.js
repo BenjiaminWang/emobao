@@ -1,6 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 应聘挑战（P0：凌晨超售）
-   v10：动态场景提示 + 居中卡片式布局 + 放宽分数
+   v11：三段式 Flex 布局，中间对话独立滚动，底部操作区永久固定
    ================================================================ */
    (function () {
     'use strict';
@@ -20,7 +20,6 @@
       competitor:  { rate: 1.0, pitch: 1.0, preferGender: 'male' }
     };
   
-    // 给不同轮次配置不同的提示（配合场景）
     const HINT_CONFIGS = {
       r1: "客人刚到店，还在气头上。你可以试着说：**理解**您的**着急**，**抱歉**让您久等。然后再给出具体的查房动作。",
       r2: "客人坚持要赔偿。你可以试着说：我的**权限**是可以给您**升级**套房，如果超出权限，我会立刻**请示值班经理**。",
@@ -88,43 +87,49 @@
       generateTrials: function () { return [{ id: 'run_1', condition: 'interview', stimulus: {} }]; },
   
       renderTrial: function (hostEl, trial, onAnswer, meta) {
+        // 清空原有内容
         hostEl.innerHTML = '';
+        // 移除宿主容器可能的 padding 干扰
+        hostEl.style.padding = '0';
   
-        // 改为自适应高度卡片，不再是 100vh 强撑
+        // ====== 根容器：绝对固定全屏高度，禁止外部滚动 ======
         const stage = document.createElement('div');
         stage.style.cssText = `
-          position: relative;
           display: flex;
           flex-direction: column;
-          min-height: 100%;
+          height: 100vh; 
+          max-height: 100vh;
           box-sizing: border-box;
           background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
           font-family: inherit;
-          padding: 16px;
-          padding-bottom: 40px; /* 给底部留点呼吸空间 */
+          overflow: hidden; 
         `;
-        
-        // ====== 顶部状态栏 ======
+        hostEl.appendChild(stage);
+  
+        // ====== 1. 顶部固定区 (不滚动) ======
+        const topArea = document.createElement('div');
+        topArea.style.cssText = 'flex-shrink: 0; padding: 16px 16px 8px 16px;';
+        stage.appendChild(topArea);
+  
         const top = document.createElement('div');
         top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#1E293B;font-weight:bold;margin-bottom:12px;';
         top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress" style="color:#2C7BE5;">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
-        stage.appendChild(top);
+        topArea.appendChild(top);
         const progressEl = top.querySelector('#qx5_job_progress');
   
-        // ====== 场景介绍 ======
         const intro = document.createElement('div');
-        intro.style.cssText = 'font-size:13px;color:#475569;line-height:1.6;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.02);';
+        intro.style.cssText = 'font-size:13px;color:#475569;line-height:1.6;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;';
         intro.textContent = SCENARIO.intro;
-        stage.appendChild(intro);
+        topArea.appendChild(intro);
   
-        // ====== 对话框 ======
+        // ====== 2. 中间滚动区 (独立滚动) ======
         const dialog = document.createElement('div');
-        dialog.style.cssText = 'display:flex;flex-direction:column;gap:12px;margin-bottom:16px;';
+        dialog.style.cssText = 'flex: 1; overflow-y: auto; padding: 0 16px 16px 16px; display:flex; flex-direction:column; gap:12px; -webkit-overflow-scrolling: touch;';
         stage.appendChild(dialog);
   
-        // ====== 操作区：卡片式 ======
+        // ====== 3. 底部固定区 (永远贴在底边) ======
         const inputWrap = document.createElement('div');
-        inputWrap.style.cssText = 'display:flex; flex-direction:column; gap:8px; background: #FFFFFF; padding: 16px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;';
+        inputWrap.style.cssText = 'flex-shrink: 0; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: #FFFFFF; border-top: 1px solid #E2E8F0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); display:flex; flex-direction:column; gap:8px;';
         stage.appendChild(inputWrap);
   
         const ta = document.createElement('textarea');
@@ -152,7 +157,7 @@
         
         const demoBtn = document.createElement('button');
         demoBtn.className = 'qx5-btn qx5-btn-secondary';
-        demoBtn.textContent = '提示';
+        demoBtn.textContent = '💡 提示';
         demoBtn.style.cssText = 'padding:12px 16px;border:1px solid #CBD5E1;border-radius:8px;background:#F1F5F9;color:#475569;font-size:14px;font-weight:bold;cursor:pointer;';
         
         const quitBtn = document.createElement('button');
@@ -164,8 +169,6 @@
         btnRow.appendChild(submitBtn);
         btnRow.appendChild(demoBtn);
         btnRow.appendChild(quitBtn);
-  
-        hostEl.appendChild(stage);
   
         let roundIdx = 0;
         const mainScores = [];
@@ -183,26 +186,27 @@
         function addBubble(role, speaker, text) {
           const isPlayer = role === 'player';
           const wrap = document.createElement('div');
-          wrap.style.cssText = `display:flex; flex-direction:column; gap:4px; align-items: ${isPlayer ? 'flex-end' : 'flex-start'};`;
+          wrap.style.cssText = `display:flex; flex-direction:column; gap:4px; align-items: ${isPlayer ? 'flex-end' : 'flex-start'}; flex-shrink: 0;`;
           
           const name = document.createElement('div');
           name.textContent = speaker;
           name.style.cssText = 'font-size:12px; font-weight:bold; color:#64748B; margin: 0 4px;';
           
           const bubble = document.createElement('div');
-          bubble.innerHTML = text; // 这里改成 innerHTML 以支持加粗高亮
+          bubble.innerHTML = text;
           
           let bg = '#FFFFFF'; let color = '#1E293B'; let border = '1px solid #E2E8F0';
           if (role === 'npc') { bg = '#FFFFFF'; color = '#1E293B'; border = '1px solid #E2E8F0'; } 
           else if (role === 'interrupt') { bg = '#FFF7ED'; color = '#C2410C'; border = '1px solid #FFEDD5'; } 
           else if (role === 'competitor') { bg = '#F8FAFC'; color = '#475569'; border = '1px solid #E2E8F0'; }
           else if (role === 'player') { bg = '#2C7BE5'; color = '#FFFFFF'; border = 'none'; }
-          else if (role === 'hint') { bg = '#FEF3C7'; color = '#B45309'; border = '1px solid #FDE68A'; } // 提示框样式
+          else if (role === 'hint') { bg = '#FEF3C7'; color = '#B45309'; border = '1px solid #FDE68A'; } 
           
           bubble.style.cssText = `font-size:15px; line-height:1.6; padding:12px 16px; border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; background: ${bg}; color: ${color}; border: ${border}; max-width: 90%; box-shadow: 0 2px 8px rgba(0,0,0,0.04);`;
           
           wrap.appendChild(name); wrap.appendChild(bubble);
           dialog.appendChild(wrap);
+          dialog.scrollTop = dialog.scrollHeight;
         }
   
         function decideInterrupter(round) {
@@ -333,7 +337,6 @@
             pass = false;
             announce = competitorScore >= 50 ? SCENARIO.judgeAnnounce.failByCompetitor : SCENARIO.judgeAnnounce.failAll;
           } else {
-            // 放宽通过标准：主评分 >= 45，干扰 >= 35，且比竞争者高
             pass = main >= 45 && intr >= 35 && main > competitorScore;
             announce = pass ? SCENARIO.judgeAnnounce.pass : (competitorScore >= 50 ? SCENARIO.judgeAnnounce.failByCompetitor : SCENARIO.judgeAnnounce.failAll);
           }
@@ -354,7 +357,6 @@
           onAnswer(JSON.stringify({ main: 0, interrupt: 0, competitor: competitorScore, pass: false, announce: '你提前离开了面试。', quit: true }), false);
         };
   
-        // 【动态场景提示】
         demoBtn.onclick = function () {
           if (!currentRound) return;
           const hintText = HINT_CONFIGS[currentRound.id] || "试着结合客人的情绪，给出具体的解决步骤。";
@@ -391,10 +393,10 @@
   
         const wrap = document.createElement('div');
         wrap.className = 'qx5-result';
-        wrap.style.cssText = `min-height: 100vh; background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; position: relative;`;
+        wrap.style.cssText = `min-height: 100vh; background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; position: relative; overflow-y: auto;`;
         
         const card = document.createElement('div');
-        card.style.cssText = 'position:relative; z-index:1; background:#FFFFFF; border-radius:20px; padding:30px 20px; width:100%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.08); border:1px solid #E2E8F0; text-align:center; overflow: hidden;';
+        card.style.cssText = 'position:relative; z-index:1; background:#FFFFFF; border-radius:20px; padding:30px 20px; width:100%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.08); border:1px solid #E2E8F0; text-align:center; overflow: hidden; margin: auto 0;';
         
         const ratingHtml = `
           <div style="position:absolute; top:-10px; right:-10px; font-size:120px; font-weight:900; color:${ratingColor}; opacity:0.1; transform:rotate(15deg); pointer-events:none;">${rating}</div>

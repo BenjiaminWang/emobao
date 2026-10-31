@@ -1,6 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 应聘挑战（P0：凌晨超售）
-   v7：完美适配手机端 + 底部固定操作区 + 语音防中断
+   v8：抛弃图片依赖，极简清爽 UI，底部操作区强悬浮
    ================================================================ */
    (function () {
     'use strict';
@@ -11,9 +11,7 @@
   
     const E = window.qx5Engine;
   
-    const IMG_INTERVIEW = 'picture/hotel_lobby.jpg'; 
-    const IMG_RESULT = 'picture/hotel_result.jpg';   
-  
+    // ================= 核心：角色音色引擎 =================
     const VOICE_CONFIGS = {
       narrator:    { rate: 1.0, pitch: 1.0, preferGender: 'female' },
       lin_manager: { rate: 0.95, pitch: 0.85, preferGender: 'female' },
@@ -86,61 +84,54 @@
       renderTrial: function (hostEl, trial, onAnswer, meta) {
         hostEl.innerHTML = '';
   
-        // ====== 全屏容器 ======
+        // ====== 全屏容器：高级灰白渐变，告别黑底 ======
         const stage = document.createElement('div');
         stage.style.cssText = `
           position: relative;
           display: flex;
           flex-direction: column;
-          height: 100vh; /* 强制撑满手机屏幕高度 */
+          height: 100vh;
           box-sizing: border-box;
-          background-image: url('${IMG_INTERVIEW}');
-          background-size: cover;
-          background-position: center;
+          background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
           font-family: inherit;
           overflow: hidden;
         `;
         
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.6); z-index: 1;';
-        stage.appendChild(overlay);
-  
-        // 内容包装（撑满，分成上下两块）
         const content = document.createElement('div');
         content.style.cssText = 'position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; padding: 16px; box-sizing: border-box;';
         stage.appendChild(content);
         hostEl.appendChild(stage);
   
-        // 顶部状态栏
+        // ====== 顶部状态栏 ======
         const top = document.createElement('div');
-        top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#fff;font-weight:bold;text-shadow: 0 1px 2px rgba(0,0,0,0.8);margin-bottom:12px;flex-shrink:0;';
-        top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
+        top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#1E293B;font-weight:bold;margin-bottom:12px;flex-shrink:0;';
+        top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress" style="color:#2C7BE5;">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
         content.appendChild(top);
         const progressEl = top.querySelector('#qx5_job_progress');
   
-        // 场景介绍（高度自适应）
+        // ====== 场景介绍卡片 ======
         const intro = document.createElement('div');
-        intro.style.cssText = 'font-size:13px;color:#fff;line-height:1.6;background:rgba(255,255,255,0.15);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;margin-bottom:12px;flex-shrink:0;';
+        intro.style.cssText = 'font-size:13px;color:#475569;line-height:1.6;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;margin-bottom:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.02);';
         intro.textContent = SCENARIO.intro;
         content.appendChild(intro);
   
-        // 对话框：自动占满剩余空间，内容多则滚动
+        // ====== 对话框（自动滚动） ======
         const dialog = document.createElement('div');
-        dialog.style.cssText = 'display:flex;flex-direction:column;gap:10px;flex:1;overflow-y:auto;padding-right:4px;margin-bottom:12px;';
+        dialog.style.cssText = 'display:flex;flex-direction:column;gap:12px;flex:1;overflow-y:auto;padding-right:4px;margin-bottom:12px;';
         content.appendChild(dialog);
   
-        // ===== 底部操作区：死死钉在底部 =====
+        // ====== 底部操作区：纯白悬浮 ======
         const inputWrap = document.createElement('div');
-        inputWrap.style.cssText = 'flex-shrink:0; display:flex; flex-direction:column; gap:8px; background: rgba(0,0,0,0.8); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);';
+        inputWrap.style.cssText = 'flex-shrink:0; display:flex; flex-direction:column; gap:8px; background: #FFFFFF; padding: 12px; border-radius: 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;';
         content.appendChild(inputWrap);
   
         const ta = document.createElement('textarea');
         ta.placeholder = '听题后点击开始，再输入你的回答……';
-        ta.style.cssText = 'width:100%;height:70px;padding:10px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:none;outline:none;';
+        ta.style.cssText = 'width:100%;height:70px;padding:10px;border:1px solid #CBD5E1;background:#F8FAFC;color:#1E293B;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:none;outline:none;transition:border 0.2s;';
         inputWrap.appendChild(ta);
   
         const timerEl = document.createElement('div');
-        timerEl.style.cssText = 'font-size:13px;color:#FFD600;font-weight:bold;text-align:center;display:none;'; // 初始隐藏
+        timerEl.style.cssText = 'font-size:13px;color:#E74C3C;font-weight:bold;text-align:center;display:none;'; 
         inputWrap.appendChild(timerEl);
   
         const btnRow = document.createElement('div');
@@ -150,22 +141,22 @@
         const startBtn = document.createElement('button');
         startBtn.className = 'qx5-btn qx5-btn-primary';
         startBtn.textContent = '▶ 开始作答（90秒）';
-        startBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:8px;background:#2ECC71;color:#fff;font-size:15px;cursor:pointer;box-shadow:0 4px 12px rgba(46,204,113,0.4);';
+        startBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:8px;background:#2ECC71;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;';
         
         const submitBtn = document.createElement('button');
         submitBtn.className = 'qx5-btn qx5-btn-primary';
         submitBtn.textContent = '提交回答';
-        submitBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:8px;background:#2C7BE5;color:#fff;font-size:15px;cursor:pointer;display:none;box-shadow:0 4px 12px rgba(44,123,229,0.4);';
+        submitBtn.style.cssText = 'flex:1;padding:12px;border:0;border-radius:8px;background:#2C7BE5;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;display:none;';
         
         const demoBtn = document.createElement('button');
         demoBtn.className = 'qx5-btn qx5-btn-secondary';
         demoBtn.textContent = '示范';
-        demoBtn.style.cssText = 'padding:12px 16px;border:0;border-radius:8px;background:rgba(255,255,255,0.2);color:#fff;font-size:14px;cursor:pointer;';
+        demoBtn.style.cssText = 'padding:12px 16px;border:1px solid #CBD5E1;border-radius:8px;background:#F1F5F9;color:#475569;font-size:14px;font-weight:bold;cursor:pointer;';
         
         const quitBtn = document.createElement('button');
         quitBtn.className = 'qx5-btn qx5-btn-secondary';
         quitBtn.textContent = '弃权';
-        quitBtn.style.cssText = 'padding:12px 16px;border:0;border-radius:8px;background:rgba(231,76,60,0.3);color:#fff;font-size:14px;cursor:pointer;';
+        quitBtn.style.cssText = 'padding:12px 16px;border:1px solid #FECACA;border-radius:8px;background:#FEF2F2;color:#DC2626;font-size:14px;font-weight:bold;cursor:pointer;';
         
         btnRow.appendChild(startBtn);
         btnRow.appendChild(submitBtn);
@@ -185,6 +176,7 @@
         let usedInterruptIds = [];
         let pendingInterruptImpact = null;
   
+        // ====== 气泡渲染（极简风格） ======
         function addBubble(role, speaker, text) {
           const isPlayer = role === 'player';
           const wrap = document.createElement('div');
@@ -192,21 +184,22 @@
           
           const name = document.createElement('div');
           name.textContent = speaker;
-          name.style.cssText = 'font-size:12px; font-weight:bold; color: rgba(255,255,255,0.8); margin: 0 4px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);';
+          name.style.cssText = 'font-size:12px; font-weight:bold; color:#64748B; margin: 0 4px;';
           
           const bubble = document.createElement('div');
           bubble.textContent = text;
           
-          let bg = 'rgba(255,255,255,0.95)'; let color = '#333';
-          if (role === 'npc') { bg = 'rgba(238,243,247,0.95)'; color = '#1A2B4A'; } 
-          else if (role === 'interrupt') { bg = 'rgba(255,243,224,0.95)'; color = '#C77A1E'; } 
-          else if (role === 'competitor') { bg = 'rgba(240,240,240,0.9)'; color = '#555'; }
+          let bg = '#FFFFFF'; let color = '#1E293B'; let border = '1px solid #E2E8F0';
+          if (role === 'npc') { bg = '#FFFFFF'; color = '#1E293B'; border = '1px solid #E2E8F0'; } 
+          else if (role === 'interrupt') { bg = '#FFF7ED'; color = '#C2410C'; border = '1px solid #FFEDD5'; } 
+          else if (role === 'competitor') { bg = '#F8FAFC'; color = '#475569'; border = '1px solid #E2E8F0'; }
+          else if (role === 'player') { bg = '#2C7BE5'; color = '#FFFFFF'; border = 'none'; } // 玩家蓝色气泡
           
-          bubble.style.cssText = `font-size:15px; line-height:1.6; padding:12px 16px; border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; background: ${bg}; color: ${color}; max-width: 90%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(8px);`;
+          bubble.style.cssText = `font-size:15px; line-height:1.6; padding:12px 16px; border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; background: ${bg}; color: ${color}; border: ${border}; max-width: 90%; box-shadow: 0 2px 8px rgba(0,0,0,0.04);`;
           
           wrap.appendChild(name); wrap.appendChild(bubble);
           dialog.appendChild(wrap);
-          dialog.scrollTop = dialog.scrollHeight; // 自动滚到底部
+          dialog.scrollTop = dialog.scrollHeight;
         }
   
         function decideInterrupter(round) {
@@ -264,7 +257,7 @@
           ta.value = '';
           ta.disabled = true;
           submitBtn.style.display = 'none';
-          startBtn.style.display = 'block'; // 显示开始按钮
+          startBtn.style.display = 'block';
           timerEl.style.display = 'none';
           timerEl.textContent = '';
   
@@ -375,16 +368,14 @@
   
       renderResult: function (hostEl, data) {
         const s = data.score; hostEl.innerHTML = '';
+        
+        // 结果页也改成清爽白底
         const wrap = document.createElement('div');
         wrap.className = 'qx5-result';
-        wrap.style.cssText = `min-height: 100vh; background-image: url('${IMG_RESULT}'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; position: relative;`;
+        wrap.style.cssText = `min-height: 100vh; background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; position: relative;`;
         
-        const resOverlay = document.createElement('div');
-        resOverlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:0;';
-        wrap.appendChild(resOverlay);
-  
         const card = document.createElement('div');
-        card.style.cssText = 'position:relative; z-index:1; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-radius:20px; padding:30px 20px; width:100%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.3); text-align:center;';
+        card.style.cssText = 'position:relative; z-index:1; background:#FFFFFF; border-radius:20px; padding:30px 20px; width:100%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.08); border:1px solid #E2E8F0; text-align:center;';
         
         let noteHtml = (s.mainScore === 0 && !s.quit) ? `<div class="qx5-result-note" style="color:#E74C3C;margin-top:12px;">你一言未发，遗憾离场。</div>` : (s.quit ? `<div class="qx5-result-note" style="color:#E67E22;margin-top:12px;">中途弃权。</div>` : '');
   
@@ -392,7 +383,7 @@
           <div style="font-size:18px;color:#64748B;margin-bottom:10px;">${E.t('应聘挑战 · 结果', 'Result')}</div>
           <div style="font-size:40px;font-weight:900;margin-bottom:10px;color:${s.pass ? '#2ECC71' : '#E74C3C'}">${s.pass ? E.t('通过', 'Pass') : E.t('未通过', 'Fail')}</div>
           <div style="font-size:16px;color:#1E293B;margin-bottom:20px;font-weight:bold;">${s.announce || ''}</div>
-          <div style="text-align:left;background:#F8FAFC;border-radius:10px;padding:15px;margin-bottom:20px;">
+          <div style="text-align:left;background:#F8FAFC;border-radius:10px;padding:15px;margin-bottom:20px;border:1px solid #E2E8F0;">
             <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>主评分</span><b>${s.mainScore}</b></div>
             <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>干扰评分</span><b>${s.interruptScore}</b></div>
             <div style="display:flex;justify-content:space-between;font-size:14px;color:#475569;"><span>竞争者评分</span><b>${s.competitorScore}</b></div>
@@ -400,7 +391,7 @@
           ${noteHtml}
           <div style="display:flex;gap:10px;margin-top:20px;">
             <button class="qx5-btn qx5-btn-primary" id="qx5_result_restart" style="flex:1;padding:12px;background:#2C7BE5;color:#fff;border:none;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer;">再刷一局</button>
-            <button class="qx5-btn qx5-btn-secondary" id="qx5_result_exit" style="flex:1;padding:12px;background:#F1F5F9;color:#475569;border:none;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer;">返回大厅</button>
+            <button class="qx5-btn qx5-btn-secondary" id="qx5_result_exit" style="flex:1;padding:12px;background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;border-radius:10px;font-weight:bold;font-size:15px;cursor:pointer;">返回大厅</button>
           </div>
         `;
         

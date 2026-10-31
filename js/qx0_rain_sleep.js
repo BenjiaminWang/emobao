@@ -1,26 +1,22 @@
 /* ================================================================
    情绪宝 - 睡眠雨声助眠（隐藏功能）
-   v2 (2026-10-31)
-   - 触发：全局事件监听，长按状态栏品牌标题 #status_title 3 秒
-   - 播放：picture/rain-loop.mp3 无限循环（loop=true，无网络请求）
-   - 画面：治愈主图轻微呼吸动画，全屏遮罩
-   - 停止：轻触屏幕任意处
-   - 兼容：手机端长按菜单屏蔽、自动播放拦截提示
+   v4 (2026-10-31) - 终极兼容版
+   - 触发：双击状态栏的日期 (#status_date) 或 右上角用户名 (#status_user)
+   - 播放：本地音频无限循环
    ================================================================ */
 
-   (function () {
+(function () {
     'use strict';
 
     const RAIN_SRC = 'picture/rain-loop.mp3';
     const RAIN_VOLUME = 0.6;
-    const LONG_PRESS_MS = 3000;
-
+    
     let _rainAudio = null;
-    let _pressTimer = null;
     let _isShowing = false;
     let _styleInjected = false;
+    let _lastTapTime = 0;
 
-    /* ---------- 注入样式（只注入一次，避免污染 style.css） ---------- */
+    /* ---------- 注入样式 ---------- */
     function injectStyleOnce() {
         if (_styleInjected) return;
         _styleInjected = true;
@@ -84,11 +80,9 @@
 body.qx-rain-active {
     overflow: hidden;
 }
-#status_title {
-    -webkit-user-select: none;
-    user-select: none;
-    -webkit-touch-callout: none;
-    cursor: default;
+/* 防止手机端双击缩放 */
+.qx-no-dbl-tap {
+    touch-action: manipulation;
 }
 `;
         const styleEl = document.createElement('style');
@@ -97,7 +91,6 @@ body.qx-rain-active {
         document.head.appendChild(styleEl);
     }
 
-    /* ---------- 取得主图 src ---------- */
     function pickBackgroundSrc() {
         const bg = document.getElementById('qx0_bg');
         if (bg && bg.src) return bg.src;
@@ -107,7 +100,6 @@ body.qx-rain-active {
         return 'picture/qxbaouser1.jpg';
     }
 
-    /* ---------- 开始雨声 ---------- */
     function startRain() {
         if (_isShowing) return;
 
@@ -120,26 +112,22 @@ body.qx-rain-active {
             return;
         }
 
-        // 画面
         bgImg.src = pickBackgroundSrc();
         document.body.classList.add('qx-rain-active');
         modal.classList.add('active');
         _isShowing = true;
 
-        // 雨声
         try {
             _rainAudio = new Audio(RAIN_SRC);
-            _rainAudio.loop = true;          // 原生无缝循环
+            _rainAudio.loop = true;
             _rainAudio.volume = RAIN_VOLUME;
             _rainAudio.preload = 'auto';
             
-            // 尝试播放
+            // 尝试直接播放，因为点击事件里通常能过
             let playPromise = _rainAudio.play();
-            
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.warn('[rain] 手机系统拦截了自动播放，需用户点击屏幕', err);
-                    // 如果被拦截了，我们在屏幕提示一下用户
+                    console.warn('[rain] 自动播放被拦截，等待用户点击', err);
                     const hint = document.getElementById('qx_rain_hint');
                     if (hint) {
                         hint.innerText = "👆 请轻触屏幕任意位置开始播放雨声";
@@ -154,7 +142,6 @@ body.qx-rain-active {
         }
     }
 
-    /* ---------- 停止雨声 ---------- */
     function stopRain() {
         if (!_isShowing) return;
 
@@ -171,7 +158,6 @@ body.qx-rain-active {
 
         document.body.classList.remove('qx-rain-active');
         
-        // 恢复提示文字
         const hint = document.getElementById('qx_rain_hint');
         if (hint) {
             hint.innerText = "轻触屏幕任意处，停止雨声";
@@ -182,57 +168,29 @@ body.qx-rain-active {
         _isShowing = false;
     }
 
-    /* ---------- 隐藏触发：全局监听（抗干扰版） ---------- */
-    function bindLongPressTrigger() {
-        let _isPressing = false;
+    /* ---------- 触发逻辑：双击左上角日期或右上角用户 ---------- */
+    function bindTapTrigger() {
+        // 给整个状态栏加上 touch-action，防止双击缩放
+        const statusBar = document.querySelector('.qx0-status-bar');
+        if (statusBar) statusBar.classList.add('qx-no-dbl-tap');
 
-        const begin = (e) => {
+        document.addEventListener('click', (e) => {
             if (_isShowing) return;
             
-            // 找到被长按的元素
-            const titleEl = document.getElementById('status_title');
-            if (!titleEl) return;
+            const dateEl = document.getElementById('status_date');
+            const userEl = document.getElementById('status_user');
             
-            // 判断按下的位置是不是在标题上
-            if (titleEl.contains(e.target)) {
-                _isPressing = true;
-                cancelPress(); // 清空之前的计时
-                
-                _pressTimer = setTimeout(() => {
-                    _pressTimer = null;
-                    if (_isPressing) {
-                        startRain();
-                        // 触发后加点振动反馈，让用户知道长按成功了
-                        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-                    }
-                }, LONG_PRESS_MS);
-            }
-        };
-
-        const cancelPress = () => {
-            _isPressing = false;
-            if (_pressTimer) {
-                clearTimeout(_pressTimer);
-                _pressTimer = null;
-            }
-        };
-
-        // 鼠标事件（Mac 端）
-        document.addEventListener('mousedown', begin);
-        document.addEventListener('mouseup', cancelPress);
-        
-        // 触摸事件（手机端）
-        document.addEventListener('touchstart', begin, { passive: true });
-        // 手指一旦移动或者离开屏幕，立刻取消计时
-        document.addEventListener('touchend', cancelPress);
-        document.addEventListener('touchcancel', cancelPress);
-        document.addEventListener('touchmove', cancelPress, { passive: true });
-
-        // 防止手机端长按弹出“复制/粘贴”菜单
-        document.addEventListener('contextmenu', (e) => {
-            const titleEl = document.getElementById('status_title');
-            if (titleEl && titleEl.contains(e.target)) {
-                e.preventDefault(); 
+            const isDate = dateEl && dateEl.contains(e.target);
+            const isUser = userEl && userEl.contains(e.target);
+            
+            if (isDate || isUser) {
+                const now = Date.now();
+                // 两次点击间隔在 300ms 内视为双击
+                if (now - _lastTapTime < 300) {
+                    startRain();
+                    if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                }
+                _lastTapTime = now;
             }
         });
     }
@@ -246,30 +204,13 @@ body.qx-rain-active {
                 stopRain();
             }
         }, true);
-
-        document.addEventListener('touchstart', (e) => {
-            if (!_isShowing) return;
-            const modal = document.getElementById('qx_rain_modal');
-            if (modal && modal.contains(e.target)) {
-                // 阻止 touchstart 后触发的 click 重复处理
-                e.stopPropagation();
-                stopRain();
-            }
-        }, { capture: true, passive: true });
-
-        // 页面被系统回收 / 切后台不自动停，保持锁屏可继续听
-        window.addEventListener('pagehide', () => {
-            if (!_isShowing) return;
-        });
     }
 
-    /* ---------- 对外挂载 ---------- */
     window.initRainSleepTrigger = function () {
-        bindLongPressTrigger();
+        bindTapTrigger();
         bindStopGesture();
     };
 
-    // 若 qx0_main.js 的 DOMContentLoaded 已跑过，提供兜底
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         setTimeout(() => {
             if (!window._qxRainBound) {

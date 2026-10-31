@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <!-- ================================================================
-     index.html   v28 (二维码版)
-     日期：2026-10-28
+     index.html   v30 (二维码版+雨声)
+     日期：2026-10-31
      ================================================================ -->
-     <!DOCTYPE html>
-     <html lang="zh-CN">
+<html lang="zh-CN">
+<head>
      <head>
          <meta charset="UTF-8">
          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
@@ -419,12 +420,22 @@
                  </div>
              </div>
          </div>
-     
+        <!-- ============ 睡眠雨声浮层（隐藏功能） ============ -->
+        <div class="qx-rain-modal" id="qx_rain_modal">
+            <div class="qx-rain-stage" id="qx_rain_stage">
+                <img id="qx_rain_bg" class="qx-rain-bg" alt="">
+                <div class="qx-rain-caption">
+                    <div class="qx-rain-title" id="qx_rain_title">🌧️ 雨声助眠</div>
+                    <div class="qx-rain-hint" id="qx_rain_hint">轻触屏幕任意处，停止雨声</div>
+                </div>
+            </div>
+        </div>     
          <div class="toast-bar" id="toast_bar"></div>
      
          <!-- ============ 脚本引入 ============ -->
          <script src="js/qx_type_label.js"></script>
          <script src="js/qx0_main.js"></script>
+         <script src="js/qx0_rain_sleep.js"></script>
          <script src="js/qx_emotion_wheel.js"></script>
          <script src="js/qx_thermometer.js"></script>
          <script src="js/qx_mood_mirror.js"></script>

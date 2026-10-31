@@ -499,6 +499,7 @@ function fallbackToBrowserTTS(text, onEnd) {
        initMenuBar();
        initBackButtons();
        initMuteButton(); // 挂载极简按钮
+       initRainSleepTrigger(); // 隐藏雨声助眠触发
    });
    
    window.qx0GetTypeMapSafe = getTypeMapSafe;

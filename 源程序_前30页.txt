@@ -1,0 +1,1770 @@
+情绪宝（Emo Treasure）V1.0                              第 1 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+<!-- ================================================================
+     index.html   v28 (二维码版)
+     日期：2026-10-28
+     ================================================================ -->
+     <!DOCTYPE html>
+     <html lang="zh-CN">
+     <head>
+         <meta charset="UTF-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+         <title>情绪宝 · 身心互动</title>
+         <link rel="icon" href="data:,">
+         <link rel="stylesheet" href="style.css">
+         <link rel="manifest" href="manifest.json">
+         <meta name="theme-color" content="#E26A6A">
+         <meta name="mobile-web-app-capable" content="yes">
+         <meta name="apple-mobile-web-app-capable" content="yes">
+         <meta name="apple-mobile-web-app-status-bar-style" content="default">
+         <link rel="apple-touch-icon" href="picture/icon-192.png">
+        </head>
+     <body class="main-page">
+     
+         <!-- ============ 状态栏（直接把静音键硬编码在这里） ============ -->
+         <div class="qx0-status-bar">
+             <div class="date" id="status_date"></div>
+             <div class="brand" id="status_title">情绪宝 / Emo Treasure</div>
+             
+             <!-- 强行写死的静音按钮，放弃 JS 动态生成 -->
+             <button id="global_mute_btn" style="margin-left: auto; margin-right: 12px; font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 12px; background: transparent; border: 1px solid transparent; color: #333; transition: all 0.2s ease; display: flex; align-items: center; outline: none;">
+                🤭
+            </button>
+     
+             <div class="user" id="status_user">👤 访客</div>
+         </div>
+     
+         <!-- ============ 菜单条 ============ -->
+         <div class="qx0-menu-bar" id="menu_bar">
+             <button class="menu-item" data-page="qx1" data-i18n="menu_perceive">感知</button>
+             <button class="menu-item" data-page="qx2" data-i18n="menu_regulate">调节</button>
+             <button class="menu-item" data-page="qx3" data-i18n="menu_report">报告</button>
+             <button class="menu-item" data-page="qx4" data-i18n="menu_qa">问答</button>
+             <button class="menu-item" data-page="qx5" data-i18n="menu_assessment">测评</button>
+             <button class="menu-item" data-page="qx6" data-i18n="menu_settings">设置</button>
+         </div>
+     
+         <!-- ============ 主屏背景 ============ -->
+         <div class="qx0-content">
+             <img id="qx0_bg" class="qx0-bg-image" alt="">
+         </div>
+     
+         <!-- ============ qx1 情绪感知 ============ -->
+         <div class="qx-function-layer" id="qx1_layer">
+             <div class="qx1-container" id="qx1_container">
+                 <div class="qx1-top-row">
+                     <div class="qx1-emotion-area">
+                         <div class="qx1-section-title" data-i18n="qx1_today_emotion">今日情绪</div>
+
+
+情绪宝（Emo Treasure）V1.0                              第 2 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+                         <div class="qx1-emotion-wheel" id="qx1_emotion_wheel"></div>
+                     </div>
+                     <div class="qx1-impact-area">
+                         <div class="qx1-section-title" data-i18n="qx1_life_event">生活事件</div>
+                         <div class="qx1-impact-body">
+                             <div class="qx1-impact-chart" id="qx1_impact_chart"></div>
+                             <div class="qx1-impact-summary" id="qx1_impact_summary"></div>
+                             <div class="qx1-heart-col heart-white" id="qx1_heart_icon" data-i18n-title="qx1_heart_title" title="点击查看 HRV 图">
+                                 <svg class="heart-svg heart-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+                                     <path fill="none" stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+                                           d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
+                                 </svg>
+                                 <svg class="heart-svg heart-red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+                                     <path fill="#E53935" d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
+                                     <path fill="none" stroke="#FFD600" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M8 60 H34 L42 44 L52 76 L62 52 L72 68 L80 60 H112"/>
+                                 </svg>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+     
+                 <div class="qx1-mid-row">
+                     <div class="qx1-picker-section">
+                         <div class="qx1-section-title" data-i18n="qx1_optional_events">可选生活事件</div>
+                         <div class="qx1-tree" id="qx1_tree"></div>
+                     </div>
+                     <div class="qx1-events-area">
+                         <div class="qx1-section-title" data-i18n="qx1_today_events">当日生活事件</div>
+                         <div class="qx1-event-list" id="qx1_event_list"></div>
+                     </div>
+                     <div class="qx1-detail-area">
+                         <div class="qx1-section-title" data-i18n="qx1_event_attr">事件属性</div>
+                         <div class="qx1-event-detail disabled" id="qx1_event_detail">
+                             <div class="qx1-detail-block">
+                                 <div class="qx1-detail-options">
+                                     <label class="qx1-radio"><input type="radio" name="qx1_nature" value="好事"> <span data-i18n="qx1_nature_good">好</span></label>
+                                     <label class="qx1-radio"><input type="radio" name="qx1_nature" value="坏事"> <span data-i18n="qx1_nature_bad">坏</span></label>
+                                     <span class="qx1-radio-plain" data-i18n="qx1_nature_suffix">事</span>
+                                 </div>
+                             </div>
+                             <div class="qx1-detail-block">
+                                 <div class="qx1-detail-title" data-i18n="qx1_impact_title">影响程度</div>
+                                 <div class="qx1-impact-options">
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="1"><span class="qx1-impact-dot"></span><span class="qx1-impact-label" data-i18n="qx1_impact_1">轻</span></label>
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="2"><span class="qx1-impact-dot"></span><span class="qx1-impact-label" data-i18n="qx1_impact_2">中</span></label>
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="3"><span class="qx1-impact-dot"></span><span class="qx1-impact-label" data-i18n="qx1_impact_3">重</span></label>
+                                     <label class="qx1-impact-item"><input type="radio" name="qx1_impact" value="4"><span class="qx1-impact-dot"></span><span class="qx1-impact-label" data-i18n="qx1_impact_4">极重</span></label>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+     
+                 <div class="qx1-bottom-row">
+                     <div class="qx1-hrv-capture-area">
+
+
+情绪宝（Emo Treasure）V1.0                              第 3 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+                         <div class="qx1-hrv-capture-header">
+                             <div class="qx1-section-title" data-i18n="qx1_hrv_title">心率与 HRV 采集</div>
+                             <div class="qx1-hrv-capture-timer" id="qx1_hrv_timer">0 / 60 秒</div>
+                         </div>
+                         <div class="qx1-hrv-capture" id="qx1_hrv_capture"></div>
+                     </div>
+                 </div>
+     
+                 <div class="qx1-actions-row">
+                     <button class="qx1-btn qx1-btn-save" id="qx1_btn_save" data-i18n="qx1_btn_save">存入</button>
+                     <button class="qx1-btn qx1-btn-del-event" id="qx1_btn_del_event" data-i18n="qx1_btn_del">删除当前此生活事件</button>
+                     <button class="qx1-btn qx1-btn-exit" id="qx1_btn_exit" data-i18n="qx1_btn_exit">退出</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx2 情绪调节 ============ -->
+         <div class="qx-function-layer" id="qx2_layer">
+             <div class="qx2-container" id="qx2_container">
+     
+                 <div class="qx2-top-bar">
+                     <div class="qx2-emotion-slot qx2-emotion-slot-before" id="qx2_slot_before">
+                         <div class="qx2-slot-label">
+                             <span data-i18n="qx2_before_label">听前情绪</span> <span class="qx2-slot-name" id="qx2_face_before_name">--</span>
+                         </div>
+                         <div class="qx2-wheel-box" id="qx2_wheel_before"></div>
+                     </div>
+     
+                     <div class="qx2-flow-bar" id="qx2_flow_bar">
+                         <div class="qx2-flow-step" data-step="1"><span class="qx2-flow-name" data-i18n="qx2_flow_1">听前</span></div>
+                         <div class="qx2-flow-step" data-step="2"><span class="qx2-flow-name" data-i18n="qx2_flow_2">调整</span></div>
+                         <div class="qx2-flow-step" data-step="3"><span class="qx2-flow-name" data-i18n="qx2_flow_3">评价</span></div>
+                         <div class="qx2-flow-step" data-step="4"><span class="qx2-flow-name" data-i18n="qx2_flow_4">分析</span></div>
+                     </div>
+     
+                     <div class="qx2-emotion-slot qx2-emotion-slot-after" id="qx2_slot_after">
+                         <div class="qx2-slot-label">
+                             <span data-i18n="qx2_after_label">听后情绪</span> <span class="qx2-slot-name" id="qx2_face_after_name">--</span>
+                         </div>
+                         <div class="qx2-wheel-box" id="qx2_wheel_after"></div>
+                     </div>
+                 </div>
+     
+                 <div class="qx2-music-row">
+                     <div class="qx2-camera-hint" id="qx2_camera_hint" data-i18n="qx2_camera_hint">
+                         请把干净的手指放在摄像头上，准备安静地听音乐
+                     </div>
+                     <div class="qx2-trend-mini" id="qx2_trend_mini">
+                         <div class="qx2-trend-video-wrap">
+                             <video id="qx2_trend_video" class="qx2-trend-video" autoplay playsinline muted></video>
+                         </div>
+                     </div>
+                     <div class="qx-hrv-dots qx-hrv-dots-qx2">
+                         <span class="qx-hrv-dot" id="qx2_dot_a"></span>
+                         <span class="qx-hrv-dot" id="qx2_dot_b"></span>
+
+
+情绪宝（Emo Treasure）V1.0                              第 4 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+                     </div>
+                     <button class="qx2-btn-collection" id="qx2_btn_collection" data-i18n="qx2_btn_pick">选曲</button>
+                     <button class="qx2-btn-start" id="qx2_btn_start" data-i18n="qx2_btn_start">开始</button>
+                 </div>
+     
+                 <div class="qx2-mid-row">
+                     <div class="qx2-analysis-area" id="qx2_analysis_area">
+                         <div class="qx2-analysis-title" data-i18n="qx2_analysis_title">分析</div>
+                         <div class="qx2-analysis-body" id="qx2_analysis_body">
+                             <div class="qx2-analysis-placeholder" data-i18n="qx2_analysis_ph">进第 4 步，自动给出分析</div>
+                         </div>
+                     </div>
+     
+                     <div class="qx2-heal-area">
+                         <div class="qx2-heal-title" data-i18n="qx2_heal_title">实时治愈主图</div>
+                         <div class="qx2-work-info-card" id="qx2_work_info" style="display:none;"></div>
+                         <div class="qx2-heal-tabs" id="qx2_heal_tabs"></div>
+                         
+                         <div class="qx2-heal-canvas-wrap" style="position:relative;">
+                             <div class="qx2-heal-canvas" id="qx2_heal_canvas">
+                                 <span class="qx2-heal-placeholder" data-i18n="qx2_heal_ph">待定</span>
+                             </div>
+                             <div class="qx2-heal-overlay-bar" id="qx2_heal_overlay">
+                                 <div class="qx2-trend-mini" id="qx2_trend_mini_overlay">
+                                     <div class="qx2-trend-video-wrap">
+                                         <video id="qx2_trend_video_overlay" class="qx2-trend-video" autoplay playsinline muted></video>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+     
+                     <div class="qx2-feedback-area">
+                         <div class="qx2-feedback-title" data-i18n="qx2_feedback_title">主观评价</div>
+                         <div class="qx2-feedback-options" id="qx2_feedback_options">
+                             <label class="qx2-feedback-item">
+                                 <input type="radio" name="qx2_feedback" value="better">
+                                 <span data-i18n="qx2_fb_better">更好</span>
+                             </label>
+                             <label class="qx2-feedback-item">
+                                 <input type="radio" name="qx2_feedback" value="same">
+                                 <span data-i18n="qx2_fb_same">一样</span>
+                             </label>
+                             <label class="qx2-feedback-item">
+                                 <input type="radio" name="qx2_feedback" value="worse">
+                                 <span data-i18n="qx2_fb_worse">更差</span>
+                             </label>
+                         </div>
+                     </div>
+                 </div>
+     
+                 <div class="qx2-actions-row">
+                     <button class="qx2-btn qx2-btn-restart" id="qx2_btn_restart" data-i18n="qx2_btn_restart">重新调整</button>
+                     <button class="qx2-btn qx2-btn-exit" id="qx2_btn_exit" data-i18n="qx2_btn_exit">退出调整</button>
+                 </div>
+
+
+情绪宝（Emo Treasure）V1.0                              第 5 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+     
+             </div>
+     
+             <div class="qx2-collect-modal" id="qx2_collect_modal">
+                 <div class="qx2-collect-modal-inner">
+                     <div class="qx2-collect-modal-title" data-i18n="qx2_collect_title">选择经典作品</div>
+                     <div class="qx2-collect-modal-list" id="qx2_collect_modal_list"></div>
+                     <button class="qx2-collect-modal-close" id="qx2_collect_modal_close" data-i18n="qx2_collect_close">关闭</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx3 报告分析 ============ -->
+         <div class="qx-function-layer" id="qx3_layer">
+             <div class="qx3-container" id="qx3_container">
+                 <div class="qx3-top-bar">
+                     <div class="qx3-title" id="qx3_title" data-i18n="qx3_title">情绪分析报告</div>
+                     <div class="qx3-range-switch" id="qx3_range_switch">
+                         <button class="qx3-range-btn active" data-range="week" data-i18n="qx3_range_week">近一周</button>
+                         <button class="qx3-range-btn" data-range="month" data-i18n="qx3_range_month">近一月</button>
+                         <button class="qx3-range-btn" data-range="halfyear" data-i18n="qx3_range_half">近半年</button>
+                         <button class="qx3-range-btn" data-range="year" data-i18n="qx3_range_year">近一年</button>
+                     </div>
+                     <div class="qx3-status" id="qx3_status"></div>
+                 </div>
+                 <div class="qx3-demo-bar" id="qx3_demo_bar" style="display:none;"></div>
+                 <div class="qx3-body" id="qx3_body">
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span data-i18n="qx3_emotion_card">情绪基线</span>
+                             <span class="qx3-card-sub" id="qx3_emotion_sub"></span>
+                         </div>
+                         <div class="qx3-chart-host" id="qx3_emotion_chart"></div>
+                         <div class="qx3-legend">
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#E60000"></i><span data-i18n="emo_1">焦躁</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#FF4500"></i><span data-i18n="emo_2">热烈</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#FF69B4"></i><span data-i18n="emo_3">欢快</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#00C853"></i><span data-i18n="emo_4">轻快</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#4CAF50"></i><span data-i18n="emo_5">明朗</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#1B5E20"></i><span data-i18n="emo_6">平静</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#616161"></i><span data-i18n="emo_7">压抑</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#0D47A1"></i><span data-i18n="emo_8">忧伤</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#000000"></i><span data-i18n="emo_9">悲伤</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-line-dash"></i><span data-i18n="qx3_baseline">基线</span></span>
+                         </div>
+                     </div>
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span data-i18n="qx3_event_card">生活事件综合</span>
+                             <span class="qx3-card-sub" id="qx3_event_sub"></span>
+                         </div>
+                         <div class="qx3-chart-host" id="qx3_event_chart"></div>
+                         <div class="qx3-legend">
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#E53935"></i><span data-i18n="qx3_good">好事</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#212121"></i><span data-i18n="qx3_bad">坏事</span></span>
+
+
+情绪宝（Emo Treasure）V1.0                              第 6 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+                             <span class="qx3-legend-item" id="qx3_event_totals"></span>
+                         </div>
+                     </div>
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span data-i18n="qx3_hrv_card">HRV 基线</span>
+                             <span class="qx3-card-sub" id="qx3_hrv_sub"></span>
+                         </div>
+                         <div class="qx3-chart-host" id="qx3_hrv_chart"></div>
+                         <div class="qx3-legend">
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#2C7BE5"></i>RMSSD</span>
+                             <span class="qx3-legend-item"><i class="qx3-dot" style="background:#E53935"></i><span data-i18n="qx3_avg_hr">平均心率</span></span>
+                             <span class="qx3-legend-item"><i class="qx3-line-dash"></i><span data-i18n="qx3_baseline">基线</span></span>
+                         </div>
+                     </div>
+                     <div class="qx3-card">
+                         <div class="qx3-card-title">
+                             <span data-i18n="qx3_summary_card">总评语</span>
+                             <span class="qx3-card-sub" id="qx3_summary_sub"></span>
+                         </div>
+                         <div class="qx3-summary-body" id="qx3_summary_body">
+                             <div class="qx3-summary-placeholder" data-i18n="qx3_summary_ph">正在生成…</div>
+                         </div>
+                     </div>
+                 </div>
+                 <div class="qx3-actions-row">
+                     <button class="qx3-btn qx3-btn-exit" id="qx3_btn_exit" data-i18n="qx3_btn_exit">退出</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx4 知识问答 ============ -->
+         <div class="qx-function-layer" id="qx4_layer">
+             <div class="qx4-container" id="qx4_container">
+                 <div class="qx4-title-bar">
+                     <div class="qx4-title" id="qx4_title" data-i18n="qx4_title">知识问答</div>
+                     <div class="qx4-hint"  id="qx4_hint"></div>
+                     <div class="qx4-user"  id="qx4_user"></div>
+                 </div>
+                 <div class="qx4-tree-wrap">
+                     <div class="qx4-tree" id="qx4_tree"></div>
+                 </div>
+                 <div class="qx4-actions-row">
+                     <button class="qx4-btn qx4-btn-pick" id="qx4_btn_pick" data-i18n="qx4_btn_pick">选择</button>
+                     <button class="qx4-btn qx4-btn-exit" id="qx4_btn_exit" data-i18n="qx4_btn_exit">退出</button>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx5 趣味评测 ============ -->
+         <div class="qx-function-layer" id="qx5_layer">
+             <div class="qx5-container" id="qx5_container">
+                 <div class="qx5-list-view" id="qx5_list_view">
+                     <div class="qx5-header">
+                         <div class="qx5-header-left">
+
+
+情绪宝（Emo Treasure）V1.0                              第 7 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+                             <div class="qx5-title" id="qx5_title" data-i18n="qx5_title">趣味评测</div>
+                             <div class="qx5-subtitle" id="qx5_subtitle" data-i18n="qx5_subtitle">玩一玩，看看你的大脑怎么工作</div>
+                         </div>
+                         <button class="qx5-profile-pill" id="qx5_profile_bar" style="display:none;">
+                             <span class="qx5-profile-pill-icon">🎯</span>
+                             <span class="qx5-profile-pill-text" id="qx5_profile_bar_sub">0 / 60</span>
+                             <span class="qx5-profile-pill-arrow">›</span>
+                         </button>
+                     </div>
+                     <div class="qx5-game-grid" id="qx5_game_grid"></div>
+                     <div class="qx5-actions-row">
+                         <button class="qx5-btn qx5-btn-exit" id="qx5_btn_exit" data-i18n="qx5_btn_exit">退出</button>
+                     </div>
+                 </div>
+                 <div class="qx5-play-view" id="qx5_play_view" style="display:none;">
+                     <div class="qx5-play-header">
+                         <div class="qx5-play-title" id="qx5_play_title"></div>
+                         <button class="qx5-btn qx5-btn-small" id="qx5_btn_quit" data-i18n="qx5_btn_quit">退出游戏</button>
+                     </div>
+                     <div class="qx5-play-host" id="qx5_play_host"></div>
+                 </div>
+                 <div class="qx5-profile-modal" id="qx5_profile_modal" style="display:none;">
+                     <div class="qx5-profile-modal-inner">
+                         <div class="qx5-profile-modal-header">
+                             <div class="qx5-profile-modal-title" data-i18n="qx5_profile_title">我的认知画像</div>
+                             <button class="qx5-profile-modal-close" id="qx5_profile_modal_close">✕</button>
+                         </div>
+                         <div class="qx5-profile-modal-body">
+                             <div class="qx5-profile-radar-wrap" id="qx5_profile_radar"></div>
+                             <div class="qx5-profile-list" id="qx5_profile_list"></div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     
+         <!-- ============ qx6 设置 ============ -->
+         <div class="qx-function-layer" id="qx6_layer">
+             <div class="qx6-container" id="qx6_container">
+                 <div class="qx6-list-view" id="qx6_list_view">
+                     <div class="qx6-header">
+                         <button class="qx6-back-main" id="qx6_back_main" type="button" data-i18n="qx6_back_main">‹ 主屏</button>
+                         <div class="qx6-title" data-i18n="qx6_title">设置</div>
+                     </div>
+                     <div class="qx6-menu" id="qx6_menu"></div>
+                 </div>
+                 <div class="qx6-panel-view" id="qx6_panel_view" style="display:none;">
+                     <div class="qx6-panel-header">
+                         <button class="qx6-panel-back" id="qx6_panel_back" type="button" data-i18n="qx6_panel_back">‹ 返回</button>
+                         <div class="qx6-panel-title" id="qx6_panel_title"></div>
+                     </div>
+                     <div class="qx6-panel-body" id="qx6_panel_body"></div>
+                 </div>
+             </div>
+         </div>
+
+
+情绪宝（Emo Treasure）V1.0                              第 8 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+     
+         <!-- ============ qx1 实时治愈主图 浮层 ============ -->
+         <div class="qx1-heal-modal" id="qx1_heal_modal">
+             <div class="qx1-heal-modal-inner">
+                 <div class="qx1-heal-modal-header">
+                     <div class="qx1-heal-modal-title" data-i18n="qx1_heal_title">情绪宝 HRV 采集 · 实时治愈主图</div>
+                     <div class="qx1-heal-modal-timer" id="qx1_heal_modal_timer">0 / 120 秒</div>
+                     <button class="qx1-heal-modal-close" id="qx1_heal_modal_close" data-i18n="qx1_heal_close">关闭</button>
+                 </div>
+                 <div class="qx1-heal-modal-progress">
+                     <div class="qx1-heal-modal-progress-fill" id="qx1_heal_modal_progress"></div>
+                 </div>
+                 <div class="qx1-heal-modal-canvas-wrap">
+                     <div class="qx1-heal-modal-canvas" id="qx1_heal_canvas">
+                         <span class="qx1-heal-modal-placeholder" data-i18n="qx1_heal_wait">等待采集开始…</span>
+                     </div>
+                 </div>
+                 <div class="qx1-heal-modal-wave-row">
+                     <div class="qx1-heal-wave-video-wrap">
+                         <video id="qx1_heal_wave_video" class="qx1-heal-wave-video" autoplay playsinline muted></video>
+                     </div>
+                     <div class="qx1-heal-modal-wave">
+                         <svg viewBox="0 0 400 40" preserveAspectRatio="none" class="qx1-heal-modal-wave-svg">
+                             <polyline id="qx1_heal_modal_wave_line" fill="none" stroke="#2ecc71" stroke-width="1.2" points=""></polyline>
+                         </svg>
+                     </div>
+                 </div>
+                 <div class="qx1-heal-modal-hintbar">
+                     <div class="qx1-heal-modal-hint" id="qx1_heal_modal_hint" data-i18n="qx1_heal_wait_hint">等待采集开始…</div>
+                     <div class="qx-hrv-dots">
+                         <span class="qx-hrv-dot" id="qx1_dot_a"></span>
+                         <span class="qx-hrv-dot" id="qx1_dot_b"></span>
+                     </div>
+                 </div>
+             </div>
+         </div>
+     
+         <div class="toast-bar" id="toast_bar"></div>
+     
+         <!-- ============ 脚本引入 ============ -->
+         <script src="js/qx_type_label.js"></script>
+         <script src="js/qx0_main.js"></script>
+         <script src="js/qx_emotion_wheel.js"></script>
+         <script src="js/qx_thermometer.js"></script>
+         <script src="js/qx_mood_mirror.js"></script>
+         <script src="js/qx_life_event_chart.js"></script>
+         <script src="js/qx_polar_h10.js"></script>
+         <script src="js/qx_hrv_capture.js"></script>
+         <script src="js/qx_help_card.js"></script>
+         <script src="js/qx1_perceive.js"></script>
+         <script src="js/qx2_heal_chart.js"></script>
+         <script src="js/qx2_regulate.js"></script>
+         <script src="js/qx3_report.js"></script>
+         <script src="js/qx4_qa.js"></script>
+         <script src="js/qx5_engine.js"></script>
+
+
+情绪宝（Emo Treasure）V1.0                              第 9 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+         <script src="js/qx5_games.js"></script>
+         <script src="js/qx5_games_extra.js"></script>
+         <script src="js/qx5_games_extra2.js"></script>
+         <script src="js/qx5_games_extra3.js"></script>
+         <script src="js/qx5_games_extra4.js"></script>
+         <script src="js/qx5_profile.js"></script>
+         <script src="js/qx5_mbti.js"></script> 
+         <script src="js/qx5_holland.js"></script>
+         <script src="js/qx5_card_poker.js"></script>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>         
+         <script src="js/qx5_main.js"></script>
+     
+         <script src="js/qx6/qx6_utils.js"></script>
+         <script src="js/qx6/qx6_registry.js"></script>
+         <script src="js/qx6/qx6_1_account.js"></script>
+         <script src="js/qx6/qx6_2_password.js"></script>
+         <script src="js/qx6/qx6_3_device.js"></script>
+         <script src="js/qx6/qx6_4_stats_users.js"></script>
+         <script src="js/qrcode.min.js"></script>
+         <script src="js/qx6/qx6_5b_qrcode.js"></script>
+         <script src="js/qx6/qx6_5_redeem.js"></script>
+         <script src="js/qx6/qx6_6_manage_users.js"></script>
+         <script src="js/qx6/qx6_7_qa_engine.js"></script>
+         <script src="js/qx6/qx6_8_music_lib.js"></script>
+         <script src="js/qx6/qx6_9_music_workbench.js"></script>
+         <script src="js/qx6/qx6_10_rule_edit.js"></script>
+         <script src="js/qx6/qx6_11_finance.js"></script>
+         <script src="js/qx6/qx6_12_sys_exit.js"></script>
+         <script src="js/qx6/qx6_settings.js"></script>
+
+     </html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>情绪宝 · Emo Treasure</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+
+    <div id="toast_bar" class="toast-bar"></div>
+
+    <button class="lang-switch" id="lang_switch">中 / EN</button>
+
+    <div id="welcome_layer" class="layer active">
+        <div class="login-container">
+            <div class="logo-block">
+                <div class="logo-cn">情绪宝</div>
+                <div class="logo-en">Emo Treasure</div>
+            </div>
+            <div class="welcome-text" id="welcome_text"></div>
+            <div class="welcome-buttons">
+                <button class="btn-primary" id="btn_welcome_agree">同意</button>
+                <button class="btn-secondary" id="btn_welcome_disagree">不同意</button>
+
+
+情绪宝（Emo Treasure）V1.0                              第 10 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+            </div>
+        </div>
+    </div>
+
+    <div id="login_layer" class="layer">
+        <div class="login-container">
+            <div class="logo-block">
+                <div class="logo-cn">情绪宝</div>
+                <div class="logo-en">Emo Treasure</div>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab_login">登录</button>
+                <button class="auth-tab" id="tab_register">注册</button>
+            </div>
+
+            <div id="auth_login_panel" class="auth-panel active">
+                <div class="input-group">
+                    <input type="text" id="input_login_name" class="input-field" placeholder="请输入用户名" autocomplete="username">
+                </div>
+                <div class="input-group password-wrapper">
+                    <input type="password" id="input_login_password" class="input-field" placeholder="请输入密码" autocomplete="current-password">
+                    <button type="button" class="password-eye" data-target="input_login_password" aria-label="显示/隐藏密码">
+                        <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg class="eye-closed" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="status-msg" id="login_status"></div>
+                <button class="btn-primary btn-block" id="btn_do_login">登 录</button>
+            </div>
+
+            <div id="auth_register_panel" class="auth-panel">
+                <div class="input-group">
+                    <input type="text" id="input_account" class="input-field" placeholder="请输入手机号或邮箱" autocomplete="username">
+                </div>
+                <div class="input-group input-group-code">
+                    <input type="text" id="input_code" class="input-field" placeholder="请输入验证码" autocomplete="one-time-code">
+                    <button class="btn-code" id="btn_get_code">获取验证码</button>
+                </div>
+                <button class="btn-primary btn-block" id="btn_login">注 册</button>
+                <div class="divider"><span>其他注册方式</span></div>
+                <div class="alt-buttons">
+                    <button class="btn-alt" id="btn_wechat"><span class="icon">💬</span> 微信注册</button>
+                    <button class="btn-alt" id="btn_activation"><span class="icon">🔑</span> 激活码</button>
+                </div>
+            </div>
+
+            <button class="btn-guest" id="btn_guest">👤 访客体验</button>
+        </div>
+
+
+情绪宝（Emo Treasure）V1.0                              第 11 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+    </div>
+
+    <div id="guest_layer" class="layer">
+        <div class="login-container">
+            <div class="logo-block">
+                <div class="logo-cn">情绪宝</div>
+                <div class="logo-en">Emo Treasure</div>
+            </div>
+            <div class="input-group">
+                <input type="text" id="input_guest_name" class="input-field" placeholder="请输入您的名字（必填）" maxlength="20" autocomplete="off">
+            </div>
+            <button class="btn-primary btn-block" id="btn_guest_confirm">确 认</button>
+            <button class="btn-secondary btn-block" id="btn_guest_back">返 回</button>
+        </div>
+    </div>
+
+    <div id="activation_layer" class="layer">
+        <div class="login-container">
+            <div class="logo-block">
+                <div class="logo-cn">情绪宝</div>
+                <div class="logo-en">Emo Treasure</div>
+            </div>
+            <div id="activation_partner_banner" style="display:none; margin-bottom:16px; padding:12px 14px; background:#EEF6FF; border-left:4px solid #2C7BE5; border-radius:6px; font-size:14px; font-weight:bold; color:#1A2B4A; line-height:1.5;">
+                <span id="activation_partner_name"></span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="input_activation_code" class="input-field" placeholder="请输入激活码" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="text" id="input_activation_name" class="input-field" placeholder="请输入您的名字（必填）" maxlength="20" autocomplete="off">
+            </div>
+            <button class="btn-primary btn-block" id="btn_activation_confirm">确 认</button>
+            <button class="btn-secondary btn-block" id="btn_activation_back">返 回</button>
+            <div class="status-msg" id="activation_status"></div>
+        </div>
+    </div>
+
+    <div id="password_layer" class="layer">
+        <div class="login-container">
+            <div class="logo-block">
+                <div class="logo-cn">情绪宝</div>
+                <div class="logo-en">Emo Treasure</div>
+            </div>
+
+            <div class="password-intro" id="password_intro">请设置您的登录密码</div>
+
+            <div class="input-group password-wrapper">
+                <input type="password" id="input_new_password" class="input-field" placeholder="请输入密码" autocomplete="new-password">
+                <button type="button" class="password-eye" data-target="input_new_password" aria-label="显示/隐藏密码">
+                    <svg class="eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <svg class="eye-closed" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+
+
+情绪宝（Emo Treasure）V1.0                              第 12 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="password-strength-bar">
+                <div class="password-strength-fill" id="pwd_strength_fill"></div>
+            </div>
+            <div class="password-strength-text" id="pwd_strength_text"></div>
+
+            <div class="password-rules" id="password_rules">
+                <div>至少 8 位</div>
+                <div>包含字母 / 数字 / 大写 / 小写 / 特殊字符（至少 3 类）</div>
+            </div>
+
+            <div class="status-msg" id="password_status"></div>
+
+            <button class="btn-primary btn-block" id="btn_password_confirm" disabled>完 成</button>
+        </div>
+    </div>
+
+    <script src="js/qx00_login.js"></script>
+</body>
+</html>
+/* ================================================================
+   情绪宝 - qx0 主屏框架
+   v21 改动（2026-10-19）：
+   - 去除大色块，改为极简透明图标
+   - 有声：深绿色喇叭；静音：浅灰色捂嘴
+   ================================================================ */
+
+   const MQXB_VERSION = 1;
+   const EXPIRY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+   const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co'; 
+   const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
+   
+   const INLINE_TYPE_FALLBACK = {
+       1:  { cn: '普通用户',  en: 'Normal User',   sortorder: 1 },
+       2:  { cn: 'VIP',      en: 'VIP',           sortorder: 2 },
+       3:  { cn: 'VIP',      en: 'VIP',           sortorder: 3 },
+       4:  { cn: 'VIP',      en: 'VIP',           sortorder: 4 },
+       5:  { cn: 'VIP',      en: 'VIP',           sortorder: 5 },
+       6:  { cn: '家庭',     en: 'Family',        sortorder: 6 },
+       7:  { cn: '辅导员',   en: 'Counselor',     sortorder: 7 },
+       8:  { cn: '音乐管理', en: 'Music Admin',   sortorder: 8 },
+       9:  { cn: '系统管理', en: 'System Admin',  sortorder: 9 },
+       10: { cn: '财务',     en: 'Finance',       sortorder: 10 },
+       11: { cn: '企业',     en: 'Enterprise',    sortorder: 11 },
+       12: { cn: '学生',     en: 'Student',       sortorder: 12 },
+       13: { cn: '待用身份', en: 'Reserved',      sortorder: 13 },
+       14: { cn: '访客',     en: 'Guest',         sortorder: 14 },
+   };
+   
+   function getTypeMapSafe() {
+       if (window.qxTypeLabel && typeof window.qxTypeLabel.getMap === 'function') {
+
+
+情绪宝（Emo Treasure）V1.0                              第 13 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+           return window.qxTypeLabel.getMap();
+       }
+       return INLINE_TYPE_FALLBACK;
+   }
+   
+   function typeHasSafe(ut) {
+       const k = parseInt(ut);
+       if (isNaN(k)) return false;
+       if (window.qxTypeLabel && typeof window.qxTypeLabel.has === 'function') {
+           return window.qxTypeLabel.has(k);
+       }
+       return !!INLINE_TYPE_FALLBACK[k];
+   }
+   
+   function typeLabelSafe(ut) {
+       const k = parseInt(ut);
+       if (window.qxTypeLabel && typeof window.qxTypeLabel.get === 'function') {
+           return window.qxTypeLabel.get(k);
+       }
+       const lb = INLINE_TYPE_FALLBACK[k] || INLINE_TYPE_FALLBACK[1];
+       const lang = (window.mQxb && window.mQxb.Language) || 1;
+       return lang === 1 ? lb.cn : lb.en;
+   }
+   
+   async function ensureTypeDictLoaded() {
+       if (!window.qxTypeLabel) {
+           console.warn('[qx0_main] qxTypeLabel 未加载，使用内联兜底字典');
+           return false;
+       }
+       if (typeof window.qxTypeLabel.waitFor === 'function') {
+           const ok = await window.qxTypeLabel.waitFor(3000);
+           if (!ok) console.warn('[qx0_main] qxTypeLabel.waitFor 超时，继续');
+           return ok;
+       }
+       if (typeof window.qxTypeLabel.load === 'function') {
+           try { await window.qxTypeLabel.load(); return true; }
+           catch (e) { return false; }
+       }
+       return false;
+   }
+   
+   const I18N = {
+       1: {
+           brand: '情绪宝 / Emo Treasure',
+           menu_perceive: '感知', menu_regulate: '调节', menu_report: '报告', menu_qa: '问答', menu_assessment: '测评', menu_settings: '设置',
+           title_main: '情绪宝 / Emo Treasure', title_qx1: '情绪感知', title_qx2: '情绪调节', title_qx3: '报告分析', title_qx4: '智能问答', title_qx5: '趣味评测', title_qx6: '设置工作',
+           back: '← 返回主屏', placeholder_qx1: '情绪感知功能开发中...', placeholder_qx2: '情绪调节功能开发中...', placeholder_qx3: '报告分析功能开发中...', placeholder_qx4: '智能问答功能开发中...', placeholder_qx5: '趣味评测功能开发中...', placeholder_qx6: '设置功能开发中...',
+           week: ['日', '一', '二', '三', '四', '五', '六'], userPrefix: '👤',
+   
+           emo_1: '焦躁', emo_2: '热烈', emo_3: '欢快', emo_4: '轻快', emo_5: '明朗', emo_6: '平静', emo_7: '压抑', emo_8: '忧伤', emo_9: '悲伤',
+   
+           qx1_today_emotion: '今日情绪', qx1_life_event: '生活事件', qx1_heart_title: '点击查看 HRV 图', qx1_optional_events: '可选生活事件', qx1_today_events: '当日生活事件', qx1_event_attr: '事件属性',
+           qx1_nature_good: '好', qx1_nature_bad: '坏', qx1_nature_suffix: '事', qx1_impact_title: '影响程度', qx1_impact_1: '轻', qx1_impact_2: '中', qx1_impact_3: '重', qx1_impact_4: '极重',
+           qx1_hrv_title: '心率与 HRV 采集', qx1_btn_save: '存入', qx1_btn_del: '删除当前此生活事件', qx1_btn_exit: '退出', qx1_heal_title: '情绪宝 HRV 采集 · 实时治愈主图', qx1_heal_close: '关闭', qx1_heal_wait: '等待采集开始…', qx1_heal_wait_hint: '等待采集开始…',
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 14 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+           qx2_before_label: '听前情绪', qx2_after_label: '听后情绪', qx2_flow_1: '听前', qx2_flow_2: '调整', qx2_flow_3: '评价', qx2_flow_4: '分析',
+           qx2_camera_hint: '请把干净的手指放在摄像头上，准备安静地听音乐', qx2_btn_pick: '选曲', qx2_btn_start: '开始',
+           qx2_analysis_title: '分析', qx2_analysis_ph: '进第 4 步，自动给出分析', qx2_heal_title: '实时治愈主图', qx2_heal_ph: '待定', qx2_feedback_title: '主观评价',
+           qx2_fb_better: '更好', qx2_fb_same: '一样', qx2_fb_worse: '更差', qx2_btn_restart: '重新调整', qx2_btn_exit: '退出调整', qx2_collect_title: '选择经典作品', qx2_collect_close: '关闭',
+   
+           qx3_title: '情绪分析报告', qx3_range_week: '近一周', qx3_range_month: '近一月', qx3_range_half: '近半年', qx3_range_year: '近一年', qx3_emotion_card: '情绪基线', qx3_event_card: '生活事件综合', qx3_hrv_card: 'HRV 基线', qx3_summary_card: '总评语', qx3_baseline: '基线', qx3_good: '好事', qx3_bad: '坏事', qx3_avg_hr: '平均心率', qx3_summary_ph: '正在生成…', qx3_btn_exit: '退出',
+   
+           qx4_title: '知识问答', qx4_btn_pick: '选择', qx4_btn_exit: '退出',
+   
+           qx5_title: '趣味评测', qx5_subtitle: '玩一玩，看看你的大脑怎么工作', qx5_btn_exit: '退出', qx5_btn_quit: '退出游戏', qx5_profile_title: '我的认知画像',
+   
+           qx6_back_main: '‹ 主屏', qx6_title: '设置', qx6_panel_back: '‹ 返回',
+       },
+       2: {
+           brand: 'Emo Treasure / 情绪宝',
+           menu_perceive: 'Perceive', menu_regulate: 'Regulate', menu_report: 'Report', menu_qa: 'Q&A', menu_assessment: 'Assessment', menu_settings: 'Settings',
+           title_main: 'Emo Treasure / 情绪宝', title_qx1: 'Emotion Perceive', title_qx2: 'Emotion Regulate', title_qx3: 'Report Analysis', title_qx4: 'Smart Q&A', title_qx5: 'Fun Assessment', title_qx6: 'Settings',
+           back: '← Back', placeholder_qx1: 'Emotion Perceive - Coming soon...', placeholder_qx2: 'Emotion Regulate - Coming soon...', placeholder_qx3: 'Report Analysis - Coming soon...', placeholder_qx4: 'Smart Q&A - Coming soon...', placeholder_qx5: 'Fun Assessment - Coming soon...', placeholder_qx6: 'Settings - Coming soon...',
+           week: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], userPrefix: '👤',
+   
+           emo_1: 'Irritable', emo_2: 'Passionate', emo_3: 'Cheerful', emo_4: 'Lively', emo_5: 'Bright', emo_6: 'Calm', emo_7: 'Down', emo_8: 'Melancholy', emo_9: 'Sad',
+   
+           qx1_today_emotion: 'Today', qx1_life_event: 'Events', qx1_heart_title: 'Tap to view HRV chart', qx1_optional_events: 'Event Library', qx1_today_events: "Today's Events", qx1_event_attr: 'Details',
+           qx1_nature_good: 'Good', qx1_nature_bad: 'Bad', qx1_nature_suffix: '', qx1_impact_title: 'Impact', qx1_impact_1: 'Mild', qx1_impact_2: 'Moderate', qx1_impact_3: 'Strong', qx1_impact_4: 'Severe',
+           qx1_hrv_title: 'Heart Rate & HRV', qx1_btn_save: 'Save', qx1_btn_del: 'Delete', qx1_btn_exit: 'Exit', qx1_heal_title: 'HRV Capture · Live Chart', qx1_heal_close: 'Close', qx1_heal_wait: 'Waiting to start…', qx1_heal_wait_hint: 'Waiting to start…',
+   
+           qx2_before_label: 'Bf', qx2_after_label: 'Af', qx2_flow_1: 'B4', qx2_flow_2: 'Set', qx2_flow_3: 'Rate', qx2_flow_4: 'Read',
+           qx2_camera_hint: 'Place a clean finger on the camera and listen quietly', qx2_btn_pick: 'Select', qx2_btn_start: 'Start',
+           qx2_analysis_title: 'Analysis', qx2_analysis_ph: 'Analysis appears at step 4', qx2_heal_title: 'Live Healing Chart', qx2_heal_ph: 'Pending', qx2_feedback_title: 'Feedback', qx2_fb_better: 'Better', qx2_fb_same: 'Same', qx2_fb_worse: 'Worse',
+           qx2_btn_restart: 'Restart', qx2_btn_collect: 'Save Playlist', qx2_btn_exit: 'Exit', qx2_collect_title: 'Classic Works', qx2_collect_close: 'Close',
+   
+           qx3_title: 'Emotion Report', qx3_range_week: 'Week', qx3_range_month: 'Month', qx3_range_half: '6 Months', qx3_range_year: 'Year', qx3_emotion_card: 'Emotion Baseline', qx3_event_card: 'Life Events', qx3_hrv_card: 'HRV Baseline', qx3_summary_card: 'Summary', qx3_baseline: 'Baseline', qx3_good: 'Positive', qx3_bad: 'Negative', qx3_avg_hr: 'Avg HR', qx3_summary_ph: 'Generating…', qx3_btn_exit: 'Exit',
+   
+           qx4_title: 'Q&A', qx4_btn_pick: 'Select', qx4_btn_exit: 'Exit',
+   
+           qx5_title: 'Fun Assessment', qx5_subtitle: 'Play and see how your brain works', qx5_btn_exit: 'Exit', qx5_btn_quit: 'Quit Game', qx5_profile_title: 'My Cognitive Profile',
+   
+           qx6_back_main: '‹ Main', qx6_title: 'Settings', qx6_panel_back: '‹ Back',
+       }
+   };
+   
+   /* ================================================================
+   全局语音合成引擎 (V2 - 接入微软 Azure 神经语音)
+   ================================================================ */
+let _globalSpeechLock = false;
+window.qxIsMuted = false;
+let _currentTTSAudio = null; // 用于保存当前正在播放的云端音频，方便随时掐断
+
+window.qxSpeak = function(text, onEnd) {
+    // 1. 兜底检查：如果处于静音状态，直接跳过并触发回调
+    if (window.qxIsMuted) { if (onEnd) onEnd(); return; }
+    if (_globalSpeechLock && !onEnd) { return; }
+
+    // 2. 停止上一次可能还在播的语音，解除锁定
+    if (_currentTTSAudio) {
+
+
+情绪宝（Emo Treasure）V1.0                              第 15 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+        _currentTTSAudio.pause();
+        _currentTTSAudio = null;
+    }
+    if (window.speechSynthesis) {
+        window.speechSynthesis.cancel(); // 同时掐断浏览器自带的语音
+    }
+    _globalSpeechLock = true;
+
+    // 3. 读取当前语言（1=中文，2=英文）和用户在设置里选的音色
+    const lang = (window.mQxb && window.mQxb.Language) || 1;
+    const isZh = (lang === 1);
+    
+    // 默认音色：中文用“云希”，英文用“Aria”（微软英语女声，非常自然）
+    let defaultVoice = isZh ? 'zh-CN-YunxiNeural' : 'en-US-AriaNeural';
+    const userVoice = localStorage.getItem('qx_tts_voice') || defaultVoice;
+
+    // 4. 向 Supabase 代理发送请求，获取音频流
+    fetch('https://lmmnwmueppkdbzvufxar.supabase.co/functions/v1/azure-tts', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: text, voice: userVoice })
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('TTS API 请求失败');
+        return res.blob();
+    })
+    .then(blob => {
+        // 5. 拿到音频流，直接播放
+        const audioUrl = URL.createObjectURL(blob);
+        _currentTTSAudio = new Audio(audioUrl);
+
+        // 6. 语音自然结束，释放锁并触发回调（这是驱动音乐播放的“发令枪”）
+        _currentTTSAudio.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+            _currentTTSAudio = null;
+            _globalSpeechLock = false;
+            if (onEnd) onEnd();
+        };
+
+        // 7. 播放（如果浏览器拦截了自动播放，静默失败）
+        _currentTTSAudio.play().catch(e => {
+            console.warn('[qxSpeak] 播放被拦截或失败', e);
+            _globalSpeechLock = false; 
+            if (onEnd) onEnd();
+        });
+    })
+    .catch(err => {
+        console.warn('[qxSpeak] 云端请求失败，自动回退到本地语音', err);
+        // 8. 兜底机制：如果网络断了，自动用回你之前的浏览器本地语音，保证不断播
+        fallbackToBrowserTTS(text, onEnd);
+    });
+};
+
+
+情绪宝（Emo Treasure）V1.0                              第 16 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+
+// 兜底方案：利用你原有的浏览器本地 TTS 逻辑
+function fallbackToBrowserTTS(text, onEnd) {
+    if (!window.speechSynthesis) { if (onEnd) onEnd(); return; }
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    const lang = (window.mQxb && window.mQxb.Language) || 1;
+    utterance.lang = (lang === 1) ? 'zh-CN' : 'en-US';
+    utterance.rate = 0.9;
+
+    utterance.onend = () => { _globalSpeechLock = false; if (onEnd) onEnd(); };
+    utterance.onerror = () => { _globalSpeechLock = false; if (onEnd) onEnd(); };
+    
+    window.speechSynthesis.speak(utterance);
+}
+   
+   // ============ 极简素雅版静音按钮 ============
+   function initMuteButton() {
+       const btn = document.getElementById('global_mute_btn');
+       if (!btn) return;
+   
+       // 彻底清除行内难看的大色块样式，改为极简透明悬浮
+       btn.style.cssText = 'margin-left: auto; margin-right: 12px; border: none; background: transparent; font-size: 20px; cursor: pointer; padding: 4px 8px; transition: opacity 0.2s ease; display: flex; align-items: center; justify-content: center; outline: none;';
+   
+       const updateMuteUI = () => {
+           if (window.qxIsMuted) {
+               // 静音：灰色、微小的透明度，提示状态不对
+               btn.innerHTML = '🤫';
+               btn.style.opacity = '0.4';
+               btn.title = '已静音，点击恢复语音';
+           } else {
+               // 有声：正常深色/绿色
+               btn.innerHTML = '🔊';
+               btn.style.opacity = '1';
+               btn.title = '正在语音播报，点击静音';
+           }
+       };
+   
+       updateMuteUI();
+       
+       btn.onclick = (e) => {
+           e.stopPropagation();
+           window.qxIsMuted = !window.qxIsMuted;
+           updateMuteUI();
+           if (window.qxIsMuted && window.speechSynthesis) {
+               window.speechSynthesis.cancel();
+           }
+       };
+   
+       window.qxUpdateMuteLang = updateMuteUI;
+   }
+   
+   // ... 剩下的基础框架代码保持不变 ...
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 17 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+   function clearMqxbAndGoLogin(reason) {
+       localStorage.removeItem('mQxb');
+       const url = reason ? `qx00_login.html?reason=${encodeURIComponent(reason)}` : 'qx00_login.html';
+       window.location.href = url;
+   }
+   
+   function initSensorPrefs() {
+       if (!window.mQxb) window.mQxb = {};
+       if (!window.mQxb.Sensor) window.mQxb.Sensor = {};
+   
+       let hrvSource = 'camera';
+       let hrvCameraFacing = 'environment';
+   
+       try {
+           const s = localStorage.getItem('emobao_hrv_source');
+           if (s === 'polar' || s === 'camera') hrvSource = s;
+       } catch (e) {}
+   
+       try {
+           const f = localStorage.getItem('emobao_camera_facing');
+           if (f === 'user' || f === 'environment') hrvCameraFacing = f;
+       } catch (e) {}
+   
+       window.mQxb.Sensor.hrvSource = hrvSource;
+       window.mQxb.Sensor.hrvCameraFacing = hrvCameraFacing;
+   }
+   
+   async function loadGlobalVars() {
+       const saved = localStorage.getItem('mQxb');
+       if (!saved) { clearMqxbAndGoLogin(); return false; }
+   
+       let data;
+       try { data = JSON.parse(saved); } catch (e) { clearMqxbAndGoLogin(); return false; }
+   
+       if (data._version !== MQXB_VERSION) { clearMqxbAndGoLogin(); return false; }
+       if (!data._createdAt || isNaN(Date.parse(data._createdAt))) { clearMqxbAndGoLogin(); return false; }
+   
+       const required = ['user_id', 'user_id_Type', 'Username', 'UserImage'];
+       for (const key of required) {
+           if (data[key] === null || data[key] === undefined || data[key] === '') { clearMqxbAndGoLogin(); return false; }
+       }
+   
+       await ensureTypeDictLoaded();
+       const ut = parseInt(data.user_id_Type);
+       if (!typeHasSafe(ut)) { clearMqxbAndGoLogin(); return false; }
+   
+       if (!EXPIRY_REGEX.test(data.ExpiryDate)) { clearMqxbAndGoLogin(); return false; }
+   
+       const today = new Date();
+       today.setHours(0, 0, 0, 0);
+       const expiry = new Date(data.ExpiryDate + 'T00:00:00');
+       if (expiry < today) { clearMqxbAndGoLogin('expired'); return false; }
+   
+       window.mQxb = Object.assign(window.mQxb || {}, data);
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 18 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+       const savedLang = localStorage.getItem('emobao_lang');
+       if (savedLang) window.mQxb.Language = parseInt(savedLang);
+   
+       initSensorPrefs();
+       return true;
+   }
+   
+   function getUserTypeLabel() {
+       const type = parseInt(window.mQxb.user_id_Type) || 1;
+       return typeLabelSafe(type);
+   }
+   
+   function updateStatusBar(middleTitle) {
+       const lang = window.mQxb.Language || 1;
+       const t = I18N[lang];
+       const now = new Date();
+       const dayIndex = now.getDay();
+   
+       let dateStr;
+       if (lang === 1) {
+           dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} 周${t.week[dayIndex]}`;
+       } else {
+           dateStr = `${t.week[dayIndex]}, ${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${now.getFullYear()}`;
+       }
+   
+       const dateEl = document.getElementById('status_date');
+       if (dateEl) dateEl.innerText = dateStr;
+       const titleEl = document.getElementById('status_title');
+       if (titleEl) titleEl.innerText = middleTitle || t.title_main;
+       const userEl = document.getElementById('status_user');
+       if (userEl) userEl.innerText = `${t.userPrefix} ${getUserTypeLabel()} ${window.mQxb.Username || 'User'}`;
+   }
+   
+   function updateMenuBar() {
+       const lang = window.mQxb.Language || 1;
+       const t = I18N[lang];
+       document.querySelectorAll('.qx0-menu-bar .menu-item').forEach(btn => {
+           const key = btn.dataset.i18n;
+           if (key && t[key]) btn.innerText = t[key];
+       });
+   }
+   
+   function applyDataI18n() {
+       const lang = window.mQxb.Language || 1;
+       const dict = I18N[lang];
+       if (!dict) return;
+   
+       document.querySelectorAll('[data-i18n]').forEach(el => {
+           const key = el.dataset.i18n;
+           if (!key || dict[key] == null) return;
+           const val = dict[key];
+   
+           if (val === '') {
+               el.style.display = 'none';
+               return;
+
+
+情绪宝（Emo Treasure）V1.0                              第 19 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+           }
+           el.style.display = '';
+   
+           if (el.children.length === 0) {
+               el.innerText = val;
+               return;
+           }
+           for (const node of el.childNodes) {
+               if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                   node.textContent = val;
+                   break;
+               }
+           }
+       });
+   
+       document.querySelectorAll('[data-i18n-title]').forEach(el => {
+           const key = el.dataset.i18nTitle;
+           if (!key || dict[key] == null) return;
+           el.setAttribute('title', dict[key]);
+       });
+   }
+   
+   function updateFunctionTexts() {
+       const lang = window.mQxb.Language || 1;
+       const t = I18N[lang];
+   
+       document.querySelectorAll('.qx-function-layer').forEach(layer => {
+           const layerId = layer.id.replace('_layer', '');
+   
+           const titleEl = layer.querySelector('.qx-title');
+           if (titleEl) {
+               const titleKey = `title_${layerId}`;
+               if (t[titleKey]) titleEl.innerText = t[titleKey];
+           }
+   
+           const backBtn = layer.querySelector('.qx-back-btn');
+           if (backBtn) backBtn.innerText = t.back;
+   
+           const placeholder = layer.querySelector('.qx-placeholder');
+           if (placeholder) {
+               const phKey = `placeholder_${layerId}`;
+               if (t[phKey]) placeholder.innerText = t[phKey];
+           }
+       });
+   }
+   
+   async function updateBackground() {
+    const bgEl = document.getElementById('qx0_bg');
+    if (!bgEl) return;
+
+    // 1. 优先：扫码激活带来的品牌底图（云端 URL）
+    if (window.mQxb.BrandLogoUrl) {
+        bgEl.src = window.mQxb.BrandLogoUrl;
+        return;
+    }
+
+
+情绪宝（Emo Treasure）V1.0                              第 20 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+
+    // 2. 其次：团队自定义底图
+    const teamcode = window.mQxb.TeamCode;
+    if (teamcode) {
+        const customUrl = await fetchTeamBgUrl(teamcode);
+        if (customUrl) { bgEl.src = customUrl; return; }
+    }
+
+    // 3. 兜底：身份默认图
+    const img = window.mQxb.UserImage || 'qxbaouser1.jpg';
+    bgEl.src = `picture/${img}`;
+}
+   
+   async function fetchTeamBgUrl(teamcode) {
+       try {
+           const res = await fetch(
+               `${SUPABASE_URL}/rest/v1/emobao_redemptioncode?code=eq.${encodeURIComponent(teamcode)}&select=custom_bg_url&limit=1`,
+               { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+           );
+           if (!res.ok) return null;
+           const rows = await res.json();
+           return (rows && rows[0] && rows[0].custom_bg_url) || null;
+       } catch (e) { return null; }
+   }
+   
+   function applyAllI18n() {
+       document.body.classList.toggle('lang-en', (window.mQxb.Language || 1) === 2);
+       updateStatusBar();
+       updateMenuBar();
+       updateFunctionTexts();
+       applyDataI18n();
+       if (window.qxUpdateMuteLang) window.qxUpdateMuteLang();
+   }
+   
+   function initMenuBar() {
+       document.querySelectorAll('.qx0-menu-bar .menu-item').forEach(btn => {
+           btn.addEventListener('click', () => { enterFunction(btn.dataset.page); });
+       });
+   }
+   
+   function enterFunction(page) {
+       document.body.classList.add('function-active');
+       document.querySelectorAll('.qx-function-layer').forEach(l => l.classList.remove('active'));
+       const target = document.getElementById(`${page}_layer`);
+       if (target) target.classList.add('active');
+   
+       const lang = window.mQxb.Language || 1;
+       const t = I18N[lang];
+       const titleKey = `title_${page}`;
+       updateStatusBar(t[titleKey] || t.title_main);
+   
+       const initFn = window[`${page}_init`];
+       if (typeof initFn === 'function') initFn();
+   }
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 21 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+   function returnToMain() {
+       const activeLayer = document.querySelector('.qx-function-layer.active');
+       if (activeLayer) {
+           const pageId = activeLayer.id.replace('_layer', '');
+           const destroyFn = window[`${pageId}_destroy`];
+           if (typeof destroyFn === 'function') destroyFn();
+           activeLayer.classList.remove('active');
+       }
+       document.body.classList.remove('function-active');
+   
+       const lang = window.mQxb.Language || 1;
+       const t = I18N[lang];
+       updateStatusBar(t.title_main);
+   }
+   
+   function initBackButtons() {
+       document.querySelectorAll('.qx-back-btn').forEach(btn => {
+           btn.addEventListener('click', () => returnToMain());
+       });
+   }
+   
+   document.addEventListener('DOMContentLoaded', async () => {
+       const ok = await loadGlobalVars();
+       if (!ok) return;
+   
+       applyAllI18n();
+       updateBackground();
+       initMenuBar();
+       initBackButtons();
+       initMuteButton(); // 挂载极简按钮
+   });
+   
+   window.qx0GetTypeMapSafe = getTypeMapSafe;
+   window.qx0TypeHasSafe = typeHasSafe;
+   window.qx0TypeLabelSafe = typeLabelSafe;
+   window.qx0ApplyDataI18n = applyDataI18n;
+/* ================================================================
+   情绪宝 - qx00 登录前逻辑
+   v9（2026-10-27）：
+   - 新增二维码入口：URL 带 ?qrcode_id=xxx 时查合作方、记扫码、预填码
+   - 激活成功后双归因（扫码 + 手输码都调 emo_link_activation_to_user）
+   - 二维码过期/无效时静默降级，不阻塞用户
+   - mQxb 新增 BrandLogoUrl 字段
+   - 其余（登录/注册/密码/访客/Toast）与 v8 完全一致
+   ================================================================ */
+   const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co';
+
+   const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
+   
+   const MQXB_VERSION = 1;
+   const PASSWORD_SALT = 'emobao_salt_2026';
+   
+   const SCAN_SESSION_KEY = 'emo_current_scanid';
+   const QRCODE_PARAM_KEY = 'emo_current_qrcode_id';
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 22 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+   window.mQxb = {
+       user_id: null,
+       user_id_Type: null,
+       Language: 1,
+       Username: null,
+       UserImage: null,
+       BrandLogoUrl: null,
+       IsGuest: false,
+       ExpiryDate: null,
+       IsTeamLeader: false,
+       TeamCode: null,
+   };
+   
+   let _pendingUser = null;
+   let _currentQrcodeInfo = null;
+   
+   /* ================================================================
+      密码哈希（SHA-256 + salt）
+      ================================================================ */
+   async function hashPassword(plain) {
+       const buf = new TextEncoder().encode(plain + PASSWORD_SALT);
+       const hash = await crypto.subtle.digest('SHA-256', buf);
+       return [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('');
+   }
+   
+   /* ================================================================
+      身份 → 主图映射
+      ================================================================ */
+   function getUserImage(usertype) {
+       const t = parseInt(usertype);
+       if (t >= 1 && t <= 6) return 'qxbaouser2.jpg';
+       if (t === 7 || t === 8) return 'qxbaouser4.jpg';
+       if (t === 9 || t === 10) return 'qxbaouser5.jpg';
+       if (t === 11 || t === 12 || t === 13) return 'qxbaouser3.jpg';
+       if (t === 14) return 'qxbaouser1.jpg';
+       return 'qxbaouser2.jpg';
+   }
+   
+   /* ================================================================
+      契约字段统一写入
+      ================================================================ */
+   function saveMqxb() {
+       window.mQxb._version = MQXB_VERSION;
+       window.mQxb._createdAt = new Date().toISOString();
+       localStorage.setItem('mQxb', JSON.stringify(window.mQxb));
+   }
+   
+   /* ================================================================
+      Toast 提示条
+      ================================================================ */
+   let _toastTimer = null;
+   
+   function showToast(text, type = 'info', duration = 3000) {
+       const bar = document.getElementById('toast_bar');
+       if (!bar) return;
+
+
+情绪宝（Emo Treasure）V1.0                              第 23 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+   
+       if (_toastTimer) {
+           clearTimeout(_toastTimer);
+           _toastTimer = null;
+       }
+   
+       const iconMap = {
+           info: 'ℹ️',
+           success: '✓',
+           warning: '⚠️',
+           error: '✕'
+       };
+   
+       bar.className = 'toast-bar toast-' + type;
+       bar.innerHTML =
+           '<span class="toast-icon"></span>' +
+           '<span class="toast-text"></span>' +
+           '<button class="toast-close" type="button" aria-label="关闭">✕</button>';
+   
+       bar.querySelector('.toast-icon').textContent = iconMap[type] || iconMap.info;
+       bar.querySelector('.toast-text').textContent = text;
+   
+       bar.querySelector('.toast-close').addEventListener('click', () => {
+           hideToast();
+       });
+   
+       requestAnimationFrame(() => {
+           bar.classList.add('show');
+       });
+   
+       if (duration > 0) {
+           _toastTimer = setTimeout(() => {
+               hideToast();
+           }, duration);
+       }
+   }
+   
+   function hideToast() {
+       const bar = document.getElementById('toast_bar');
+       if (!bar) return;
+       bar.classList.remove('show');
+       if (_toastTimer) {
+           clearTimeout(_toastTimer);
+           _toastTimer = null;
+       }
+   }
+   
+   /* ================================================================
+      多语言文案
+      ================================================================ */
+   const TEXT = {
+       1: {
+           welcome: "情绪宝帮助您记录理解改善自己的情绪。\n情绪宝作为一个工具不替代任何专业的医疗诊断和医疗处理。\n情绪宝遵循隐私高于一切的原则，情绪数据属于用户本人。\n系统不会上传个人敏感信息。",
+           agree: "同意",
+           disagree: "不同意",
+
+
+情绪宝（Emo Treasure）V1.0                              第 24 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+           tabLogin: "登录",
+           tabRegister: "注册",
+           loginNamePlaceholder: "请输入用户名",
+           loginPasswordPlaceholder: "请输入密码",
+           loginBtn: "登 录",
+           registerBtn: "注 册",
+           accountPlaceholder: "请输入手机号或邮箱",
+           codePlaceholder: "请输入验证码",
+           getCode: "获取验证码",
+           otherRegister: "其他注册方式",
+           wechat: "微信注册",
+           activation: "激活码",
+           guest: "访客体验",
+           guestNamePlaceholder: "请输入您的名字（必填）",
+           confirm: "确 认",
+           back: "返 回",
+           activationPlaceholder: "请输入激活码",
+           activationNamePlaceholder: "请输入您的名字（必填）",
+           alertGuestName: "请输入您的名字",
+           alertActivationEmpty: "请输入激活码",
+           alertActivationNameEmpty: "请输入您的名字",
+           alertLoginEmpty: "请输入用户名和密码",
+           loginFailed: "用户名或密码错误",
+           loginSuccess: "登录成功，正在进入...",
+           checking: "校验中...",
+           activationSuccess: "激活成功！请设置登录密码",
+           activationInvalid: "激活码无效或已使用",
+           activationUsed: "激活码已被使用",
+           activationExpired: "激活码已过期",
+           activationExhausted: "激活码已用尽",
+           usernameTaken: "该用户名已被占用，请换一个",
+           networkError: "网络错误，请重试",
+           sessionExpired: "登录已过期，请重新登录",
+           passwordIntro: "请设置您的登录密码",
+           passwordRules1: "至少 8 位",
+           passwordRules2: "包含字母 / 数字 / 大写 / 小写 / 特殊字符（至少 3 类）",
+           passwordTooWeak: "密码强度不足",
+           passwordComplete: "完 成",
+           passwordSuccess: "设置成功，正在进入...",
+           passwordEmpty: "请输入密码",
+           strength0: "太弱",
+           strength1: "弱",
+           strength2: "中",
+           strength3: "强",
+           strength4: "很强",
+   
+           qrcodeChecking: "正在校验二维码...",
+           qrcodeInvalid: "二维码无效",
+           qrcodeExpired: "入口已过期，可继续使用兑换码",
+           qrcodeNotYetValid: "入口尚未生效，可继续使用兑换码",
+           qrcodeInactive: "入口已停用，可继续使用兑换码",
+           qrcodeNotFound: "入口不存在",
+           qrcodePartnerWelcome: "欢迎来自「{name}」的朋友",
+           qrcodeCodePrefilled: "已为您填入兑换码",
+       },
+
+
+情绪宝（Emo Treasure）V1.0                              第 25 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+       2: {
+           welcome: "Emo Treasure helps you record, understand, and improve your emotions.\nAs a tool, Emo Treasure does not replace any professional medical diagnosis or medical treatment.\nEmo Treasure follows the principle that privacy is above all. Your emotional data belongs to you.\nThe system will not upload any of your personal sensitive information.",
+           agree: "Agree",
+           disagree: "Disagree",
+           tabLogin: "Login",
+           tabRegister: "Register",
+           loginNamePlaceholder: "Username",
+           loginPasswordPlaceholder: "Password",
+           loginBtn: "Log In",
+           registerBtn: "Register",
+           accountPlaceholder: "Phone or Email",
+           codePlaceholder: "Verification code",
+           getCode: "Get Code",
+           otherRegister: "Other ways",
+           wechat: "WeChat",
+           activation: "Activation",
+           guest: "Guest",
+           guestNamePlaceholder: "Enter your name (required)",
+           confirm: "Confirm",
+           back: "Back",
+           activationPlaceholder: "Enter activation code",
+           activationNamePlaceholder: "Enter your name (required)",
+           alertGuestName: "Please enter your name",
+           alertActivationEmpty: "Please enter activation code",
+           alertActivationNameEmpty: "Please enter your name",
+           alertLoginEmpty: "Please enter username and password",
+           loginFailed: "Invalid username or password",
+           loginSuccess: "Login successful. Entering...",
+           checking: "Checking...",
+           activationSuccess: "Activated! Please set your password",
+           activationUsed: "Code already used",
+           activationInvalid: "Invalid or used code",
+           activationExpired: "Code expired",
+           activationExhausted: "Code exhausted",
+           usernameTaken: "Username already taken, please choose another",
+           networkError: "Network error, please retry",
+           sessionExpired: "Your session has expired. Please log in again.",
+           passwordIntro: "Please set your login password",
+           passwordRules1: "At least 8 characters",
+           passwordRules2: "Include letters / digits / uppercase / lowercase / special chars (at least 3 types)",
+           passwordTooWeak: "Password too weak",
+           passwordComplete: "Complete",
+           passwordSuccess: "Success! Entering...",
+           passwordEmpty: "Please enter password",
+           strength0: "Too weak",
+           strength1: "Weak",
+           strength2: "Medium",
+           strength3: "Strong",
+           strength4: "Very strong",
+   
+           qrcodeChecking: "Verifying QR code...",
+           qrcodeInvalid: "Invalid QR code",
+           qrcodeExpired: "Entry expired, you can still use the code",
+           qrcodeNotYetValid: "Entry not yet valid, you can still use the code",
+           qrcodeInactive: "Entry inactive, you can still use the code",
+
+
+情绪宝（Emo Treasure）V1.0                              第 26 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+           qrcodeNotFound: "Entry not found",
+           qrcodePartnerWelcome: "Welcome from \"{name}\"",
+           qrcodeCodePrefilled: "Activation code pre-filled",
+       }
+   };
+   
+   function tr(key, vars) {
+       const lang = window.mQxb.Language || 1;
+       const dict = TEXT[lang] || TEXT[1];
+       let s = dict[key] || key;
+       if (vars) {
+           Object.keys(vars).forEach(k => {
+               s = s.replace(new RegExp('\\{' + k + '\\}', 'g'), vars[k]);
+           });
+       }
+       return s;
+   }
+   
+   /* ================================================================
+      页面切换
+      ================================================================ */
+   function showLayer(layerId) {
+       document.querySelectorAll('.layer').forEach(l => l.classList.remove('active'));
+       document.getElementById(layerId).classList.add('active');
+   }
+   
+   /* ================================================================
+      Tab 切换（登录 / 注册）
+      ================================================================ */
+   function switchAuthTab(tab) {
+       const tabLogin = document.getElementById('tab_login');
+       const tabRegister = document.getElementById('tab_register');
+       const panelLogin = document.getElementById('auth_login_panel');
+       const panelRegister = document.getElementById('auth_register_panel');
+   
+       if (tab === 'login') {
+           tabLogin.classList.add('active');
+           tabRegister.classList.remove('active');
+           panelLogin.classList.add('active');
+           panelRegister.classList.remove('active');
+       } else {
+           tabRegister.classList.add('active');
+           tabLogin.classList.remove('active');
+           panelRegister.classList.add('active');
+           panelLogin.classList.remove('active');
+       }
+   }
+   
+   function initAuthTabs() {
+       document.getElementById('tab_login').addEventListener('click', () => switchAuthTab('login'));
+       document.getElementById('tab_register').addEventListener('click', () => switchAuthTab('register'));
+   }
+   
+   /* ================================================================
+      多语言应用
+
+
+情绪宝（Emo Treasure）V1.0                              第 27 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+      ================================================================ */
+   function applyLanguage() {
+       const lang = window.mQxb.Language;
+       const t = TEXT[lang];
+   
+       document.getElementById('welcome_text').innerText = t.welcome;
+       document.getElementById('btn_welcome_agree').innerText = t.agree;
+       document.getElementById('btn_welcome_disagree').innerText = t.disagree;
+   
+       document.getElementById('tab_login').innerText = t.tabLogin;
+       document.getElementById('tab_register').innerText = t.tabRegister;
+   
+       document.getElementById('input_login_name').placeholder = t.loginNamePlaceholder;
+       document.getElementById('input_login_password').placeholder = t.loginPasswordPlaceholder;
+       document.getElementById('btn_do_login').innerText = t.loginBtn;
+   
+       document.getElementById('input_account').placeholder = t.accountPlaceholder;
+       document.getElementById('input_code').placeholder = t.codePlaceholder;
+       document.getElementById('btn_get_code').innerText = t.getCode;
+       document.getElementById('btn_login').innerText = t.registerBtn;
+       document.querySelector('#auth_register_panel .divider span').innerText = t.otherRegister;
+       document.getElementById('btn_wechat').innerHTML = `<span class="icon">💬</span> ${t.wechat}`;
+       document.getElementById('btn_activation').innerHTML = `<span class="icon">🔑</span> ${t.activation}`;
+       document.getElementById('btn_guest').innerText = `👤 ${t.guest}`;
+   
+       document.getElementById('input_guest_name').placeholder = t.guestNamePlaceholder;
+       document.getElementById('btn_guest_confirm').innerText = t.confirm;
+       document.getElementById('btn_guest_back').innerText = t.back;
+   
+       document.getElementById('input_activation_code').placeholder = t.activationPlaceholder;
+       document.getElementById('input_activation_name').placeholder = t.activationNamePlaceholder;
+       document.getElementById('btn_activation_confirm').innerText = t.confirm;
+       document.getElementById('btn_activation_back').innerText = t.back;
+   
+       document.getElementById('password_intro').innerText = t.passwordIntro;
+       document.getElementById('input_new_password').placeholder = t.loginPasswordPlaceholder;
+       document.getElementById('password_rules').innerHTML =
+           `<div>${t.passwordRules1}</div><div>${t.passwordRules2}</div>`;
+       document.getElementById('btn_password_confirm').innerText = t.passwordComplete;
+   
+       const banner = document.getElementById('activation_partner_banner');
+       const bannerName = document.getElementById('activation_partner_name');
+       if (banner && bannerName && _currentQrcodeInfo) {
+           const name = lang === 1
+               ? (_currentQrcodeInfo.partner_name_cn || _currentQrcodeInfo.partner_name_en || '')
+               : (_currentQrcodeInfo.partner_name_en || _currentQrcodeInfo.partner_name_cn || '');
+           bannerName.innerText = tr('qrcodePartnerWelcome', { name: name });
+       }
+   
+       const langBtn = document.getElementById('lang_switch');
+       if (langBtn) {
+           langBtn.innerText = lang === 1 ? '中 / EN' : 'EN / 中';
+       }
+   
+       document.querySelectorAll('.logo-block').forEach(block => {
+
+
+情绪宝（Emo Treasure）V1.0                              第 28 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+           if (lang === 2) {
+               block.classList.add('en-mode');
+           } else {
+               block.classList.remove('en-mode');
+           }
+       });
+   }
+   
+   /* ================================================================
+      语言切换
+      ================================================================ */
+   function initLangSwitch() {
+       const langBtn = document.getElementById('lang_switch');
+       if (!langBtn) return;
+       langBtn.addEventListener('click', () => {
+           window.mQxb.Language = window.mQxb.Language === 1 ? 2 : 1;
+           applyLanguage();
+           localStorage.setItem('emobao_lang', window.mQxb.Language);
+       });
+   }
+   
+   /* ================================================================
+      欢迎页
+      ================================================================ */
+   function initWelcome() {
+       document.getElementById('btn_welcome_agree').addEventListener('click', () => {
+           localStorage.setItem('emobao_agreed', 'true');
+           showLayer('login_layer');
+       });
+       document.getElementById('btn_welcome_disagree').addEventListener('click', () => {
+           alert('感谢您的访问');
+           window.close();
+       });
+   }
+   
+   /* ================================================================
+      密码强度计算
+      ================================================================ */
+   function calcPasswordStrength(pwd) {
+       if (!pwd || pwd.length < 8) return 0;
+       const weakList = ['88888888', '66666666', '12345678', '11111111', '00000000', '123456789'];
+       if (weakList.includes(pwd)) return 0;
+   
+       let types = 0;
+       if (/[a-z]/.test(pwd)) types++;
+       if (/[A-Z]/.test(pwd)) types++;
+       if (/[0-9]/.test(pwd)) types++;
+       if (/[^a-zA-Z0-9]/.test(pwd)) types++;
+   
+       if (types <= 1) return 1;
+       if (types === 2) return 2;
+       if (types === 3) return 3;
+       return 4;
+   }
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 29 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+   function renderPasswordStrength(strength) {
+       const fill = document.getElementById('pwd_strength_fill');
+       const text = document.getElementById('pwd_strength_text');
+       const t = TEXT[window.mQxb.Language];
+   
+       const colors = ['#E74C3C', '#E67E22', '#F1C40F', '#2C7BE5', '#2ECC71'];
+       const widths = ['20%', '40%', '60%', '80%', '100%'];
+       const labels = [t.strength0, t.strength1, t.strength2, t.strength3, t.strength4];
+   
+       fill.style.width = widths[strength];
+       fill.style.background = colors[strength];
+       text.innerText = labels[strength];
+       text.style.color = colors[strength];
+   }
+   
+   /* ================================================================
+      密码框眼睛切换
+      ================================================================ */
+   function initPasswordEyes() {
+       document.querySelectorAll('.password-eye').forEach(btn => {
+           btn.addEventListener('click', () => {
+               const targetId = btn.dataset.target;
+               const input = document.getElementById(targetId);
+               if (!input) return;
+   
+               const eyeOpen = btn.querySelector('.eye-open');
+               const eyeClosed = btn.querySelector('.eye-closed');
+   
+               if (input.type === 'password') {
+                   input.type = 'text';
+                   eyeOpen.style.display = 'none';
+                   eyeClosed.style.display = 'block';
+               } else {
+                   input.type = 'password';
+                   eyeOpen.style.display = 'block';
+                   eyeClosed.style.display = 'none';
+               }
+           });
+       });
+   }
+   
+   /* ================================================================
+      设置密码页
+      ================================================================ */
+   function initPasswordPage() {
+       const pwdInput = document.getElementById('input_new_password');
+       const confirmBtn = document.getElementById('btn_password_confirm');
+       const statusMsg = document.getElementById('password_status');
+   
+       function showStatus(text, type) {
+           statusMsg.innerText = text;
+           statusMsg.classList.remove('success', 'error');
+           statusMsg.classList.add('show', type);
+       }
+   
+
+
+情绪宝（Emo Treasure）V1.0                              第 30 页 / 共 60 页
+──────────────────────────────────────────────────────────────────────────────
+       pwdInput.addEventListener('input', () => {
+           const pwd = pwdInput.value;
+           const strength = calcPasswordStrength(pwd);
+           renderPasswordStrength(strength);
+           confirmBtn.disabled = (strength < 3);
+       });
+   
+       confirmBtn.addEventListener('click', async () => {
+           const t = TEXT[window.mQxb.Language];
+           const pwd = pwdInput.value;
+   
+           if (!pwd) {
+               showStatus(t.passwordEmpty, 'error');
+               return;
+           }
+   
+           const strength = calcPasswordStrength(pwd);
+           if (strength < 3) {
+               showStatus(t.passwordTooWeak, 'error');
+               return;
+           }
+   
+           confirmBtn.disabled = true;
+           confirmBtn.innerText = t.checking;
+   
+           try {
+               const hash = await hashPassword(pwd);
+   
+               const resp = await fetch(
+                   `${SUPABASE_URL}/rest/v1/rpc/emobao_set_password`,
+                   {
+                       method: 'POST',
+                       headers: {
+                           'apikey': SUPABASE_KEY,
+                           'Authorization': `Bearer ${SUPABASE_KEY}`,
+                           'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify({
+                           p_userid: _pendingUser.user_id,
+                           p_passwordhash: hash
+                       })
+                   }
+               );
+   
+               const result = await resp.json();
+               if (!result || !result[0] || !result[0].success) {
+                   throw new Error('更新密码失败');
+               }
+   
+               const brandLogoUrl = _pendingUser.BrandLogoUrl || null;
+   
+               window.mQxb.user_id = _pendingUser.user_id;
+               window.mQxb.user_id_Type = _pendingUser.user_id_Type;
+               window.mQxb.Username = _pendingUser.Username;
+               window.mQxb.UserImage = _pendingUser.UserImage;
+
+

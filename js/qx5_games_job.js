@@ -1,6 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 应聘挑战（P0：凌晨超售）
-   v5：沉浸式场景背景 + 玻璃拟态UI + 智能语音分配 + 降门槛
+   v6：修复 Chrome TTS 中断问题 + 优化对话播放节奏
    ================================================================ */
    (function () {
     'use strict';
@@ -11,24 +11,26 @@
   
     const E = window.qx5Engine;
   
-    // ================= 图片资源（请确保 picture 文件夹里有这两张图） =================
-    const IMG_INTERVIEW = 'picture/hotel_lobby.jpg'; // 第一张：深色前台
-    const IMG_RESULT = 'picture/hotel_result.jpg';   // 第二张：白墙冷静
+    const IMG_INTERVIEW = 'picture/hotel_lobby.jpg'; 
+    const IMG_RESULT = 'picture/hotel_result.jpg';   
   
-    // ================= 核心：角色音色引擎 v2 =================
+    // ================= 核心：角色音色引擎 =================
     const VOICE_CONFIGS = {
       narrator:    { rate: 1.0, pitch: 1.0, preferGender: 'female' },
       lin_manager: { rate: 0.95, pitch: 0.85, preferGender: 'female' },
-      xiaozhou:    { rate: 1.3, pitch: 1.5, preferGender: 'male' },
-      laok:        { rate: 0.8, pitch: 1.2, preferGender: 'male' },
+      xiaozhou:    { rate: 1.2, pitch: 1.5, preferGender: 'male' }, // 稍微降一点语速，免得听不清
+      laok:        { rate: 0.85, pitch: 1.2, preferGender: 'male' },
       wangjie:     { rate: 0.9, pitch: 1.1, preferGender: 'female' },
       competitor:  { rate: 1.0, pitch: 1.0, preferGender: 'male' }
     };
   
-    function speakRole(roleId, text) {
-      if (!window.speechSynthesis || !text) return;
+    function speakRole(roleId, text, onEndCallback) {
+      if (!window.speechSynthesis || !text) {
+        if (onEndCallback) onEndCallback();
+        return;
+      }
       try {
-        window.speechSynthesis.cancel();
+        // 不再直接 cancel，让浏览器自然排队，除非强制要求打断
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'zh-CN';
         const cfg = VOICE_CONFIGS[roleId] || VOICE_CONFIGS.narrator;
@@ -36,22 +38,26 @@
         u.pitch = cfg.pitch;
   
         const voices = window.speechSynthesis.getVoices();
-        let selectedVoice = null;
         const zhVoices = voices.filter(v => v.lang.includes('zh') || v.lang.includes('CN'));
-        
         if (zhVoices.length > 0) {
           if (cfg.preferGender === 'female') {
-            selectedVoice = zhVoices.find(v => v.name.includes('女') || v.name.includes('Xiaoxiao') || v.name.includes('Yaoyao')) || zhVoices[0];
+            u.voice = zhVoices.find(v => v.name.includes('女') || v.name.includes('Xiaoxiao') || v.name.includes('Yaoyao')) || zhVoices[0];
           } else if (cfg.preferGender === 'male') {
-            selectedVoice = zhVoices.find(v => v.name.includes('男') || v.name.includes('Yunxi') || v.name.includes('Kangkang')) || zhVoices[0];
+            u.voice = zhVoices.find(v => v.name.includes('男') || v.name.includes('Yunxi') || v.name.includes('Kangkang')) || zhVoices[0];
           }
         }
-        if (selectedVoice) u.voice = selectedVoice;
+  
+        // 注册结束回调，用来控制对话节奏
+        u.onend = () => { if (onEndCallback) onEndCallback(); };
+        u.onerror = () => { if (onEndCallback) onEndCallback(); };
   
         window.speechSynthesis.speak(u);
-      } catch (e) { console.warn('语音播报失败', e); }
+      } catch (e) { 
+        console.warn('语音播报失败', e); 
+        if (onEndCallback) onEndCallback();
+      }
     }
-    
+  
     if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = () => {};
     }
@@ -62,7 +68,6 @@
       const out = {};
       for (const [dim, cfg] of Object.entries(evaluate)) {
         const hits = (cfg.keywords || []).filter(k => userText.includes(k)).length;
-        // 只要有命中，直接给 85 分起步，确保玩家能过关
         out[dim] = hits > 0 ? Math.min(85 + hits * 5, 100) : 0; 
       }
       return out;
@@ -84,51 +89,33 @@
       renderTrial: function (hostEl, trial, onAnswer, meta) {
         hostEl.innerHTML = '';
   
-        // ====== 场景背景层 ======
         const stage = document.createElement('div');
-        stage.style.cssText = `
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          padding: 16px;
-          min-height: 100vh;
-          box-sizing: border-box;
-          background-image: url('${IMG_INTERVIEW}');
-          background-size: cover;
-          background-position: center;
-          font-family: inherit;
-        `;
+        stage.style.cssText = `position: relative; display: flex; flex-direction: column; padding: 16px; min-height: 100vh; box-sizing: border-box; background-image: url('${IMG_INTERVIEW}'); background-size: cover; background-position: center; font-family: inherit;`;
         
-        // 暗色遮罩：保证文字清晰，增加沉浸感
         const overlay = document.createElement('div');
         overlay.style.cssText = 'position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.55); z-index: 1;';
         stage.appendChild(overlay);
   
-        // 交互内容层
         const content = document.createElement('div');
         content.style.cssText = 'position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; flex: 1;';
         stage.appendChild(content);
         hostEl.appendChild(stage);
   
-        // ====== 顶部 HUD ======
         const top = document.createElement('div');
         top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#fff;font-weight:bold;text-shadow: 0 1px 2px rgba(0,0,0,0.8);';
         top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
         content.appendChild(top);
         const progressEl = top.querySelector('#qx5_job_progress');
   
-        // 场景介绍气泡
         const intro = document.createElement('div');
         intro.style.cssText = 'font-size:13px;color:#fff;line-height:1.6;background:rgba(255,255,255,0.15);backdrop-filter: blur(8px);border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;';
         intro.textContent = SCENARIO.intro;
         content.appendChild(intro);
   
-        // 对话框容器（自适应高度，超出滚动）
         const dialog = document.createElement('div');
         dialog.style.cssText = 'display:flex;flex-direction:column;gap:10px;flex:1;overflow-y:auto;padding-right:4px;';
         content.appendChild(dialog);
   
-        // 底部输入区
         const inputWrap = document.createElement('div');
         inputWrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-top:auto;padding-top:10px;';
         content.appendChild(inputWrap);
@@ -146,7 +133,6 @@
         btnRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
         inputWrap.appendChild(btnRow);
   
-        // ====== 按钮组 ======
         const startBtn = document.createElement('button');
         startBtn.className = 'qx5-btn qx5-btn-primary';
         startBtn.textContent = '▶ 开始作答（90秒）';
@@ -172,7 +158,6 @@
         btnRow.appendChild(demoBtn);
         btnRow.appendChild(quitBtn);
   
-        // ====== 状态 ======
         let roundIdx = 0;
         const mainScores = [];
         const interruptScores = [];
@@ -186,7 +171,6 @@
         let usedInterruptIds = [];
         let pendingInterruptImpact = null;
   
-        // ====== 气泡渲染 ======
         function addBubble(role, speaker, text) {
           const isPlayer = role === 'player';
           const wrap = document.createElement('div');
@@ -201,21 +185,11 @@
           
           let bg = 'rgba(255,255,255,0.95)';
           let color = '#333';
-          if (role === 'npc') {
-             bg = 'rgba(238,243,247,0.95)'; color = '#1A2B4A';
-          } else if (role === 'interrupt') {
-             bg = 'rgba(255,243,224,0.95)'; color = '#C77A1E';
-          } else if (role === 'competitor') {
-             bg = 'rgba(240,240,240,0.9)'; color = '#555';
-          }
+          if (role === 'npc') { bg = 'rgba(238,243,247,0.95)'; color = '#1A2B4A'; } 
+          else if (role === 'interrupt') { bg = 'rgba(255,243,224,0.95)'; color = '#C77A1E'; } 
+          else if (role === 'competitor') { bg = 'rgba(240,240,240,0.9)'; color = '#555'; }
           
-          bubble.style.cssText = `
-            font-size:15px; line-height:1.6; padding:12px 16px; 
-            border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; 
-            background: ${bg}; color: ${color}; 
-            max-width: 88%; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            backdrop-filter: blur(8px);
-          `;
+          bubble.style.cssText = `font-size:15px; line-height:1.6; padding:12px 16px; border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; background: ${bg}; color: ${color}; max-width: 88%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); backdrop-filter: blur(8px);`;
           
           wrap.appendChild(name);
           wrap.appendChild(bubble);
@@ -282,18 +256,31 @@
   
           const q = pick(currentRound.npcLineVariants);
           addBubble('npc', '面试官 · 林经理', q);
-          speakRole('lin_manager', q);
   
-          const ir = decideInterrupter(currentRound);
-          if (ir) {
-            usedInterruptIds.push(ir.id);
-            pendingInterruptImpact = ir.impact;
-            setTimeout(() => {
-              const speakerName = ir.id === 'xiaozhou' ? '傻助理 小周' : ir.id === 'laok' ? '总部观察员 老K' : '隔壁部门 王姐';
-              addBubble('interrupt', speakerName, ir.line);
-              speakRole(ir.id, ir.line);
-            }, 1500);
-          }
+          // 【核心修复】只有等林经理完全读完了，小周才插嘴（或者最长等3秒）
+          let hasInterrupted = false;
+          const doInterrupt = () => {
+            if (hasInterrupted || finished) return;
+            hasInterrupted = true;
+            const ir = decideInterrupter(currentRound);
+            if (ir) {
+              usedInterruptIds.push(ir.id);
+              pendingInterruptImpact = ir.impact;
+              setTimeout(() => {
+                const speakerName = ir.id === 'xiaozhou' ? '傻助理 小周' : ir.id === 'laok' ? '总部观察员 老K' : '隔壁部门 王姐';
+                addBubble('interrupt', speakerName, ir.line);
+                speakRole(ir.id, ir.line);
+              }, 800); // 气泡延迟0.8秒出
+            }
+          };
+  
+          // 播放林经理的声音，读完回调触发插话
+          speakRole('lin_manager', q, () => {
+            setTimeout(doInterrupt, 500); // 读完后深呼吸0.5秒再被打断
+          });
+          
+          // 兜底：万一浏览器 TTS 不支持回调，2.5秒后强制插话
+          setTimeout(doInterrupt, 2500);
         }
   
         startBtn.onclick = function() {
@@ -312,7 +299,7 @@
           clearInterval(timerId);
           anyAnswer = true;
           
-          addBubble('player', '你的回答', text); // 增加玩家回答回显
+          addBubble('player', '你的回答', text);
   
           const dimScores = normalizeScores(text, currentRound.evaluate);
           const mainAvg = avg(dimScores);
@@ -354,16 +341,17 @@
           }
   
           addBubble('npc', '面试官 · 林经理', announce);
-          speakRole('lin_manager', announce);
           submitBtn.disabled = true;
           demoBtn.disabled = true;
   
-          setTimeout(() => {
-            onAnswer(JSON.stringify({
-              main: main, interrupt: intr, competitor: competitorScore,
-              pass: pass, announce: announce, rounds: roundIdx
-            }), pass);
-          }, 2500);
+          speakRole('lin_manager', announce, () => {
+            setTimeout(() => {
+              onAnswer(JSON.stringify({
+                main: main, interrupt: intr, competitor: competitorScore,
+                pass: pass, announce: announce, rounds: roundIdx
+              }), pass);
+            }, 1000); // 读完宣布，等1秒进结果页
+          });
         }
   
         quitBtn.onclick = function () {
@@ -399,24 +387,10 @@
         const s = data.score;
         hostEl.innerHTML = '';
         
-        // ====== 结果页也加背景！ ======
         const wrap = document.createElement('div');
         wrap.className = 'qx5-result';
-        wrap.style.cssText = `
-          min-height: 100vh;
-          background-image: url('${IMG_RESULT}');
-          background-size: cover;
-          background-position: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 20px;
-          box-sizing: border-box;
-          position: relative;
-        `;
+        wrap.style.cssText = `min-height: 100vh; background-image: url('${IMG_RESULT}'); background-size: cover; background-position: center; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; position: relative;`;
         
-        // 结果页的暗色遮罩，让结果看得清
         const resOverlay = document.createElement('div');
         resOverlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:0;';
         wrap.appendChild(resOverlay);

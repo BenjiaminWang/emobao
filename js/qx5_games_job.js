@@ -1,6 +1,6 @@
 /* ================================================================
    情绪宝 - qx5 应聘挑战（P0：凌晨超售）
-   v9：评级系统 + 成就徽章 + 反抄袭检测 + 极简清爽 UI
+   v10：动态场景提示 + 居中卡片式布局 + 放宽分数
    ================================================================ */
    (function () {
     'use strict';
@@ -11,7 +11,6 @@
   
     const E = window.qx5Engine;
   
-    // ================= 核心：角色音色引擎 =================
     const VOICE_CONFIGS = {
       narrator:    { rate: 1.0, pitch: 1.0, preferGender: 'female' },
       lin_manager: { rate: 0.95, pitch: 0.85, preferGender: 'female' },
@@ -19,6 +18,13 @@
       laok:        { rate: 0.85, pitch: 1.2, preferGender: 'male' },
       wangjie:     { rate: 0.9, pitch: 1.1, preferGender: 'female' },
       competitor:  { rate: 1.0, pitch: 1.0, preferGender: 'male' }
+    };
+  
+    // 给不同轮次配置不同的提示（配合场景）
+    const HINT_CONFIGS = {
+      r1: "客人刚到店，还在气头上。你可以试着说：**理解**您的**着急**，**抱歉**让您久等。然后再给出具体的查房动作。",
+      r2: "客人坚持要赔偿。你可以试着说：我的**权限**是可以给您**升级**套房，如果超出权限，我会立刻**请示值班经理**。",
+      r3: "经理要方案。你可以试着用**首先...然后...最后...**的结构，说出你的**优先级**和兜底**方案**。"
     };
   
     function speakRole(roleId, text, onEndCallback) {
@@ -84,50 +90,46 @@
       renderTrial: function (hostEl, trial, onAnswer, meta) {
         hostEl.innerHTML = '';
   
-        // ====== 全屏容器 ======
+        // 改为自适应高度卡片，不再是 100vh 强撑
         const stage = document.createElement('div');
         stage.style.cssText = `
           position: relative;
           display: flex;
           flex-direction: column;
-          height: 100vh;
+          min-height: 100%;
           box-sizing: border-box;
           background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
           font-family: inherit;
-          overflow: hidden;
+          padding: 16px;
+          padding-bottom: 40px; /* 给底部留点呼吸空间 */
         `;
         
-        const content = document.createElement('div');
-        content.style.cssText = 'position: relative; z-index: 2; display: flex; flex-direction: column; height: 100%; padding: 16px; box-sizing: border-box;';
-        stage.appendChild(content);
-        hostEl.appendChild(stage);
-  
         // ====== 顶部状态栏 ======
         const top = document.createElement('div');
-        top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#1E293B;font-weight:bold;margin-bottom:12px;flex-shrink:0;';
+        top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#1E293B;font-weight:bold;margin-bottom:12px;';
         top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress" style="color:#2C7BE5;">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
-        content.appendChild(top);
+        stage.appendChild(top);
         const progressEl = top.querySelector('#qx5_job_progress');
   
         // ====== 场景介绍 ======
         const intro = document.createElement('div');
-        intro.style.cssText = 'font-size:13px;color:#475569;line-height:1.6;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;margin-bottom:12px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.02);';
+        intro.style.cssText = 'font-size:13px;color:#475569;line-height:1.6;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:10px;padding:10px 12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.02);';
         intro.textContent = SCENARIO.intro;
-        content.appendChild(intro);
+        stage.appendChild(intro);
   
         // ====== 对话框 ======
         const dialog = document.createElement('div');
-        dialog.style.cssText = 'display:flex;flex-direction:column;gap:12px;flex:1;overflow-y:auto;padding-right:4px;margin-bottom:12px;';
-        content.appendChild(dialog);
+        dialog.style.cssText = 'display:flex;flex-direction:column;gap:12px;margin-bottom:16px;';
+        stage.appendChild(dialog);
   
-        // ====== 底部操作区 ======
+        // ====== 操作区：卡片式 ======
         const inputWrap = document.createElement('div');
-        inputWrap.style.cssText = 'flex-shrink:0; display:flex; flex-direction:column; gap:8px; background: #FFFFFF; padding: 12px; border-radius: 16px; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;';
-        content.appendChild(inputWrap);
+        inputWrap.style.cssText = 'display:flex; flex-direction:column; gap:8px; background: #FFFFFF; padding: 16px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;';
+        stage.appendChild(inputWrap);
   
         const ta = document.createElement('textarea');
         ta.placeholder = '听题后点击开始，再输入你的回答……';
-        ta.style.cssText = 'width:100%;height:70px;padding:10px;border:1px solid #CBD5E1;background:#F8FAFC;color:#1E293B;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:none;outline:none;transition:border 0.2s;';
+        ta.style.cssText = 'width:100%;height:80px;padding:10px;border:1px solid #CBD5E1;background:#F8FAFC;color:#1E293B;border-radius:8px;font-size:14px;box-sizing:border-box;font-family:inherit;resize:none;outline:none;';
         inputWrap.appendChild(ta);
   
         const timerEl = document.createElement('div');
@@ -163,6 +165,8 @@
         btnRow.appendChild(demoBtn);
         btnRow.appendChild(quitBtn);
   
+        hostEl.appendChild(stage);
+  
         let roundIdx = 0;
         const mainScores = [];
         const interruptScores = [];
@@ -186,19 +190,19 @@
           name.style.cssText = 'font-size:12px; font-weight:bold; color:#64748B; margin: 0 4px;';
           
           const bubble = document.createElement('div');
-          bubble.textContent = text;
+          bubble.innerHTML = text; // 这里改成 innerHTML 以支持加粗高亮
           
           let bg = '#FFFFFF'; let color = '#1E293B'; let border = '1px solid #E2E8F0';
           if (role === 'npc') { bg = '#FFFFFF'; color = '#1E293B'; border = '1px solid #E2E8F0'; } 
           else if (role === 'interrupt') { bg = '#FFF7ED'; color = '#C2410C'; border = '1px solid #FFEDD5'; } 
           else if (role === 'competitor') { bg = '#F8FAFC'; color = '#475569'; border = '1px solid #E2E8F0'; }
           else if (role === 'player') { bg = '#2C7BE5'; color = '#FFFFFF'; border = 'none'; }
+          else if (role === 'hint') { bg = '#FEF3C7'; color = '#B45309'; border = '1px solid #FDE68A'; } // 提示框样式
           
           bubble.style.cssText = `font-size:15px; line-height:1.6; padding:12px 16px; border-radius: ${isPlayer ? '16px 16px 0 16px' : '16px 16px 16px 0'}; background: ${bg}; color: ${color}; border: ${border}; max-width: 90%; box-shadow: 0 2px 8px rgba(0,0,0,0.04);`;
           
           wrap.appendChild(name); wrap.appendChild(bubble);
           dialog.appendChild(wrap);
-          dialog.scrollTop = dialog.scrollHeight;
         }
   
         function decideInterrupter(round) {
@@ -296,37 +300,12 @@
           const text = ta.value.trim();
           if (!text) { alert('请先输入你的回答'); return; }
   
-          // === 新增：防作弊/防抄袭检测 ===
-          const demo = currentRound.demoAnswer || '';
-          let isCheating = false;
-          
-          if (text.length > 8 && demo.includes(text)) {
-            isCheating = true;
-          } else if (text.length > 10 && demo.length > 10) {
-            let matchChars = 0;
-            for (let char of text) {
-              if (demo.includes(char)) matchChars++;
-            }
-            if (matchChars / text.length > 0.8) {
-              isCheating = true;
-            }
-          }
-  
           clearInterval(timerId);
           anyAnswer = true;
           addBubble('player', '你的回答', text);
   
           let dimScores = normalizeScores(text, currentRound.evaluate);
           let mainAvg = avg(dimScores);
-  
-          if (isCheating) {
-            setTimeout(() => {
-              addBubble('npc', '面试官 · 林经理', "（皱眉）你是在背网上的面经吗？我想听听你真实的处理思路。");
-              speakRole('lin_manager', "你是在背网上的面经吗？我想听听你真实的处理思路。");
-            }, 500);
-            mainAvg = Math.floor(mainAvg * 0.5); 
-          }
-  
           mainScores.push(mainAvg);
   
           if (pendingInterruptImpact) {
@@ -354,7 +333,8 @@
             pass = false;
             announce = competitorScore >= 50 ? SCENARIO.judgeAnnounce.failByCompetitor : SCENARIO.judgeAnnounce.failAll;
           } else {
-            pass = main >= 50 && intr >= 40 && main > competitorScore;
+            // 放宽通过标准：主评分 >= 45，干扰 >= 35，且比竞争者高
+            pass = main >= 45 && intr >= 35 && main > competitorScore;
             announce = pass ? SCENARIO.judgeAnnounce.pass : (competitorScore >= 50 ? SCENARIO.judgeAnnounce.failByCompetitor : SCENARIO.judgeAnnounce.failAll);
           }
   
@@ -374,11 +354,12 @@
           onAnswer(JSON.stringify({ main: 0, interrupt: 0, competitor: competitorScore, pass: false, announce: '你提前离开了面试。', quit: true }), false);
         };
   
-        // 【替换：提示小纸条】
+        // 【动态场景提示】
         demoBtn.onclick = function () {
           if (!currentRound) return;
-          addBubble('npc', '（HR 提示纸条）', "你可以试着先说一句共情的话，然后给出两步以上的解决方案。");
-          speakRole('narrator', "你可以试着先说一句共情的话，然后给出两步以上的解决方案。");
+          const hintText = HINT_CONFIGS[currentRound.id] || "试着结合客人的情绪，给出具体的解决步骤。";
+          addBubble('hint', '💡 话术提示', hintText);
+          speakRole('narrator', hintText.replace(/\*\*/g, ''));
         };
   
         submitBtn.onclick = submitRound;
@@ -391,11 +372,9 @@
         return { accuracy: 1, correctCount: 1, totalCount: 1, mainScore: info.main || 0, interruptScore: info.interrupt || 0, competitorScore: info.competitor || 0, pass: !!info.pass, announce: info.announce || '', quit: !!info.quit, rounds: info.rounds || 0 };
       },
   
-      // 【替换：带 S/A/B/C 评级的结果页】
       renderResult: function (hostEl, data) {
         const s = data.score; hostEl.innerHTML = '';
         
-        // === 计算评级 ===
         let rating = 'C';
         let ratingColor = '#E74C3C';
         let ratingTitle = '被辞退';

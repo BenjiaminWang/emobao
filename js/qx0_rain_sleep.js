@@ -1,14 +1,14 @@
 /* ================================================================
    情绪宝 - 睡眠雨声助眠（隐藏功能）
-   v1 (2026-10-30)
-   - 触发：长按状态栏品牌标题 #status_title 3 秒
+   v2 (2026-10-31)
+   - 触发：全局事件监听，长按状态栏品牌标题 #status_title 3 秒
    - 播放：picture/rain-loop.mp3 无限循环（loop=true，无网络请求）
    - 画面：治愈主图轻微呼吸动画，全屏遮罩
    - 停止：轻触屏幕任意处
-   - 不依赖任何其他业务模块，仅读取 window.mQxb 的语言（可选）
+   - 兼容：手机端长按菜单屏蔽、自动播放拦截提示
    ================================================================ */
 
-(function () {
+   (function () {
     'use strict';
 
     const RAIN_SRC = 'picture/rain-loop.mp3';
@@ -58,7 +58,7 @@
 }
 @keyframes qxRainBreathe {
     0%, 100% { transform: scale(1.00); opacity: 0.90; }
-    50%      { transform: scale(1.045); opacity: 1.00; }
+    50%      { transform: scale(1.04); opacity: 1.00; }
 }
 .qx-rain-caption {
     position: absolute;
@@ -79,9 +79,16 @@
     font-size: 14px;
     opacity: 0.72;
     letter-spacing: 0.5px;
+    transition: all 0.3s ease;
 }
 body.qx-rain-active {
     overflow: hidden;
+}
+#status_title {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    cursor: default;
 }
 `;
         const styleEl = document.createElement('style');
@@ -125,16 +132,26 @@ body.qx-rain-active {
             _rainAudio.loop = true;          // 原生无缝循环
             _rainAudio.volume = RAIN_VOLUME;
             _rainAudio.preload = 'auto';
-            _rainAudio.play().catch(err => {
-                console.warn('[rain] 播放失败，可能缺少 MP3 或浏览器拦截', err);
-            });
+            
+            // 尝试播放
+            let playPromise = _rainAudio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.warn('[rain] 手机系统拦截了自动播放，需用户点击屏幕', err);
+                    // 如果被拦截了，我们在屏幕提示一下用户
+                    const hint = document.getElementById('qx_rain_hint');
+                    if (hint) {
+                        hint.innerText = "👆 请轻触屏幕任意位置开始播放雨声";
+                        hint.style.color = "#FFD600"; 
+                        hint.style.opacity = "1";
+                    }
+                });
+            }
         } catch (e) {
             console.warn('[rain] 创建音频失败', e);
             _rainAudio = null;
         }
-
-        // 轻微震动反馈（支持的设备才有）
-        try { if (navigator.vibrate) navigator.vibrate(40); } catch (e) {}
     }
 
     /* ---------- 停止雨声 ---------- */
@@ -153,52 +170,71 @@ body.qx-rain-active {
         if (modal) modal.classList.remove('active');
 
         document.body.classList.remove('qx-rain-active');
+        
+        // 恢复提示文字
+        const hint = document.getElementById('qx_rain_hint');
+        if (hint) {
+            hint.innerText = "轻触屏幕任意处，停止雨声";
+            hint.style.color = ""; 
+            hint.style.opacity = "0.72";
+        }
+
         _isShowing = false;
     }
 
-    /* ---------- 隐藏触发：长按品牌标题 3 秒 ---------- */
+    /* ---------- 隐藏触发：全局监听（抗干扰版） ---------- */
     function bindLongPressTrigger() {
-        const titleEl = document.getElementById('status_title');
-        if (!titleEl) {
-            console.warn('[rain] 找不到 #status_title，隐藏触发未挂载');
-            return;
-        }
+        let _isPressing = false;
 
-        titleEl.style.cursor = 'default';
-        titleEl.style.userSelect = 'none';
-        titleEl.style.webkitUserSelect = 'none';
-        titleEl.style.webkitTouchCallout = 'none';
-
-        const begin = (ev) => {
+        const begin = (e) => {
             if (_isShowing) return;
-            cancelPress();
-            _pressTimer = setTimeout(() => {
-                _pressTimer = null;
-                startRain();
-            }, LONG_PRESS_MS);
+            
+            // 找到被长按的元素
+            const titleEl = document.getElementById('status_title');
+            if (!titleEl) return;
+            
+            // 判断按下的位置是不是在标题上
+            if (titleEl.contains(e.target)) {
+                _isPressing = true;
+                cancelPress(); // 清空之前的计时
+                
+                _pressTimer = setTimeout(() => {
+                    _pressTimer = null;
+                    if (_isPressing) {
+                        startRain();
+                        // 触发后加点振动反馈，让用户知道长按成功了
+                        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                    }
+                }, LONG_PRESS_MS);
+            }
         };
 
         const cancelPress = () => {
+            _isPressing = false;
             if (_pressTimer) {
                 clearTimeout(_pressTimer);
                 _pressTimer = null;
             }
         };
 
-        titleEl.addEventListener('mousedown', begin);
-        titleEl.addEventListener('mouseup', cancelPress);
-        titleEl.addEventListener('mouseleave', cancelPress);
+        // 鼠标事件（Mac 端）
+        document.addEventListener('mousedown', begin);
+        document.addEventListener('mouseup', cancelPress);
+        
+        // 触摸事件（手机端）
+        document.addEventListener('touchstart', begin, { passive: true });
+        // 手指一旦移动或者离开屏幕，立刻取消计时
+        document.addEventListener('touchend', cancelPress);
+        document.addEventListener('touchcancel', cancelPress);
+        document.addEventListener('touchmove', cancelPress, { passive: true });
 
-        titleEl.addEventListener('touchstart', (e) => {
-            begin(e);
-        }, { passive: true });
-
-        titleEl.addEventListener('touchend', cancelPress);
-        titleEl.addEventListener('touchcancel', cancelPress);
-        titleEl.addEventListener('touchmove', cancelPress, { passive: true });
-
-        // 长按结束不应触发点击等默认行为
-        titleEl.addEventListener('contextmenu', (e) => e.preventDefault());
+        // 防止手机端长按弹出“复制/粘贴”菜单
+        document.addEventListener('contextmenu', (e) => {
+            const titleEl = document.getElementById('status_title');
+            if (titleEl && titleEl.contains(e.target)) {
+                e.preventDefault(); 
+            }
+        });
     }
 
     /* ---------- 轻触任意处停止 ---------- */
@@ -222,10 +258,8 @@ body.qx-rain-active {
         }, { capture: true, passive: true });
 
         // 页面被系统回收 / 切后台不自动停，保持锁屏可继续听
-        // 仅在页面真正 unload 时清理，避免资源泄漏
         window.addEventListener('pagehide', () => {
             if (!_isShowing) return;
-            // 不强停，仅释放引用，音频由浏览器接管
         });
     }
 
@@ -237,7 +271,6 @@ body.qx-rain-active {
 
     // 若 qx0_main.js 的 DOMContentLoaded 已跑过，提供兜底
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        // 稍等，确保 qx0_main 已经执行过且 status_title 存在
         setTimeout(() => {
             if (!window._qxRainBound) {
                 window._qxRainBound = true;

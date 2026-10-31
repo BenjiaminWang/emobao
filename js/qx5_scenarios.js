@@ -1,46 +1,41 @@
-// qx5_scenarios.js — P0 副本库
-// 验收：能跑通"酒店前厅·凌晨超售"一局：3轮问答 + 干扰 + 超时抢答 + 考官宣布
 window.QX5_SCENARIOS = [
     {
-      id: 'hotel_front_desk_night',
-      name: '凌晨超售',
-      emoji: '🏨',
-      scene: 'hotel_lobby',
+      id: 'space_hotel_666',
+      name: '太空舱危机',
+      emoji: '🚀',
+      scene: 'space_lobby',
       npc: 'lin_manager',
       tags: ['S','E','C'],
-      difficulty: 2,
-      intro: '凌晨1:20，前台。系统显示超售，客人已到店，情绪激动。',
-      goal: '让客人情绪稳定并给出可行方案',
-      // 题目变体池：同一考点，不同问法（防背答案）
+      difficulty: 3,
+      intro: '2031 年，云顶太空酒店。重力系统刚刚发生严重故障，一位身价百亿的 VIP 客人现在正贴在舱顶上，而 AI 前台还在不断重复“对不起”。林经理要求你在 3 轮内稳住这位客人。',
+      goal: '安抚 VIP，并给出人类特有的解决方案',
       rounds: [
         {
           id: 'r1',
           npcLineVariants: [
-            '先给你30秒，说说你此刻会先做什么？',
-            '客人现在就站在你面前，你第一句话说什么？',
-            '你只有一分钟，先做什么？'
+            '客人现在连人带床贴在舱顶上，AI 正在念废话。你第一句话说什么？',
+            '这位大老板平时脾气就大，现在被重力失误挂在半空，你先怎么做？',
+            '全息投影里客人的脸都绿了，你打算怎么救场？'
           ],
           npcExpression: 'thinking',
-          timeLimit: 60,
-          tips: ['先接情绪，再给方案'],
-          demoAnswer: '我会先请客人坐下，倒杯水，表示理解他的疲惫……',
+          timeLimit: 90,
+          tips: ['先用共情安抚，明确表示人类会接管'],
+          demoAnswer: '我会立刻直视客人说：我非常**理解**您的愤怒，这绝对是我们的失职。现在我作为人类主管，立刻**接管**系统，马上帮您恢复重力。',
           evaluate: {
-            empathy:   { keywords: ['理解','抱歉','着急','辛苦','我明白','理解您'], weight: 3 },
-            structure: { keywords: ['首先','然后','最后','第一步','先','再','其次'], weight: 2 },
-            action:    { keywords: ['升级','经理','调房','补偿','请示','权限','值班经理','超售'], weight: 2 }
+            empathy:   { keywords: ['理解','抱歉','失职','愤怒','明白'], weight: 3 },
+            structure: { keywords: ['首先','马上','立刻','其次','方案'], weight: 2 },
+            action:    { keywords: ['接管','重启','人工','拔电','维修','控制台'], weight: 2 }
           },
-          // 第1轮固定小周（打断型）
           interrupter: {
             id: 'xiaozhou',
             trigger: 'fixed',
-            line: '哎——我觉得吧，直接给客人换套房不就行了？',
-            tone: '愣',
-            impact: '化解'   // 影响干扰评分中的"化解"维度
+            line: '（机器人卡顿音）宿主请不要惊慌，根据《太空安全守则》第13条，请保持倒立呼吸……',
+            tone: '机械',
+            impact: '化解'
           },
-          // 超时竞争者答案（中等水平，2个变体）
           competitorAnswers: [
-            '我会先道歉，然后看看有没有空房，没有的话请示经理。',
-            '先安抚客人情绪，再查系统，最后给一个补偿方案。'
+            '我会说：客人对不起，我马上重启重力系统，您别着急。',
+            '先道歉，然后联系技术部去修重力机。'
           ],
           branches: [
             { if: 'empathy >= 60', next: 'r2_good', npcReaction: 'npc_smile' },
@@ -50,30 +45,30 @@ window.QX5_SCENARIOS = [
         {
           id: 'r2_good',
           npcLineVariants: [
-            '客人情绪好一点了，但坚持要赔偿。你的权限边界在哪？',
-            '客人说"必须赔钱"，你怎么接？'
+            '客人破口大骂：“我出三倍价钱，你立刻让人来修，否则我把这破酒店买下来炸了！”你怎么办？',
+            '老板要求立刻安排逃生舱返回地球，但他的系统卡死了，你如何处理？',
+            '客人说他的宠物狗飘出窗外了，要你马上找回来。但公司规定不能进入外部辐射区。你怎么接？'
           ],
           npcExpression: 'neutral',
-          timeLimit: 60,
-          tips: ['先确认权限，再给替代方案'],
-          demoAnswer: '我的权限是免费升级+餐饮券，超出部分需请示值班经理……',
+          timeLimit: 90,
+          tips: ['先通过“人工”手段解决问题，哪怕违规'],
+          demoAnswer: '我的权限不够动用逃生舱，但我可以立刻**请示值班经理**，给您**升级**到最高级的 VIP 套房，并且亲自去**人工**把您的狗救回来。',
           evaluate: {
-            empathy:   { keywords: ['理解','抱歉','我明白'], weight: 1 },
+            empathy:   { keywords: ['理解','抱歉','明白'], weight: 1 },
             structure: { keywords: ['首先','然后','其次','先','再'], weight: 2 },
-            action:    { keywords: ['请示','权限','升级','餐饮券','值班经理','调房'], weight: 3 }
+            action:    { keywords: ['请示','权限','升级','人工','亲自','特权','赔付'], weight: 3 }
           },
-          // 第2轮：老K（压制）或王姐（羞辱）二选一
           interrupter: {
             id: 'random_laok_or_wang',
-            trigger: 'random',   // 引擎随机选
+            trigger: 'random',
             options: [
-              { id: 'laok', line: '如果是我，我会先调监控确认超售原因，再谈补偿。', tone: '沉稳', impact: '借力' },
-              { id: 'wangjie', line: '现在的年轻人啊～遇到点事就慌。', tone: '嘲讽', impact: '自嘲' }
+              { id: 'laok', line: '（地球老专家）年轻人，太空酒店有规定，不能为了客人破例吧？', tone: '沉稳', impact: '借力' },
+              { id: 'wangjie', line: '（舱内抱怨）我都快缺氧了，你们还在那边废话！', tone: '焦躁', impact: '自嘲' }
             ]
           },
           competitorAnswers: [
-            '我的权限有限，先给客人升级房间，再请示经理。',
-            '先确认客人诉求，再在自己的权限内给方案。'
+            '抱歉，我帮不了您，这是规定。',
+            '请稍等，我马上联系技术人员。'
           ],
           branches: [
             { if: 'action >= 60 && structure >= 50', next: 'r3_warm', npcReaction: 'npc_nod' },
@@ -83,36 +78,32 @@ window.QX5_SCENARIOS = [
         {
           id: 'r3_warm',
           npcLineVariants: [
-            '经理让你5分钟内给方案，你怎么排优先级？',
-            '如果客人还是不满意，你最后一步做什么？'
+            '林经理把你拉到一边：“AI 系统全面死机了，现在所有客人都在敲墙。你只有 5 分钟，排个优先级。”',
+            '现在酒店断电了，所有人被困在黑暗里，你手头只有一把应急扳手，怎么办？'
           ],
           npcExpression: 'smile',
-          timeLimit: 45,
-          tips: ['排优先级：先稳情绪，再给方案，最后请示'],
-          demoAnswer: '先稳住客人情绪，再给一个我能拍板的方案，最后请示超出权限的部分……',
+          timeLimit: 90,
+          tips: ['按照危急程度，优先保住客人的生命和核心需求'],
+          demoAnswer: '我会**首先**确保客人安全，让他们待在原地。**然后**用扳手强行打开应急门。**最后**用手动广播安抚所有人，让 AI 闭嘴。',
           evaluate: {
             empathy:   { keywords: ['理解','我明白'], weight: 1 },
-            structure: { keywords: ['先','再','最后','优先级','第一步'], weight: 3 },
-            action:    { keywords: ['方案','请示','权限','补偿','升级'], weight: 2 }
+            structure: { keywords: ['先','再','最后','优先级','首先'], weight: 3 },
+            action:    { keywords: ['安全','扳手','强行','广播','应急门','AI'], weight: 2 }
           },
-          // 第3轮：若前两轮未触发干扰，本轮补一个（引擎判断）
           interrupter: { id: 'fill_if_needed', trigger: 'if_none_yet' },
           competitorAnswers: [
-            '先安抚，再给方案，最后请示。',
-            '按紧急程度排，先解决客人住宿，再谈补偿。'
+            '我会先修电，再去安抚客人。',
+            '先救人，再汇报。'
           ],
           branches: [{ if: 'default', next: 'end' }]
         }
       ],
-      // 考官宣布台词（结束是剧情事件）
       judgeAnnounce: {
-        pass:            '你被录用了。',
-        failByCompetitor:'这次我们选了另一位。',
-        failAll:         '今天两位都不太合适。'
+        pass:            '很好，人类确实比 AI 更有用。欢迎入职。',
+        failByCompetitor:'这次我们选了另一位更有破局思维的人。',
+        failAll:         '今天两位的回答都太像 AI 了。'
       },
-      rewards: { badges: ['救场王'], exp: 100 },
-      // 判定参数（引擎读取）
-      judgeRule: { mainThreshold: 65, interruptThreshold: 55, competitorBase: 55, competitorCap: 65 }
+      rewards: { badges: ['人类之光'], exp: 100 },
+      judgeRule: { mainThreshold: 45, interruptThreshold: 35, competitorBase: 55, competitorCap: 65 }
     }
-    // 其余 5 个副本 P0 占位，结构同上，rounds 只填 1 轮示例
   ];

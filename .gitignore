@@ -5,3 +5,7 @@ test_supabase.html
 test_login.html
 Caddyfile
 .wrangler/
+*.bak
+*.zip
+NewQXB/
+.DS_Store

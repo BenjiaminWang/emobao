@@ -1,13 +1,11 @@
 /* ================================================================
    情绪宝 - qx00 登录前逻辑
-   v9（2026-10-27）：
-   - 新增二维码入口：URL 带 ?qrcode_id=xxx 时查合作方、记扫码、预填码
-   - 激活成功后双归因（扫码 + 手输码都调 emo_link_activation_to_user）
-   - 二维码过期/无效时静默降级，不阻塞用户
-   - mQxb 新增 BrandLogoUrl 字段
-   - 其余（登录/注册/密码/访客/Toast）与 v8 完全一致
+   v10（2026-11-05）：
+   - 新增 handleUrlCodeParam()：读 ?code=，预填激活码并跳激活页
+   - 与 v9 的 handleUrlQrcode() 共存：有 qrcode_id 走旧链路，有 code 走新预填
+   - 其余（登录/注册/密码/访客/Toast/激活/归因）与 v9 完全一致
    ================================================================ */
-   const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co';
+   const SUPABASE_URL = 'https://api.emobao.com';
 
    const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
    
@@ -1005,7 +1003,7 @@
    }
    
    /* ================================================================
-      扫码入口：URL 带 qrcode_id 时处理
+      扫码入口：URL 带 qrcode_id 时处理（v9 原链路，保留）
       ================================================================ */
    async function handleUrlQrcode() {
        const params = new URLSearchParams(window.location.search);
@@ -1104,6 +1102,24 @@
    }
    
    /* ================================================================
+      【v10 新增】URL 带 code 时预填激活码（不依赖 qrcode_id）
+      走激活页，预填码，聚焦名字；归属仍由 emobao_activate_code 决定
+      ================================================================ */
+   function handleUrlCodeParam() {
+       const params = new URLSearchParams(window.location.search);
+       const code = params.get('code');
+       if (!code) return;
+   
+       // 若同时带 qrcode_id，交给 handleUrlQrcode 处理，避免重复
+       if (params.get('qrcode_id')) return;
+   
+       gotoActivationWithCode(code);
+   
+       // 清掉 URL 参数，避免刷新重复预填
+       history.replaceState(null, '', window.location.pathname);
+   }
+   
+   /* ================================================================
       检查 mQxb 是否有效，有效直接进主屏
       ================================================================ */
    function checkMqxbAndRedirect() {
@@ -1131,7 +1147,7 @@
       入口
       ================================================================ */
    document.addEventListener('DOMContentLoaded', () => {
-       console.log('qx00_login.js v9 已加载');
+       console.log('qx00_login.js v10 已加载');
    
        if (checkMqxbAndRedirect()) return;
    
@@ -1160,6 +1176,9 @@
        initGuest();
    
        handleUrlReason();
+   
+       // 【v10】先处理新二维码带来的 ?code=，再走旧 qrcode_id 链路
+       handleUrlCodeParam();
    
        handleUrlQrcode().catch(e => {
            console.warn('[qx00] handleUrlQrcode 异常', e);

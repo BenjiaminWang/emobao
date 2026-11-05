@@ -1,9 +1,9 @@
 /* ================================================================
    情绪宝 - qx6-5b 二维码生成面板
-   v17 (2026-10-29)
+   v20.1 完整版 (2026-11-05)
    更新内容：
-   - 新增：生成卡片时，支持操作者选择“身份”和“有效天数”
-   - 修复：彻底接管合作方改名、新建批次等弹窗逻辑
+   - 在“新建/编辑合作方”弹窗中，统一支持上传企业Logo (自动压缩30KB)。
+   - 在生成邀请卡面板中，新增“使用名额”输入框。
    ================================================================ */
 
    (function () {
@@ -17,28 +17,78 @@
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    // 图片压缩工具（压缩到指定 KB 以下）
+    function compressImage(file, maxSizeKB = 30) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    let maxDim = 800; // 限制最大边长
+                    let scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                    let w = img.width * scale;
+                    let h = img.height * scale;
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    let quality = 0.9;
+                    let base64 = canvas.toDataURL('image/jpeg', quality);
+                    
+                    // 循环降低品质直到小于目标 KB
+                    while (base64.length / 1024 > maxSizeKB && quality > 0.1) {
+                        quality -= 0.1;
+                        base64 = canvas.toDataURL('image/jpeg', quality);
+                    }
+                    resolve(base64);
+                };
+                img.onerror = () => reject(new Error('图片加载失败'));
+            };
+            reader.onerror = () => reject(new Error('文件读取失败'));
+        });
+    }
+
     // ================= 1. 企业信息大表单弹窗 =================
     function showPartnerModal(partnerData, callback) {
         const isEdit = !!partnerData;
         const title = isEdit ? '编辑合作方信息' : '新建合作方';
+        const defaultLogo = isEdit ? (partnerData.brand_logo_url || '') : '';
         
         const overlay = document.createElement('div');
         overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 99999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(2px);';
 
         const modal = document.createElement('div');
-        modal.style.cssText = 'background: #fff; padding: 24px; border-radius: 12px; width: 340px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; transform: scale(0.95); transition: all 0.2s ease;';
+        modal.style.cssText = 'background: #fff; padding: 24px; border-radius: 12px; width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; transform: scale(0.95); transition: all 0.2s ease; max-height: 90vh; overflow-y: auto;';
 
         modal.innerHTML = `
             <div style="font-size: 16px; font-weight: bold; color: #1E293B; margin-bottom: 16px;">${title}</div>
             
             <label style="font-size:13px; color:#64748B; margin-bottom:4px;">企业/合作方名称 *</label>
-            <input type="text" id="qx6_p_name" value="${isEdit ? esc(partnerData.partner_name_cn) : ''}" placeholder="如：凤凰健身房" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; outline: none; margin-bottom: 12px; box-sizing: border-box;">
+            <input type="text" id="qx6_p_name" value="${isEdit ? esc(partnerData.partner_name_cn) : ''}" placeholder="如：海花岛健身中心" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; outline: none; margin-bottom: 12px; box-sizing: border-box;">
 
             <label style="font-size:13px; color:#64748B; margin-bottom:4px;">联系人姓名</label>
             <input type="text" id="qx6_p_contact" value="${isEdit ? esc(partnerData.contact_name || '') : ''}" placeholder="如：王经理" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; outline: none; margin-bottom: 12px; box-sizing: border-box;">
 
             <label style="font-size:13px; color:#64748B; margin-bottom:4px;">联系电话</label>
             <input type="text" id="qx6_p_phone" value="${isEdit ? esc(partnerData.contact_phone || '') : ''}" placeholder="如：13800138000" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; outline: none; margin-bottom: 12px; box-sizing: border-box;">
+
+            <!-- 统一上传 Logo -->
+            <div style="border-top: 1px dashed #E2E8F0; padding-top: 12px; margin-bottom: 12px;">
+                <label style="font-size:13px; font-weight:bold; color:#1E293B; margin-bottom:4px;">企业底图 (Logo)</label>
+                <div style="font-size: 12px; color: #64748B; margin-bottom: 8px;">统一展示，自动压缩30KB以下。</div>
+                <div id="qx6_p_logo_preview" style="margin-bottom: 8px;">
+                    ${defaultLogo 
+                        ? `<img src="${defaultLogo}" style="max-height: 60px; border-radius: 4px; border: 1px solid #E2E8F0;">` 
+                        : `<span style="font-size: 12px; color: #94A3B8;">暂无底图</span>`}
+                </div>
+                <input type="file" id="qx6_p_logo_input" accept="image/*" style="display: none;">
+                <button id="qx6_p_logo_btn" style="padding: 4px 10px; font-size: 12px; border-radius: 4px; border: 1px solid #CBD5E1; background: #F8FAFC; cursor: pointer;">选择图片并压缩</button>
+                <span id="qx6_p_logo_status" style="font-size: 12px; margin-left: 8px; color: #00C853;"></span>
+            </div>
 
             <label style="font-size:13px; color:#64748B; margin-bottom:4px;">备注信息</label>
             <input type="text" id="qx6_p_remark" value="${isEdit ? esc(partnerData.remark || '') : ''}" placeholder="如：年框协议客户" style="width: 100%; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 14px; outline: none; margin-bottom: 20px; box-sizing: border-box;">
@@ -63,6 +113,30 @@
             setTimeout(() => document.body.removeChild(overlay), 200); 
         };
 
+        let newLogoBase64 = null;
+        const logoPreview = modal.querySelector('#qx6_p_logo_preview');
+        const logoInput = modal.querySelector('#qx6_p_logo_input');
+        const logoBtn = modal.querySelector('#qx6_p_logo_btn');
+        const logoStatus = modal.querySelector('#qx6_p_logo_status');
+
+        logoBtn.onclick = () => logoInput.click();
+        logoInput.onchange = async () => {
+            const file = logoInput.files[0];
+            if (!file) return;
+            logoStatus.innerText = '压缩中…';
+            logoStatus.style.color = '#2C7BE5';
+            try {
+                newLogoBase64 = await compressImage(file, 30);
+                logoPreview.innerHTML = `<img src="${newLogoBase64}" style="max-height: 60px; border-radius: 4px; border: 1px solid #E2E8F0;">`;
+                const sizeKB = (newLogoBase64.length / 1024).toFixed(1);
+                logoStatus.innerText = `完成 (${sizeKB}KB)`;
+                logoStatus.style.color = '#00C853';
+            } catch (e) {
+                logoStatus.innerText = '失败：' + e.message;
+                logoStatus.style.color = '#E74C3C';
+            }
+        };
+
         modal.querySelector('#qx6_p_cancel').onclick = close;
 
         modal.querySelector('#qx6_p_confirm').onclick = () => {
@@ -77,6 +151,10 @@
                 isactive: true
             };
             
+            if (newLogoBase64) {
+                data.brand_logo_url = newLogoBase64;
+            }
+
             close();
             callback(data);
         };
@@ -134,7 +212,6 @@
             return;
         }
 
-        // 获取身份字典，用来渲染下拉框
         const map = U.typeMap();
         const typeOptions = U.typeKeysSorted().map(k => {
             const lb = map[k];
@@ -147,7 +224,7 @@
             <div class="qx6-card" style="padding: 24px; background:#fff; border-radius:12px; margin-bottom:20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
                     <div style="font-size: 18px; font-weight: bold; color: #1E293B;">生成专属邀请卡</div>
-                    <button id="qx6_qr_print_top" style="padding: 8px 16px; border-radius: 20px; border:none; background:#E2E8F0; color:#64748B; cursor:not-allowed; display:flex; align-items:center; gap:6px;" disabled>🖨️ 打印全部</button>
+                    <button id="qx6_qr_print_top" style="padding: 8px 16px; border-radius: 20px; border:none; background:#E2E8F0; color:#64748B; cursor:not-allowed; display:flex; align-items: center; gap:6px;" disabled>🖨️ 打印全部</button>
                 </div>
                 
                 <div style="margin-bottom: 12px;">
@@ -159,7 +236,7 @@
                         <option value="">加载中...</option>
                     </select>
                     <div style="text-align: right; margin-top: 8px;">
-                        <a href="javascript:void(0)" id="qx6_qr_edit_partner" style="color:#E67E22; font-size:13px; text-decoration:none; cursor:pointer; display:none;">✏️ 修改当前合作方信息 / 改名</a>
+                        <a href="javascript:void(0)" id="qx6_qr_edit_partner" style="color:#E67E22; font-size:13px; text-decoration:none; cursor:pointer; display:none;">✏️ 修改当前合作方信息 / Logo / 改名</a>
                     </div>
                 </div>
 
@@ -173,7 +250,6 @@
                     </select>
                 </div>
 
-                <!-- 【新增】身份与期限选择 -->
                 <div style="display: flex; gap: 16px; margin-bottom: 20px;">
                     <div style="flex: 2;">
                         <label style="display:block; font-weight: bold; margin-bottom: 8px; color: #1E293B;">赋予身份</label>
@@ -187,9 +263,27 @@
                     </div>
                 </div>
 
+                <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <label style="display:block; font-weight: bold; margin-bottom: 8px; color: #1E293B;">生成数量</label>
+                        <input type="number" id="qx6_qr_count" value="1" min="1" max="100" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1; outline:none; background:#F8FAFC;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display:block; font-weight: bold; margin-bottom: 8px; color: #1E293B;">使用名额</label>
+                        <input type="number" id="qx6_qr_maxact" value="1" min="1" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1; outline:none; background:#F8FAFC;" title="1个码能供多少人使用">
+                    </div>
+                </div>
+
                 <div style="margin-bottom: 20px;">
-                    <label style="display:block; font-weight: bold; margin-bottom: 8px; color: #1E293B;">生成数量</label>
-                    <input type="number" id="qx6_qr_count" value="1" min="1" max="100" style="width: 120px; padding: 10px; border-radius: 8px; border: 1px solid #CBD5E1; outline:none; background:#F8FAFC;">
+                    <label style="display:block; font-weight: bold; margin-bottom: 8px; color: #1E293B;">二维码模式</label>
+                    <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
+                        <input type="radio" name="qx6_qr_mode" value="with_code" checked>
+                        <span>带兑换码（扫码自动预填，推荐）</span>
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="radio" name="qx6_qr_mode" value="no_code">
+                        <span>不带兑换码（扫码后手动输入，用于公共海报）</span>
+                    </label>
                 </div>
 
                 <div id="qx6_qr_status" style="margin-bottom: 16px; font-size: 14px; color: #64748B;"></div>
@@ -207,6 +301,7 @@
         const typeSel    = bodyEl.querySelector('#qx6_qr_type');
         const daysInput  = bodyEl.querySelector('#qx6_qr_days');
         const countInput = bodyEl.querySelector('#qx6_qr_count');
+        const maxActInput= bodyEl.querySelector('#qx6_qr_maxact');
         const statusEl   = bodyEl.querySelector('#qx6_qr_status');
         const genBtn     = bodyEl.querySelector('#qx6_qr_generate');
         const printTopBtn= bodyEl.querySelector('#qx6_qr_print_top');
@@ -284,6 +379,7 @@
                     remark: newData.remark || '',
                     isactive: true 
                 };
+                if (newData.brand_logo_url) payload.brand_logo_url = newData.brand_logo_url;
 
                 fetch(`${U.SUPABASE_URL}/rest/v1/emo_partner?partner_id=eq.${pid}`, {
                     method: 'PATCH',
@@ -342,16 +438,16 @@
         genBtn.onclick = async () => {
             const pid = partnerSel.value;
             const qid = imageSel.value;
-            const ut = parseInt(typeSel.value); // 【新增】获取身份
-            const days = parseInt(daysInput.value); // 【新增】获取天数
+            const ut = parseInt(typeSel.value);
+            const days = parseInt(daysInput.value);
             const count = parseInt(countInput.value) || 1;
+            const maxact = parseInt(maxActInput.value) || 1;
+
+            const modeEl = bodyEl.querySelector('input[name="qx6_qr_mode"]:checked');
+            const qrMode = modeEl ? modeEl.value : 'with_code';
 
             if (!pid || !qid) {
                 showStatus('请选择合作方和批次', 'error');
-                return;
-            }
-            if (!days || days < 1) {
-                showStatus('有效天数必须大于0', 'error');
                 return;
             }
 
@@ -368,10 +464,10 @@
                     const rand = Math.random().toString(36).substring(2, 10).toUpperCase();
                     codesToInsert.push({
                         code: `EMO-${rand}-${Date.now().toString(36).toUpperCase()}`,
-                        usertypekey: ut,          // 【动态】
-                        maxactivations: 1,
+                        usertypekey: ut,
+                        maxactivations: maxact,
                         currentactivations: 0,
-                        validays: days,           // 【动态】
+                        validays: days,
                         isused: false,
                         batchno: batchNo,
                         qrcode_id: qid
@@ -393,9 +489,13 @@
                 const createdCodes = await res.json();
                 const partnerName = partnerSel.options[partnerSel.selectedIndex].text;
                 
-                const cleanUrl = 'https://emobao.com/qx00_login.html';
+                const baseUrl = 'https://emobao.com/qx00_login.html';
 
                 createdCodes.forEach((c, i) => {
+                    const cardUrl = (qrMode === 'with_code')
+                        ? `${baseUrl}?code=${encodeURIComponent(c.code)}`
+                        : baseUrl;
+
                     const card = document.createElement('div');
                     card.className = 'qx-print-card';
                     card.style.cssText = 'width: 280px; height: 380px; background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; overflow: hidden; margin: 10px; box-sizing: border-box;';
@@ -410,6 +510,7 @@
 
                     const qrBox = document.createElement('div');
                     qrBox.id = `qr_holder_${i}`;
+                    qrBox.dataset.qrUrl = cardUrl;
                     qrBox.style.cssText = 'position: absolute; top: 110px; left: 50%; transform: translateX(-50%); width: 160px; height: 160px; display: block; z-index: 99;';
 
                     const codeText = document.createElement('div');
@@ -418,7 +519,9 @@
 
                     const hint = document.createElement('div');
                     hint.style.cssText = 'position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; font-size: 13px; color: #94A3B8;';
-                    hint.innerText = '扫码开启情绪之旅';
+                    hint.innerText = (qrMode === 'with_code')
+                        ? '扫码自动填入兑换码'
+                        : '扫码进入，手动输入兑换码';
 
                     card.appendChild(title);
                     card.appendChild(pName);
@@ -450,8 +553,10 @@
                             tempDiv.style.cssText = 'width:160px; height:160px; visibility:hidden; position:absolute; left:-9999px;';
                             document.body.appendChild(tempDiv);
 
+                            const qrUrl = holder.dataset.qrUrl || baseUrl;
+
                             new window.QRCode(tempDiv, {
-                                text: cleanUrl,
+                                text: qrUrl,
                                 width: 160,
                                 height: 160,
                                 correctLevel: window.QRCode.CorrectLevel.H

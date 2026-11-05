@@ -7,7 +7,7 @@
 
    const MQXB_VERSION = 1;
    const EXPIRY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-   const SUPABASE_URL = 'https://lmmnwmueppkdbzvufxar.supabase.co'; 
+   const SUPABASE_URL = 'https://api.emobao.com'; 
    const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
    
    const INLINE_TYPE_FALLBACK = {
@@ -156,7 +156,7 @@ window.qxSpeak = function(text, onEnd) {
     const userVoice = localStorage.getItem('qx_tts_voice') || defaultVoice;
 
     // 4. 向 Supabase 代理发送请求，获取音频流
-    fetch('https://lmmnwmueppkdbzvufxar.supabase.co/functions/v1/azure-tts', {
+    fetch('https://api.emobao.com/functions/v1/azure-tts', {
         method: 'POST',
         headers: {
             'Authorization': `Bearer sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a`,
@@ -418,11 +418,47 @@ function fallbackToBrowserTTS(text, onEnd) {
     // 2. 其次：团队自定义底图
     const teamcode = window.mQxb.TeamCode;
     if (teamcode) {
-        const customUrl = await fetchTeamBgUrl(teamcode);
-        if (customUrl) { bgEl.src = customUrl; return; }
+        try {
+            // 2.1 先查码表有没有直接写死的 custom_bg_url (老逻辑)
+            const customUrl = await fetchTeamBgUrl(teamcode);
+            if (customUrl) { bgEl.src = customUrl; return; }
+
+            // 2.2 如果没有，顺着 TeamCode 去查合作方统一上传的 Logo
+            const res = await fetch(
+                `${SUPABASE_URL}/rest/v1/emobao_redemptioncode?code=eq.${encodeURIComponent(teamcode)}&select=qrcode_id&limit=1`,
+                { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+            );
+            const rows = await res.json();
+            const qrcode_id = (rows && rows[0]) ? rows[0].qrcode_id : null;
+
+            if (qrcode_id) {
+                const res2 = await fetch(
+                    `${SUPABASE_URL}/rest/v1/emo_qrcode_image?qrcode_id=eq.${qrcode_id}&select=partner_id&limit=1`,
+                    { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+                );
+                const rows2 = await res2.json();
+                const partner_id = (rows2 && rows2[0]) ? rows2[0].partner_id : null;
+
+                if (partner_id) {
+                    const res3 = await fetch(
+                        `${SUPABASE_URL}/rest/v1/emo_partner?partner_id=eq.${partner_id}&select=brand_logo_url&limit=1`,
+                        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+                    );
+                    const rows3 = await res3.json();
+                    const logoUrl = (rows3 && rows3[0]) ? rows3[0].brand_logo_url : null;
+                    if (logoUrl) {
+                        bgEl.src = logoUrl;
+                        return;
+                    }
+                }
+            }
+        } catch (e) {
+            // 如果查图过程中发生任何网络错误，静默处理，不阻塞主屏
+            console.warn('[qx0_main] 查企业底图报错，使用默认兜底图', e);
+        }
     }
 
-    // 3. 兜底：身份默认图
+    // 3. 兜底：身份默认图（防白屏保护）
     const img = window.mQxb.UserImage || 'qxbaouser1.jpg';
     bgEl.src = `picture/${img}`;
 }

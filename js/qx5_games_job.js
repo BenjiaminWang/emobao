@@ -1,6 +1,6 @@
 /* ================================================================
-   情绪宝 - qx5 应聘挑战（P0：凌晨超售）
-   v11：三段式 Flex 布局，中间对话独立滚动，底部操作区永久固定
+   情绪宝 - qx5 应聘挑战（P0：太空舱危机）
+   v12：重构评分系统，容错率大幅提升，加入面经复盘
    ================================================================ */
    (function () {
     'use strict';
@@ -21,9 +21,9 @@
     };
   
     const HINT_CONFIGS = {
-      r1: "客人刚到店，还在气头上。你可以试着说：**理解**您的**着急**，**抱歉**让您久等。然后再给出具体的查房动作。",
-      r2: "客人坚持要赔偿。你可以试着说：我的**权限**是可以给您**升级**套房，如果超出权限，我会立刻**请示值班经理**。",
-      r3: "经理要方案。你可以试着用**首先...然后...最后...**的结构，说出你的**优先级**和兜底**方案**。"
+      r1: "客人非常生气，你首先要**安抚情绪**（比如：理解您的愤怒），然后明确表示你会**人工接管**系统。",
+      r2: "客人要求特权。你要先表示**理解**他的急迫，然后说明你会去**请示**上级，或者动用**人工**手段（比如亲自去救狗）。",
+      r3: "系统全崩了。你需要按**优先级**来，用**首先、然后、最后**的结构，说出保命和救急的动作。"
     };
   
     function speakRole(roleId, text, onEndCallback) {
@@ -64,21 +64,38 @@
   
     function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     
+    // 【核心大改】全新的、高容错的打分逻辑
     function normalizeScores(userText, evaluate) {
-      const out = {};
+      const out = { empathy: 0, structure: 0, action: 0 };
+      
+      // 1. 基础分：只要你写了超过 10 个字，说明你思考了，直接给 50 分底薪
+      if (userText.length > 10) {
+        out.empathy = 50; out.structure = 50; out.action = 50;
+      }
+  
+      // 2. 关键词命中加分
       for (const [dim, cfg] of Object.entries(evaluate)) {
         const hits = (cfg.keywords || []).filter(k => userText.includes(k)).length;
-        out[dim] = hits > 0 ? Math.min(85 + hits * 5, 100) : 0; 
+        if (hits > 0) {
+          out[dim] = Math.min(out[dim] + hits * 20, 100); // 命中一个词+20分，最高100
+        }
       }
+  
+      // 3. 情绪兜底：如果提到了客户、老板、安抚，直接加共情分
+      if (userText.includes('安抚') || userText.includes('老板') || userText.includes('客人')) {
+         out.empathy = Math.min(out.empathy + 10, 100);
+      }
+  
       return out;
     }
+  
     function avg(obj) {
       const v = Object.values(obj);
       return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0;
     }
   
     E.registerGame({
-      id: 'job_hotel_front_desk',
+      id: 'space_hotel_666',
       collectionId: 'emotion',
       isFeatured: true,
       title:    { cn: '应聘挑战', en: 'Job Challenge' },
@@ -87,12 +104,9 @@
       generateTrials: function () { return [{ id: 'run_1', condition: 'interview', stimulus: {} }]; },
   
       renderTrial: function (hostEl, trial, onAnswer, meta) {
-        // 清空原有内容
         hostEl.innerHTML = '';
-        // 移除宿主容器可能的 padding 干扰
         hostEl.style.padding = '0';
   
-        // ====== 根容器：绝对固定全屏高度，禁止外部滚动 ======
         const stage = document.createElement('div');
         stage.style.cssText = `
           display: flex;
@@ -106,14 +120,13 @@
         `;
         hostEl.appendChild(stage);
   
-        // ====== 1. 顶部固定区 (不滚动) ======
         const topArea = document.createElement('div');
         topArea.style.cssText = 'flex-shrink: 0; padding: 16px 16px 8px 16px;';
         stage.appendChild(topArea);
   
         const top = document.createElement('div');
         top.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;color:#1E293B;font-weight:bold;margin-bottom:12px;';
-        top.innerHTML = `<span>🏨 ${SCENARIO.name}</span><span id="qx5_job_progress" style="color:#2C7BE5;">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
+        top.innerHTML = `<span>🚀 ${SCENARIO.name}</span><span id="qx5_job_progress" style="color:#2C7BE5;">第 1 / ${SCENARIO.rounds.length} 轮</span>`;
         topArea.appendChild(top);
         const progressEl = top.querySelector('#qx5_job_progress');
   
@@ -122,12 +135,10 @@
         intro.textContent = SCENARIO.intro;
         topArea.appendChild(intro);
   
-        // ====== 2. 中间滚动区 (独立滚动) ======
         const dialog = document.createElement('div');
         dialog.style.cssText = 'flex: 1; overflow-y: auto; padding: 0 16px 16px 16px; display:flex; flex-direction:column; gap:12px; -webkit-overflow-scrolling: touch;';
         stage.appendChild(dialog);
   
-        // ====== 3. 底部固定区 (永远贴在底边) ======
         const inputWrap = document.createElement('div');
         inputWrap.style.cssText = 'flex-shrink: 0; padding: 12px 16px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); background: #FFFFFF; border-top: 1px solid #E2E8F0; box-shadow: 0 -4px 20px rgba(0,0,0,0.05); display:flex; flex-direction:column; gap:8px;';
         stage.appendChild(inputWrap);
@@ -182,6 +193,7 @@
         let competitorDone = false;
         let usedInterruptIds = [];
         let pendingInterruptImpact = null;
+        let failedReasons = []; // 记录未命中的维度
   
         function addBubble(role, speaker, text) {
           const isPlayer = role === 'player';
@@ -217,8 +229,8 @@
           if (ir.trigger === 'if_none_yet') {
             if (usedInterruptIds.length > 0) return null;
             const pool = [
-              { id: 'laok', line: '如果是我，我会先调监控确认超售原因，再谈补偿。', tone: '沉稳', impact: '借力' },
-              { id: 'wangjie', line: '现在的年轻人啊～遇到点事就慌。', tone: '嘲讽', impact: '自嘲' }
+              { id: 'laok', line: '（地球老专家）年轻人，太空酒店有规定，不能为了客人破例吧？', tone: '沉稳', impact: '借力' },
+              { id: 'wangjie', line: '（舱内抱怨）我都快缺氧了，你们还在那边废话！', tone: '焦躁', impact: '自嘲' }
             ].filter(x => !usedInterruptIds.includes(x.id));
             return pool.length ? pick(pool) : null;
           }
@@ -312,6 +324,14 @@
           let mainAvg = avg(dimScores);
           mainScores.push(mainAvg);
   
+          // 记录复盘信息：如果你某个维度是 50 分基础分（没命中关键词），就记录一下
+          if (dimScores.empathy === 50 && !text.includes('理解') && !text.includes('抱歉')) {
+             failedReasons.push('缺少共情词（试着说：理解您的愤怒）');
+          }
+          if (dimScores.action === 50 && !text.includes('人工') && !text.includes('接管')) {
+             failedReasons.push('缺少具体动作（试着说：我人工接管，或者重启系统）');
+          }
+  
           if (pendingInterruptImpact) {
             const map = { '化解': 'empathy', '借力': 'action', '自嘲': 'empathy' };
             const key = map[pendingInterruptImpact] || 'empathy';
@@ -346,7 +366,10 @@
   
           speakRole('lin_manager', announce, () => {
             setTimeout(() => {
-              onAnswer(JSON.stringify({ main, interrupt: intr, competitor: competitorScore, pass, announce, rounds: roundIdx }), pass);
+              onAnswer(JSON.stringify({ 
+                main, interrupt: intr, competitor: competitorScore, pass, announce, rounds: roundIdx,
+                failedReasons: [...new Set(failedReasons)] // 传给结果页
+              }), pass);
             }, 1000); 
           });
         }
@@ -371,24 +394,23 @@
       computeScore: function (data) {
         const rec = data.records[0]; let info = {};
         try { info = JSON.parse(rec.response); } catch (e) {}
-        return { accuracy: 1, correctCount: 1, totalCount: 1, mainScore: info.main || 0, interruptScore: info.interrupt || 0, competitorScore: info.competitor || 0, pass: !!info.pass, announce: info.announce || '', quit: !!info.quit, rounds: info.rounds || 0 };
+        return { 
+          accuracy: 1, correctCount: 1, totalCount: 1, 
+          mainScore: info.main || 0, interruptScore: info.interrupt || 0, 
+          competitorScore: info.competitor || 0, pass: !!info.pass, 
+          announce: info.announce || '', quit: !!info.quit, rounds: info.rounds || 0,
+          failedReasons: info.failedReasons || []
+        };
       },
   
       renderResult: function (hostEl, data) {
         const s = data.score; hostEl.innerHTML = '';
         
-        let rating = 'C';
-        let ratingColor = '#E74C3C';
-        let ratingTitle = '被辞退';
-        
+        let rating = 'C'; let ratingColor = '#E74C3C'; let ratingTitle = '被辞退';
         if (s.pass) {
-          if (s.mainScore >= 85 && s.interruptScore >= 60) {
-            rating = 'S'; ratingColor = '#F1C40F'; ratingTitle = '皇家管家';
-          } else if (s.mainScore >= 70) {
-            rating = 'A'; ratingColor = '#E67E22'; ratingTitle = '大堂经理';
-          } else {
-            rating = 'B'; ratingColor = '#2ECC71'; ratingTitle = '实习前台';
-          }
+          if (s.mainScore >= 85 && s.interruptScore >= 60) { rating = 'S'; ratingColor = '#F1C40F'; ratingTitle = '首席混乱仲裁官'; }
+          else if (s.mainScore >= 70) { rating = 'A'; ratingColor = '#E67e22'; ratingTitle = '太空站精英'; }
+          else { rating = 'B'; ratingColor = '#2ECC71'; ratingTitle = '实习主管'; }
         }
   
         const wrap = document.createElement('div');
@@ -413,21 +435,29 @@
           badgesHtml += `<span style="display:inline-block;background:#FEF3C7;color:#D97706;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:bold;margin:0 4px 4px 0;">🏅 救场王</span>`;
         }
         if (s.mainScore >= 80) {
-          badgesHtml += `<span style="display:inline-block;background:#DBEAFE;color:#2563EB;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:bold;margin:0 4px 4px 0;">🏅 话术大师</span>`;
-        }
-        if (!s.pass && s.competitorScore > s.mainScore) {
-          badgesHtml += `<span style="display:inline-block;background:#FEE2E2;color:#DC2626;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:bold;margin:0 4px 4px 0;">💔 惜败</span>`;
+          badgesHtml += `<span style="display:inline-block;background:#DBEAFE;color:#2563EB;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:bold;margin:0 4px 4px 0;">🏅 人类之光</span>`;
         }
   
-        let noteHtml = (s.mainScore === 0 && !s.quit) ? `<div style="color:#E74C3C;margin-bottom:12px;font-size:13px;">你一言未发，遗憾离场。</div>` : (s.quit ? `<div style="color:#E67E22;margin-bottom:12px;font-size:13px;">中途弃权。</div>` : '');
+        // 面经复盘
+        let reviewHtml = '';
+        if (!s.pass && s.failedReasons && s.failedReasons.length > 0) {
+          reviewHtml = `
+            <div style="text-align:left;background:#FFFBEB;border-radius:10px;padding:15px;margin-bottom:20px;border:1px solid #FDE68A;">
+              <div style="font-size:13px;color:#B45309;font-weight:bold;margin-bottom:8px;">📝 面经复盘（为什么没过）</div>
+              <ul style="margin:0; padding-left:20px; font-size:13px; color:#92400E; line-height:1.6;">
+                ${s.failedReasons.map(r => `<li>${r}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        }
   
         card.innerHTML += `
           ${ratingHtml}
-          ${noteHtml}
+          ${reviewHtml}
           
           <div style="text-align:left;background:#F8FAFC;border-radius:10px;padding:15px;margin-bottom:20px;border:1px solid #E2E8F0;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>主评分（专业发挥）</span><b>${s.mainScore}</b></div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>干扰评分（稳住程度）</span><b>${s.interruptScore}</b></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>主评分</span><b>${s.mainScore}</b></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;color:#475569;"><span>干扰评分</span><b>${s.interruptScore}</b></div>
             <div style="display:flex;justify-content:space-between;font-size:14px;color:#475569;"><span>竞争者评分</span><b>${s.competitorScore}</b></div>
           </div>
   

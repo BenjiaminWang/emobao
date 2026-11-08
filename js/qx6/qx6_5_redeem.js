@@ -1,11 +1,10 @@
 /* ================================================================
    情绪宝 - qx6-5 发卡与渠道管理面板
-   v6.2 (2026-11-05) 完整无错版
+   v8 (2026-11-05) 完整版
    更新内容：
-   - 纯码生成面板：增加“所属合作方”下拉框，生成的码自动挂靠。
-   - 纯码生成面板：增加“使用名额”输入框，不再写死 1 人。
-   - 数据与业绩：修复关联查询，能明确显示合作方名称（如：海花岛健身中心）。
-   - 数据与业绩：增加 🗑️ 删除批次功能，一键清理测试垃圾数据。
+   - 纯码生成：带合作方、带名额。
+   - 数据与业绩：支持查看归属企业、支持删除批次。
+   - 数据与业绩：新增“🖨️ 补打二维码”功能，修复了打印时二维码为空白的 bug。
    ================================================================ */
 
    (function () {
@@ -134,12 +133,9 @@
         const issueStatus = bodyEl.querySelector('#qx6_rd_issue_status');
         const issueResult = bodyEl.querySelector('#qx6_rd_issue_result');
 
-        // 加载合作方下拉框
-        let cachedPartners = [];
         U.restGet('emo_partner?isactive=eq.true&order=partner_code').then(partners => {
-            cachedPartners = partners || [];
             partnerEl.innerHTML = '<option value="">-- 请选择 --</option>';
-            cachedPartners.forEach(p => {
+            (partners || []).forEach(p => {
                 partnerEl.innerHTML += `<option value="${p.partner_id}">${p.partner_name_cn}</option>`;
             });
         });
@@ -168,7 +164,6 @@
             issueStatus.style.color = '#64748B';
 
             try {
-                // 1. 自动在 emo_qrcode_image 表里建一个批次记录来挂靠
                 const randLabel = `纯码批次 ${new Date().toLocaleDateString()}`;
                 const imgRes = await fetch(`${U.SUPABASE_URL}/rest/v1/emo_qrcode_image`, {
                     method: 'POST',
@@ -229,13 +224,137 @@
         const batchList   = bodyEl.querySelector('#qx6_rd_batch_list');
         const filterPartner = bodyEl.querySelector('#qx6_rd_filter_partner');
 
-        // 加载合作方列表到查询下拉框
         U.restGet('emo_partner?isactive=eq.true').then(partners => {
             filterPartner.innerHTML = '<option value="">全部合作方</option>';
             (partners || []).forEach(p => {
                 filterPartner.innerHTML += `<option value="${p.partner_id}">${p.partner_name_cn}</option>`;
             });
         });
+
+        // ==========================================
+        // 渲染并补打二维码（核心功能）
+        // ==========================================
+        function drawCardsForPrint(createdCodes, partnerName, qrMode) {
+            const gridEl = document.createElement('div');
+            gridEl.style.cssText = 'display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; background: #fff;';
+
+            const baseUrl = 'https://emobao.com/qx00_login.html';
+
+            // 先把卡片和占位符画出来
+            createdCodes.forEach((c, i) => {
+                const cardUrl = (qrMode === 'with_code')
+                    ? `${baseUrl}?code=${encodeURIComponent(c.code)}`
+                    : baseUrl;
+
+                const card = document.createElement('div');
+                card.className = 'qx-print-card';
+                card.style.cssText = 'width: 280px; height: 380px; background: #fff; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; overflow: hidden; margin: 10px; box-sizing: border-box;';
+
+                const title = document.createElement('div');
+                title.style.cssText = 'position: absolute; top: 30px; left: 0; width: 100%; text-align: center; font-size: 18px; font-weight: bold; color: #1E293B;';
+                title.innerText = '情绪宝 · 专属邀请卡';
+
+                const pName = document.createElement('div');
+                pName.style.cssText = 'position: absolute; top: 65px; left: 0; width: 100%; text-align: center; font-size: 15px; color: #2C7BE5; font-weight: bold;';
+                pName.innerText = partnerName;
+
+                const qrBox = document.createElement('div');
+                qrBox.id = `print_qr_holder_${i}`;
+                qrBox.dataset.qrUrl = cardUrl;
+                qrBox.style.cssText = 'position: absolute; top: 110px; left: 50%; transform: translateX(-50%); width: 160px; height: 160px; display: block; z-index: 99;';
+
+                const codeText = document.createElement('div');
+                codeText.style.cssText = 'position: absolute; bottom: 55px; left: 0; width: 100%; text-align: center; font-size: 13px; font-family: monospace; color: #1E293B; font-weight: bold;';
+                codeText.innerText = `兑换码: ${c.code}`;
+
+                const hint = document.createElement('div');
+                hint.style.cssText = 'position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; font-size: 13px; color: #94A3B8;';
+                hint.innerText = (qrMode === 'with_code') ? '扫码自动填入兑换码' : '扫码进入，手动输入兑换码';
+
+                card.appendChild(title);
+                card.appendChild(pName);
+                card.appendChild(qrBox);
+                card.appendChild(codeText); 
+                card.appendChild(hint); 
+                gridEl.appendChild(card);
+            });
+
+            let loadedCount = 0;
+            const totalCount = createdCodes.length;
+
+            // 生成 QRCode 并转成真实 img 标签
+            createdCodes.forEach((c, i) => {
+                const holder = gridEl.querySelector(`#print_qr_holder_${i}`);
+                if (!holder) return;
+
+                const tempDiv = document.createElement('div');
+                new window.QRCode(tempDiv, {
+                    text: holder.dataset.qrUrl,
+                    width: 160,
+                    height: 160,
+                    correctLevel: window.QRCode.CorrectLevel.H
+                });
+
+                setTimeout(() => {
+                    const canvas = tempDiv.querySelector('canvas');
+                    const img = tempDiv.querySelector('img');
+                    let dataUrl = '';
+                    if (canvas) {
+                        dataUrl = canvas.toDataURL("image/png");
+                    } else if (img && img.src) {
+                        dataUrl = img.src;
+                    }
+
+                    if (dataUrl) {
+                        const newImg = document.createElement('img');
+                        newImg.src = dataUrl;
+                        newImg.style.cssText = 'width: 160px; height: 160px; display: block;';
+                        // 图片加载成功后，计数 +1
+                        newImg.onload = () => {
+                            loadedCount++;
+                            if (loadedCount === totalCount) {
+                                // 全部生成完毕，执行打印
+                                triggerPrint();
+                            }
+                        };
+                        holder.innerHTML = '';
+                        holder.appendChild(newImg);
+                    }
+                }, 50);
+            });
+
+            // 真正的打印逻辑
+            function triggerPrint() {
+                const cards = gridEl.innerHTML;
+                const iframe = document.createElement('iframe');
+                iframe.style.cssText = 'position:fixed; right:0; bottom:0; width:0; height:0; border:0;';
+                document.body.appendChild(iframe);
+
+                const doc = iframe.contentWindow.document;
+                doc.open();
+                doc.write(`
+                    <html>
+                    <head>
+                        <style>
+                            body { margin:0; padding:20px; display:flex; flex-wrap:wrap; gap:20px; justify-content:center; background:#fff;}
+                            .qx-print-card { width:280px; height:380px; border:1px dashed #ccc; page-break-inside:avoid; position: relative; }
+                            .qx-print-card img { width:160px !important; height:160px !important; display:block !important; }
+                            @media print { @page { margin: 10mm; } }
+                        </style>
+                    </head>
+                    <body>${cards}</body>
+                    </html>
+                `);
+                doc.close();
+
+                // 给一点时间，确保 img 标签在 iframe 里渲染完成再弹打印
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                    setTimeout(() => document.body.removeChild(iframe), 1000);
+                }, 300);
+            }
+        }
 
         async function loadBatches() {
             queryStatus.innerText = '加载中…';
@@ -246,7 +365,7 @@
                 const selectedPid = filterPartner.value;
                 
                 const rows = await U.restGet(
-                    `emobao_redemptioncode?select=batchno,generatedat,validays,maxactivations,usertypekey,isused,currentactivations,qrcode_id&order=generatedat.desc&limit=1000`
+                    `emobao_redemptioncode?select=code,batchno,generatedat,validays,maxactivations,usertypekey,isused,currentactivations,qrcode_id&order=generatedat.desc&limit=1000`
                 );
 
                 const qids = [...new Set((rows || []).map(r => r.qrcode_id).filter(Boolean))];
@@ -284,12 +403,14 @@
                             total: 0, 
                             used: 0, 
                             activated: 0,
-                            qrInfo: qrMap[r.qrcode_id] || null 
+                            qrInfo: qrMap[r.qrcode_id] || null,
+                            codes: [] // 把这个批次下的所有码保存下来，用于补打
                         };
                     }
                     batches[b].total++;
                     if (r.isused) batches[b].used++;
                     batches[b].activated += (r.currentactivations || 0);
+                    batches[b].codes.push(r); // 收集码
                 });
 
                 let list = Object.values(batches).sort((a, b) => (b.generatedat || '').localeCompare(a.generatedat || ''));
@@ -314,7 +435,8 @@
                         contextHtml = `<div style="margin-bottom: 8px; font-size: 13px; color: #94A3B8;">未关联合作方</div>`;
                     }
 
-                    // 渲染每一项时带上删除按钮，data-batch 存批次号
+                    const hasQr = b.qrInfo ? true : false;
+
                     return `
                         <div style="border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; position: relative;">
                             ${contextHtml}
@@ -322,18 +444,43 @@
                                 <span style="font-weight:bold; color:#475569; font-size: 13px;">批次: ${b.batchno}</span>
                                 <span style="background:#E0F2FE; color:#2C7BE5; padding:2px 8px; border-radius:12px; font-size:12px;">${lb}</span>
                             </div>
-                            <div style="font-size: 12px; color: #64748B;">
+                            <div style="font-size: 12px; color: #64748B; padding-right: 80px;">
                                 ${(b.generatedat || '').slice(0,10)} · ${b.total} 码 · 已激活 ${b.activated} · 有效 ${b.validays} 天 · 单码名额:${b.maxactivations}
                             </div>
                             
-                            <!-- 删除按钮 -->
-                            <button class="qx6-btn-delete-batch" data-batch="${b.batchno}" title="删除此批次" 
-                                style="position: absolute; right: 12px; bottom: 12px; background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s;">
-                                🗑️
-                            </button>
+                            <!-- 按钮组 -->
+                            <div style="position: absolute; right: 12px; bottom: 12px; display: flex; gap: 10px;">
+                                ${hasQr ? `<button class="qx6-btn-reprint" data-batch="${b.batchno}" title="补打二维码" 
+                                    style="background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.8;">🖨️</button>` : ''}
+                                
+                                <button class="qx6-btn-delete-batch" data-batch="${b.batchno}" title="删除此批次" 
+                                    style="background: none; border: none; font-size: 16px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s;">
+                                    🗑️
+                                </button>
+                            </div>
                         </div>
                     `;
                 }).join('');
+
+                // 绑定补打事件
+                batchList.querySelectorAll('.qx6-btn-reprint').forEach(btn => {
+                    btn.onmouseenter = () => btn.style.opacity = '1';
+                    btn.onmouseleave = () => btn.style.opacity = '0.8';
+                    
+                    btn.onclick = (e) => {
+                        const bno = e.target.dataset.batch;
+                        const bData = list.find(x => x.batchno === bno);
+                        if (!bData || !bData.codes || !bData.codes.length) return;
+
+                        // 弹出确认框
+                        if (!confirm(`准备好打印机，即将渲染并打印 ${bData.codes.length} 张邀请卡。继续吗？`)) return;
+
+                        const pName = bData.qrInfo ? bData.qrInfo.partnerName : '情绪宝';
+                        
+                        // 默认补打模式为“带兑换码”
+                        drawCardsForPrint(bData.codes, pName, 'with_code');
+                    };
+                });
 
                 // 绑定删除事件
                 batchList.querySelectorAll('.qx6-btn-delete-batch').forEach(btn => {
@@ -344,7 +491,6 @@
                         const batchnoToDel = e.target.dataset.batch;
                         if (!batchnoToDel) return;
 
-                        // 双重确认，防误触
                         if (!confirm(`⚠️ 确定要删除批次 [${batchnoToDel}] 及其包含的所有兑换码吗？`)) return;
                         if (!confirm(`再次确认：此操作不可恢复！`)) return;
 
@@ -352,7 +498,6 @@
                         e.target.disabled = true;
 
                         try {
-                            // 1. 删除这批兑换码
                             const res = await fetch(`${U.SUPABASE_URL}/rest/v1/emobao_redemptioncode?batchno=eq.${encodeURIComponent(batchnoToDel)}`, {
                                 method: 'DELETE',
                                 headers: { 'apikey': U.SUPABASE_KEY, 'Authorization': `Bearer ${U.SUPABASE_KEY}` }
@@ -361,7 +506,7 @@
 
                             queryStatus.innerText = '删除成功';
                             queryStatus.style.color = '#00C853';
-                            loadBatches(); // 刷新列表
+                            loadBatches(); 
                         } catch (err) {
                             alert("删除失败：" + err.message);
                             e.target.innerText = '🗑️';

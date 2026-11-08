@@ -1,9 +1,9 @@
 /* ================================================================
    情绪宝 - qx6-5b 二维码生成面板
-   v20.1 完整版 (2026-11-05)
+   v20.2 完整版 (2026-11-07)
    更新内容：
-   - 在“新建/编辑合作方”弹窗中，统一支持上传企业Logo (自动压缩30KB)。
-   - 在生成邀请卡面板中，新增“使用名额”输入框。
+   - 【关键修复】生成二维码的 URL 时，强制拼接 qrcode_id 参数。
+     确保用户扫码后，前端 qx00_login.js 能精准识别是哪个合作方（如海花岛）。
    ================================================================ */
 
    (function () {
@@ -437,7 +437,7 @@
 
         genBtn.onclick = async () => {
             const pid = partnerSel.value;
-            const qid = imageSel.value;
+            const qid = imageSel.value; // 这就是我们需要的 qrcode_id
             const ut = parseInt(typeSel.value);
             const days = parseInt(daysInput.value);
             const count = parseInt(countInput.value) || 1;
@@ -492,9 +492,10 @@
                 const baseUrl = 'https://emobao.com/qx00_login.html';
 
                 createdCodes.forEach((c, i) => {
+                    // 【关键修复】：在此处拼接 qrcode_id
                     const cardUrl = (qrMode === 'with_code')
-                        ? `${baseUrl}?code=${encodeURIComponent(c.code)}`
-                        : baseUrl;
+                        ? `${baseUrl}?qrcode_id=${encodeURIComponent(qid)}&code=${encodeURIComponent(c.code)}`
+                        : `${baseUrl}?qrcode_id=${encodeURIComponent(qid)}`;
 
                     const card = document.createElement('div');
                     card.className = 'qx-print-card';

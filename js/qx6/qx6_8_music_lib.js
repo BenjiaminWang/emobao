@@ -196,9 +196,10 @@
                 <div class="qx6-ml-detail-row"><b>${t('大小','Size')}:</b> <span class="qx6-ml-size">${t('查询中…','Loading…')}</span></div>
                 <div class="qx6-ml-detail-row"><b>${t('入库','Created')}:</b> ${(tr.createdat || '').slice(0,19)}</div>
                 <div class="qx6-ml-detail-row"><b>${t('操作者','By')}:</b> <span class="qx6-ml-by">${tr.createdby || '—'}</span></div>
-                <div class="qx6-ml-detail-actions">
+                  <div class="qx6-ml-detail-actions" style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button class="qx6-btn qx6-btn-primary qx6-btn-small" data-act="play">${t('试听','Play')}</button>
                     <button class="qx6-btn qx6-btn-primary qx6-btn-small" data-act="rename">${t('改名','Rename')}</button>
+                    <button class="qx6-btn qx6-btn-primary qx6-btn-small" data-act="timeline" style="background:#F39C12; border-color:#F39C12;">🎬 音乐导播台</button>
                     <button class="qx6-btn qx6-btn-danger qx6-btn-small" data-act="delete">${t('删除','Delete')}</button>
                 </div>
                 <div class="qx6-ml-audio-host"></div>
@@ -213,7 +214,14 @@
             } else {
                 detail.querySelector('.qx6-ml-size').innerText = '—';
             }
-
+            detail.querySelector('[data-act="timeline"]').onclick = () => {
+                if (window.qxRenderTimelineEditor) {
+                    // 注意：这里传 tr.trackid 还是 tr.workid 取决于你的表结构。如果是同一套表，就传 tr.trackid
+                    window.qxRenderTimelineEditor(tr.trackid, tr.title_cn);
+                } else {
+                    alert('音乐导播台未加载');
+                }
+            };
             detail.querySelector('[data-act="play"]').onclick = () => {
                 const host = detail.querySelector('.qx6-ml-audio-host');
                 if (host.dataset.playing === '1') {

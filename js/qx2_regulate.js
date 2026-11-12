@@ -1,11 +1,6 @@
 /* ================================================================
-   情绪宝 - qx2 情绪调节（v54 终极完全体·全链路版）
-   日期：2026-10-24
-   说明：
-   1. 完美串行驱动：先念词，后放音乐。
-   2. 中英智能标题：智能翻译章节名。
-   3. 点击章节跳转：点击结构直接切换解说与音乐。
-   4. 100% 完整 HRV 采集与分析逻辑（古典名曲模式完美激活）。
+   情绪宝 - qx2 情绪调节 (纯净全屏版)
+   日期：2026-11-10
    ================================================================ */
 
    (function () {
@@ -14,69 +9,37 @@
     const SUPABASE_URL = 'https://api.emobao.com';
     const SUPABASE_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
 
-    const MUSIC_LEVELS = [
-        { code: 1,  cn: '壮丽', en: 'Grand' }, { code: 2,  cn: '激昂', en: 'Intense' },
-        { code: 3,  cn: '热烈', en: 'Passionate' }, { code: 4,  cn: '欢快', en: 'Cheerful' },
-        { code: 5,  cn: '轻快', en: 'Lively' }, { code: 6,  cn: '明朗', en: 'Bright' },
-        { code: 7,  cn: '平静', en: 'Calm' }, { code: 8,  cn: '沉思', en: 'Pensive' },
-        { code: 9,  cn: '忧伤', en: 'Melancholy' }, { code: 10, cn: '压抑', en: 'Down' },
-        { code: 11, cn: '悲伤', en: 'Sad' }, { code: 12, cn: '空灵', en: 'Ethereal' },
-    ];
-
-    function getMusicLevelName(code) {
-        const lang = (window.mQxb && window.mQxb.Language) || 1;
-        const m = MUSIC_LEVELS.find(x => x.code === code);
-        if (!m) return String(code);
-        return lang === 2 ? (m.en || m.cn) : m.cn;
-    }
+    let _timelineCache = {};
+    let _workInfo = { work: null, timelines: [], tags: { instruments: [], styles: [] } };
+    let speakWatchdog = null; 
+    let _fastTimer = null;
+    let mirrorBeforeId = null;
+    let mirrorAfterId = null;
 
     let state = {
         step: 1, isGuest: false, inputEmotionCode: 0, outputEmotionCode: 0, feedback: null,
         playlist: [], currentIndex: 0, audio: null, hrvResult: null, hrvAborted: false,
         started: false, finished: false, initialized: false, hrvSeries: [], hfSeries: [],
         latestHint: '', latestQuality: 'unknown', isWorkMode: false, 
-        playMode: 'guided', currentSegIndex: 0,
-        lastSpokenText: '', lastSpokenTime: 0
+        playMode: 'guided', currentSegIndex: 0, lastSpokenText: '', lastSpokenTime: 0,
+        hrvResultBefore: null
     };
 
-    let speakWatchdog = null; 
-
+    // ==========================================
+    // 🌟 基础工具与请求
+    // ==========================================
     function t(cn, en) { const lang = (window.mQxb && window.mQxb.Language) || 1; return lang === 1 ? cn : en; }
     function getUserId() { return window.mQxb && window.mQxb.user_id; }
     function getUserType() { return (window.mQxb && parseInt(window.mQxb.user_id_Type)) || 1; }
     function getLang() { return (window.mQxb && window.mQxb.Language) || 1; }
 
-    // ================ 中英章节标题智能翻译 ================
-    function translateSectionName(name) {
-        if (!name) return '';
-        const lang = getLang();
-        if (lang === 1) return name;
-
-        const dict = {
-            '第一乐章': 'Movement I', '第二乐章': 'Movement II', '第三乐章': 'Movement III', '第四乐章': 'Movement IV',
-            '快板': 'Allegro', '慢板': 'Adagio', '柔板': 'Adagio', '行板': 'Andante', '急板': 'Presto',
-            '主题呈示': 'Theme Presentation', '乐队引子': 'Orchestral Intro', '独奏呈示部': 'Solo Exposition',
-            '展开部与华彩': 'Development & Cadenza', '再现与尾声': 'Recapitulation & Coda',
-            '深情主题的呈示': 'Tender Theme Presentation', '独奏声部的装饰变奏与收束': 'Solo Variations & Coda',
-            '赋格化的舞曲终曲': 'Fugal Dance Finale', '开篇': 'Intro', '尾声': 'Outro',
-            '乐队全奏呈示主题': 'Orchestral Theme', '大键琴的华丽独奏段': 'Harpsichord Solo', '独奏乐器间的对话与华彩终结': 'Cadenza & Dialogue',
-            '回旋曲主题与第一插部': 'Rondo Theme & Episode', '土耳其风格插部': 'Turkish Episode', '回旋主题回归与尾声': 'Rondo Return & Coda'
-        };
-
-        let translated = name;
-        for (const [cn, en] of Object.entries(dict)) {
-            translated = translated.replace(new RegExp(cn, 'g'), en);
-        }
-        return translated.replace(/——/g, '- ').replace(/：/g, ': ').replace(/（/g, ' (').replace(/）/g, ')').replace(/·/g, '·');
+    function escapeHtml(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    function getCameraGuideText() {
-        let facing = 'user';
-        if (window.mQxb && window.mQxb.Sensor && window.mQxb.Sensor.hrvCameraFacing) { facing = window.mQxb.Sensor.hrvCameraFacing; }
-        const isFront = (facing === 'user');
-        return getLang() === 1
-            ? `请您闭上眼睛听音乐的同时，把干净手指放在${isFront ? '前' : '后'}摄像头上，这样可以帮助您分析出音乐对您情绪的影响。`
-            : `Please close your eyes and listen to the music. Put a clean finger on the ${isFront ? 'front' : 'back'} camera. This will help us analyze the impact of music on your emotions.`;
+    function translateSectionName(name) {
+        if (!name) return '';
+        return getLang() === 1 ? name : name.replace('乐章', 'Movement');
     }
 
     let _toastTimer = null;
@@ -105,6 +68,7 @@
         if (!res.ok) { const txt = await res.text(); throw new Error(`RPC ${fnName}: ${res.status} ${txt}`); }
         return res.json();
     }
+
     async function restGet(path) {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
@@ -113,10 +77,162 @@
         return res.json();
     }
 
-    function escapeHtml(s) {
-        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    // ==========================================
+    // 🌟 动态操作提示栏核心控制器
+    // ==========================================
+    function updateActionBar(step) {
+        const bar = document.getElementById('qx2_music_row');
+        if (!bar) return;
+
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+        if (step === 1) {
+            bar.innerHTML = `<div class="qx2-ab-text">请确认您当前的情绪、再选择是否采集HRV</div>`;
+            if (window.qxSpeak) window.qxSpeak("请确认您当前的情绪、再选择是否采集HRV", null);
+        }
+        else if (step === 2 && !state.started && !state.isWorkMode) {
+            bar.innerHTML = `
+                <div class="qx2-ab-text" style="margin-right:16px;">按'开始'听组曲调节情绪，按'选曲'听经典作品</div>
+                <div class="qx2-ab-btns">
+                    <button class="qx2-ab-btn qx2-ab-btn-secondary" onclick="window.qx2_pickWork()">选曲</button>
+                    <button class="qx2-ab-btn qx2-ab-btn-primary" onclick="window.qx2_startAuto()">开始</button>
+                </div>
+            `;
+            if (window.qxSpeak) window.qxSpeak("按开始听组曲调节情绪，按选曲听经典作品", null);
+        }
+        else if (step === 2 && !state.isWorkMode && state.started) {
+            bar.innerHTML = `<div class="qx2-ab-text">请听情绪宝为您准备的音乐</div>`;
+            if (window.qxSpeak) window.qxSpeak("请听情绪宝为您准备的音乐", null);
+        }
+        else if (step === 2 && state.isWorkMode && !state.started) {
+            bar.innerHTML = `
+                <div class="qx2-ab-text" style="margin-right:16px;">请选出您想听的音乐作品</div>
+                <div id="qx2_ab_dropdown" class="qx2-ab-dropdown"></div>
+            `;
+            if (window.qxSpeak) window.qxSpeak("请选出您想听的音乐作品", null);
+            window.qx2_renderDropdown();
+        }
+        else if (step === 2 && state.isWorkMode && state.started) {
+            const curWork = state.playlist[state.currentIndex];
+            const workName = curWork ? (curWork.title_cn || curWork.title_en) : '经典作品';
+            bar.innerHTML = `<div class="qx2-ab-text">请听《${workName}》</div>`;
+            if (window.qxSpeak) window.qxSpeak(`请听《${workName}》`, null);
+        }
+        else if (step === 3) {
+            bar.innerHTML = `
+                <div class="qx2-ab-text" style="margin-right:16px;">请按评价过程键后给出听后评价和听后情绪</div>
+                <div class="qx2-ab-btns">
+                    <button class="qx2-ab-btn qx2-ab-btn-secondary" onclick="window.qx2_quick_eval('better')">更好</button>
+                    <button class="qx2-ab-btn qx2-ab-btn-secondary" onclick="window.qx2_quick_eval('same')">一样</button>
+                    <button class="qx2-ab-btn qx2-ab-btn-secondary" onclick="window.qx2_quick_eval('worse')">更差</button>
+                </div>
+            `;
+            if (window.qxSpeak) window.qxSpeak("请按评价过程键后给出听后评价和听后情绪", null);
+        }
+        else if (step === 4) {
+            bar.innerHTML = `<div class="qx2-ab-text">情绪调整分析图已生成，请查看下方页签</div>`;
+        }
     }
 
+    // ==========================================
+    // 🌟 横条交互与评价
+    // ==========================================
+    window.qx2_pickWork = function() {
+        state.isWorkMode = true;
+        state.started = false;
+        const container = document.getElementById('qx2_container');
+        if (container) {
+            container.classList.remove('step1-mode');
+            container.classList.add('step2-mode', 'work-mode');
+        }
+        updateActionBar(2);
+        const dropdown = document.getElementById('qx2_ab_dropdown');
+        if (dropdown) {
+            dropdown.classList.add('show');
+            if (dropdown.innerHTML.indexOf('加载中') >= 0) {
+                window.qx2_renderDropdown();
+            }
+        }
+    };
+
+    window.qx2_startAuto = function() {
+        enterAdjustStep(); 
+    };
+
+    window.qx2_quick_eval = function(val) {
+        state.feedback = val; 
+        const valMap = { 'better': t('更好', 'Better'), 'same': t('一样', 'Same'), 'worse': t('更差', 'Worse') };
+        const zhVal = valMap[val] || val;
+
+        const bar = document.getElementById('qx2_music_row');
+        if (bar) {
+            bar.innerHTML = `
+                <div class="qx2-ab-text" style="color:#2C7BE5; margin-right:16px; font-weight:bold;">
+                    已记录：${zhVal}。请去右上角选情绪，然后点分析
+                </div>
+                <div class="qx2-ab-btns">
+                    <button class="qx2-ab-btn ${val === 'better' ? 'qx2-ab-btn-primary' : 'qx2-ab-btn-secondary'}" onclick="window.qx2_quick_eval('better')">更好</button>
+                    <button class="qx2-ab-btn ${val === 'same' ? 'qx2-ab-btn-primary' : 'qx2-ab-btn-secondary'}" onclick="window.qx2_quick_eval('same')">一样</button>
+                    <button class="qx2-ab-btn ${val === 'worse' ? 'qx2-ab-btn-primary' : 'qx2-ab-btn-secondary'}" onclick="window.qx2_quick_eval('worse')">更差</button>
+                </div>
+            `;
+        }
+        if (window.qxSpeak) window.qxSpeak(`已记录：${zhVal}。请去右上角选择情绪，然后点击分析`, null);
+    };
+
+    window.qx2_renderDropdown = async function() {
+        const dropdown = document.getElementById('qx2_ab_dropdown');
+        if (!dropdown) return;
+        dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">加载中...</div>';
+        
+        try {
+            const works = await restGet(`emo_works?is_published=eq.true&order=created_at.asc`);
+            if (!works || works.length === 0) {
+                dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">暂无作品</div>';
+                return;
+            }
+            
+            dropdown.innerHTML = works.map(w => {
+                const title = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
+                return `<div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')">${escapeHtml(title)}</div>`;
+            }).join('');
+        } catch (e) {
+            dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#E74C3C;">网络错误，请重试</div>';
+        }
+    };
+
+    window.qx2_selectWork = async function(workid) {
+        const dropdown = document.getElementById('qx2_ab_dropdown');
+        if (dropdown) dropdown.classList.remove('show');
+        
+        try {
+            const works = await restGet(`emo_works?workid=eq.${workid}`);
+            if (works && works.length > 0) {
+                const work = works[0];
+                state.isWorkMode = true;
+                state.started = true;
+                state.playlist = [{ trackid: work.workid, title_cn: work.title_cn, title_en: work.title_en, fileurl: work.audio_url, musictypecode: 0, isWork: true, workInfo: work }];
+                state.currentIndex = 0;
+                state.finished = false;
+                
+                const container = document.getElementById('qx2_container');
+                if (container) {
+                    container.classList.remove('step1-mode');
+                    container.classList.add('step2-mode', 'work-mode');
+                }
+                
+                await renderWorkInfo(work);
+                initAudio();
+                state.audio.src = work.audio_url;
+                playSegment(0);
+                updateActionBar(2);
+            }
+        } catch (e) { toast('加载作品失败', 'error'); }
+    };
+
+    // ==========================================
+    // 🌟 界面状态与流程控制
+    // ==========================================
     function renderFlowBar() {
         const bar = document.getElementById('qx2_flow_bar');
         if (!bar) return;
@@ -130,419 +246,54 @@
             if (s !== state.step + 1) el.classList.add('disabled');
         });
     }
+
     function applyStepLayout() {
         const container = document.getElementById('qx2_container');
-        if (!container) return;
-        if (state.step === 2) {
+        if (!container) return;        
+        container.classList.remove('step1-mode', 'step2-mode', 'work-mode', 'step4-mode', 'step3-mode');        
+        
+        if (state.step === 1 || (state.step === 2 && !state.started)) {
+            container.classList.add('step1-mode');
+        } 
+        else if (state.step === 2 && state.started) {
             container.classList.add('step2-mode');
             if (state.isWorkMode) container.classList.add('work-mode');
-            else container.classList.remove('work-mode');
-        } else {
-            container.classList.remove('step2-mode');
-            container.classList.remove('work-mode');
+        } 
+        else if (state.step === 3) {
+            container.classList.add('step3-mode');
         }
+        else if (state.step === 4) {
+            container.classList.add('step4-mode');
+        }        
+        updateActionBar(state.step);
     }
+
     function setStep(n) {
         state.step = n;
         renderFlowBar();
-        updateAllButtonsState();
         applyStepLayout();
     }
 
-    function updateAllButtonsState() {
-        const btnStart = document.getElementById('qx2_btn_start');
-        const btnCollection = document.getElementById('qx2_btn_collection');
-        const inStep1 = (state.step === 1);
-        if (btnStart) btnStart.disabled = !inStep1 || !state.inputEmotionCode;
-        if (btnCollection) btnCollection.disabled = !inStep1;
-    }
-
-    let mirrorBeforeId = null;
-    let mirrorAfterId = null;
     function initMirrorBefore(initialCode) {
         mirrorBeforeId = qxMoodMirror.create('qx2_wheel_before', {
             mode: t('听前情绪', 'Before Emotion'), initialCode: initialCode || 0, doIt: '做', thermometerSide: 'right',
-            onChange: (code) => { state.inputEmotionCode = (code == null) ? 0 : code; updateAllButtonsState(); }
+            onChange: (code) => { state.inputEmotionCode = (code == null) ? 0 : code; }
         });
     }
+
     function initMirrorAfter() {
         mirrorAfterId = qxMoodMirror.create('qx2_wheel_after', {
             mode: t('听后情绪', 'After Emotion'), initialCode: 0, doIt: '不做', thermometerSide: 'left',
-            onChange: (code) => { state.outputEmotionCode = (code == null) ? 0 : code; updateAllButtonsState(); }
+            onChange: (code) => { state.outputEmotionCode = (code == null) ? 0 : code; }
         });
     }
 
-    async function loadSystemRule(emotionCode) {
-        try {
-            const rules = await restGet(`emobao_regulationrule?emotioncode=eq.${emotionCode}&isactive=eq.true&ruletype=eq.system&limit=1`);
-            return rules && rules.length ? { ok: true, rule: rules[0] } : { ok: false, error: 'NO_RULE' };
-        } catch (e) { return { ok: false, error: 'NETWORK_RULE' }; }
+    function hideWorkInfo() {
+        const card = document.getElementById('qx2_work_info');
+        if (card) card.style.display = 'none';
+        _workInfo = { work: null, timelines: [], tags: { instruments: [], styles: [] } };
+        state.lastSpokenText = '';
     }
-    async function loadWorks() {
-        try { return await restGet(`emo_works?is_published=eq.true&select=workid,title_cn,title_en,composer,cover_url,audio_url,total_duration,era,form,global_valence,global_arousal&order=created_at.asc`); }
-        catch (e) { return []; }
-    }
-
-    async function generatePlaylist(rule) {
-        if (!rule || !rule.sequence || !Array.isArray(rule.sequence)) return { ok: false, error: 'BROKEN_RULE' };
-        const playlist = [];
-        for (let i = 0; i < rule.sequence.length; i++) {
-            const item = rule.sequence[i];
-            if (item.mode === 'random') {
-                const tracks = await restGet(`emobao_musictrack?musictypecode=eq.${item.musictypecode}&isactive=eq.true`);
-                if (!tracks || tracks.length === 0) return { ok: false, error: 'NO_TRACK' };
-                const pick = tracks[Math.floor(Math.random() * tracks.length)];
-                playlist.push({ trackid: pick.trackid, fileurl: pick.fileurl, musictypecode: pick.musictypecode });
-            } else if (item.mode === 'fixed' && item.trackid) {
-                const tracks = await restGet(`emobao_musictrack?trackid=eq.${item.trackid}`);
-                if (!tracks || tracks.length === 0) return { ok: false, error: 'NO_TRACK' };
-                playlist.push({ trackid: tracks[0].trackid, fileurl: tracks[0].fileurl, musictypecode: tracks[0].musictypecode });
-            }
-        }
-        return { ok: true, playlist };
-    }
-    function errorToToast(errCode) { return t('组曲失败', 'Playlist failed'); }
-    
-    function renderTrendMini() {
-        let el = document.getElementById('qx2_trend_mini_overlay') || document.querySelector('#qx2_heal_overlay .qx2-trend-mini') || document.getElementById('qx2_trend_mini');
-        if (!el) return;
-        const videoWrap = el.querySelector('.qx2-trend-video-wrap');
-        el.innerHTML = '';
-        if (videoWrap) el.appendChild(videoWrap);
-        const pl = state.playlist;
-        if (pl.length === 0) return;
-
-        if (pl.length > 1) {
-            const score = document.createElement('span');
-            score.className = 'qx2-trend-score';
-            const cur = Math.min(state.currentIndex + 1, pl.length);
-            score.innerText = `${cur}/${pl.length}`;
-            el.insertBefore(score, videoWrap || null);
-            
-            for (let i = 0; i < pl.length - 1; i++) {
-                if (state.currentIndex < i + 1) break;
-                const a = MUSIC_LEVELS.find(m => m.code === pl[i].musictypecode);
-                const b = MUSIC_LEVELS.find(m => m.code === pl[i + 1].musictypecode);
-                const na = a ? a.code : 7, nb = b ? b.code : 7;
-                const SEG_W = 24, SEG_H = 24, MID_Y = 12, DELTA = 3, PAD_X = 6;
-                let y1, y2, cls;
-                if (nb < na)      { y1 = MID_Y + DELTA; y2 = MID_Y - DELTA; cls = 'qx2-trend-up'; }
-                else if (nb > na) { y1 = MID_Y - DELTA; y2 = MID_Y + DELTA; cls = 'qx2-trend-down'; }
-                else              { y1 = MID_Y;         y2 = MID_Y;         cls = 'qx2-trend-flat'; }
-                const svg = `<svg viewBox="0 0 ${SEG_W} ${SEG_H}" xmlns="http://www.w3.org/2000/svg"><line class="qx2-trend-line ${cls}" x1="${PAD_X}" y1="${y1}" x2="${SEG_W - PAD_X}" y2="${y2}"/></svg>`;
-                el.insertBefore(document.createRange().createContextualFragment(svg), videoWrap || null);
-            }
-        }
-    }
-
-    function initAudio() {
-        if (!state.audio) {
-            state.audio = new Audio(); state.audio.preload = 'auto';
-            state.audio.addEventListener('ended', onTrackEnded);
-            
-            state.audio.addEventListener('timeupdate', () => {
-                if (!state.started || state.finished) return;
-                if (state.playMode === 'musicOnly') {
-                    if (state.isWorkMode && _workInfo.work) updateWorkInfoProgress(state.audio.currentTime);
-                    return;
-                }
-                if (state.isWorkMode && _workInfo.timelines && _workInfo.timelines.length > 0) {
-                    const seg = _workInfo.timelines[state.currentSegIndex];
-                    if (seg && seg.end_time > seg.start_time) {
-                        if (state.audio.currentTime >= seg.end_time - 0.3) {
-                            state.audio.pause();
-                            playSegment(state.currentSegIndex + 1);
-                        }
-                    }
-                }
-            });
-
-            state.audio.addEventListener('stalled', () => { if (state.audio && !state.finished) { state.audio.load(); state.audio.play().catch(() => {}); } });
-            state.audio.addEventListener('error', (e) => {
-                if (!state.audio || !state.audio.error) return;
-                const curSrc = state.audio.currentSrc;
-                if (curSrc && !state.finished) {
-                    const curTime = state.audio.currentTime;
-                    setTimeout(() => { state.audio.load(); state.audio.currentTime = curTime; state.audio.play().catch(() => {}); }, 500);
-                    return;
-                }
-                toast(t('音频连接中断', 'Audio disconnected'), 'error');
-            });
-        }
-    }
-
-    // =====================================================================
-    // 串行驱动核心：先念词，后放音乐
-    // =====================================================================
-    function playSegment(index) {
-        if (index >= _workInfo.timelines.length) {
-            onPlaylistFinished();
-            return;
-        }
-        
-        state.currentSegIndex = index;
-        const seg = _workInfo.timelines[index];
-        
-        if (state.audio) state.audio.pause();
-        
-        updateWorkInfoProgress(seg.start_time);
-        const text = getLang() === 2 ? (seg.ai_guide_text_en || seg.ai_guide_text) : seg.ai_guide_text;
-
-        if (state.playMode === 'musicOnly') {
-            if (seg.end_time > seg.start_time) {
-                state.audio.currentTime = seg.start_time;
-                state.audio.play().catch(()=>{});
-            } else {
-                playSegment(index + 1); 
-            }
-            return;
-        }
-
-        if (text && window.qxSpeak) {
-            const segBox = document.getElementById('qx2_wi_curr_seg');
-            const titleEl = document.getElementById('qx2_wi_curr_title');
-            const textEl = document.getElementById('qx2_wi_curr_text');
-            if (segBox && titleEl && textEl) {
-                segBox.style.display = 'block';
-                titleEl.innerText = translateSectionName(seg.section_name || seg.emotion_tag || '');
-                textEl.innerText = text;
-            }
-
-            let hasTriggered = false;
-            const triggerMusic = () => {
-                if (hasTriggered) return;
-                hasTriggered = true;
-                clearTimeout(speakWatchdog); 
-
-                if (state.playMode !== 'guided') return; 
-                if (seg.end_time > seg.start_time) {
-                    state.audio.currentTime = seg.start_time;
-                    state.audio.play().catch(()=>{});
-                } else {
-                    playSegment(index + 1);
-                }
-            };
-
-            const expectedSeconds = Math.ceil(text.length / 3) + 3;
-            clearTimeout(speakWatchdog);
-            speakWatchdog = setTimeout(() => {
-                console.log(`[看门狗] 语音超时，强制启动音乐！`);
-                if (window.speechSynthesis) window.speechSynthesis.cancel(); 
-                triggerMusic();
-            }, expectedSeconds * 1000);
-
-            window.qxSpeak(text, triggerMusic);
-        } else {
-            if (seg.end_time > seg.start_time) {
-                state.audio.currentTime = seg.start_time;
-                state.audio.play().catch(()=>{});
-            } else {
-                playSegment(index + 1);
-            }
-        }
-    }
-
-    window.qx2_togglePlayMode = function() {
-        if (!state.isWorkMode || !_workInfo.timelines || _workInfo.timelines.length === 0) return;
-        clearTimeout(speakWatchdog);
-
-        if (state.playMode === 'guided') {
-            state.playMode = 'musicOnly';
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
-            toast(t('切换为纯欣赏模式', 'Music Only'), 'info');
-            if (state.audio.paused) state.audio.play().catch(()=>{});
-        } else {
-            state.playMode = 'guided';
-            toast(t('切换为讲解模式', 'Guided Mode'), 'info');
-            const curTime = state.audio.currentTime;
-            let idx = _workInfo.timelines.findIndex(x => curTime >= x.start_time && curTime < x.end_time && x.end_time > x.start_time);
-            if (idx === -1) idx = 0;
-            state.audio.pause();
-            playSegment(idx);
-        }
-    };
-
-    function isFastMode() { try { return new URLSearchParams(window.location.search).get('fast') === '1'; } catch (e) { return false; } }
-    let _fastTimer = null;
-
-    function playCurrentTrack() {
-        if (state.currentIndex >= state.playlist.length) { onPlaylistFinished(); return; }
-        const track = state.playlist[state.currentIndex];
-        if (!track || !track.fileurl) { toast(t('曲目文件缺失', 'Track missing'), 'error'); return; }
-        initAudio();
-        
-        if (!state.audio.src || state.audio.src.indexOf(track.fileurl) === -1) {
-            state.audio.src = track.fileurl;
-        }
-
-        if (state.playMode === 'musicOnly' && !state.isWorkMode) {
-            state.audio.currentTime = 0;
-            state.audio.play().catch(e=>{});
-        }
-        
-        if (state.isWorkMode) return; 
-
-        state.audio.play().then(() => {
-            renderTrendMini();
-            if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
-            if (isFastMode()) {
-                _fastTimer = setTimeout(() => { try { state.audio.pause(); } catch (e) {} onTrackEnded(); }, 30000);
-            }
-        }).catch(err => {
-            if (err.name === 'AbortError') return;
-            console.error('播放失败', err);
-        });
-    }
-    function onTrackEnded() {
-        if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
-        state.currentIndex++;
-        if (state.currentIndex < state.playlist.length) playCurrentTrack();
-        else onPlaylistFinished();
-    }
-    function onPlaylistFinished() {
-        if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
-        state.finished = true;
-        try { qxHrvCapture.stop(); } catch (e) {}
-        setStep(3);
-        if (mirrorAfterId) qxMoodMirror.setDoIt('qx2_wheel_after', '做');
-        if (window.qxHealChart) { try { qxHealChart.finish(); } catch (e) {} }
-        
-        toast(t('音乐播放完成，请填写听后评价并选择听后情绪', 'Music done.'), 'success');
-    }
-
-    function onFlowStepClick(step) {
-        if (step === state.step + 1) {
-            if (step === 2) {
-                if (!state.inputEmotionCode || state.inputEmotionCode === 0) { toast(t('请先用魔镜选出情绪', 'Please pick emotion first'), 'warning'); return; }
-                enterAdjustStep(); return;
-            }
-            if (step === 3) {
-                if (!state.finished) { toast(t('请先等音乐播放完成', 'Please wait'), 'warning'); return; }
-                setStep(3);
-                if (mirrorAfterId) qxMoodMirror.setDoIt('qx2_wheel_after', '做');
-                return;
-            }
-            if (step === 4) {
-                if (!state.outputEmotionCode || !state.feedback) { toast(t('请先选择听后情绪和主观评价', 'Please fill output emotion and feedback'), 'warning'); return; }
-                setStep(4); renderAnalysis();
-                if (window.qxHealChart) { try { qxHealChart.showAnalysis(); } catch (e) {} }
-                return;
-            }
-        }
-    }
-
-    function renderAnalysisLive() {
-        const body = document.getElementById('qx2_analysis_body');
-        if (!body) return;
-        const series = state.hrvSeries;
-        if (series.length < 2) { body.innerHTML = `<div class="qx2-analysis-placeholder">${t('等待采样…', 'Waiting for samples…')}</div>`; return; }
-        renderAnalysis();
-    }
-    function avg(arr, key) { if (!arr || arr.length === 0) return 0; return arr.reduce((a, b) => a + (b[key] || 0), 0) / arr.length; }
-
-    // 🌟 完美恢复：完整的 HRV 分析渲染
-    function renderAnalysis() {
-        const body = document.getElementById('qx2_analysis_body');
-        if (!body) return;
-        const series = state.hrvSeries;
-        const hfSeries = state.hfSeries;
-        const html = [];
-
-        const cov = (state.hrvResult && state.hrvResult.coverage != null) ? state.hrvResult.coverage : (series.length >= 2 ? 1 : 0);
-
-        if (series.length < 2 || cov < 0.30) {
-            html.push(`<div class="qx2-analysis-tip">
-                ${t('如果您在听音乐时进行了 HRV 采样（用手机摄像头或心率带），可以分析音乐对您情绪的影响。', 'If you captured HRV while listening, we can analyze the impact.')}
-            </div>`);
-            body.innerHTML = html.join('');
-            return;
-        }
-
-        const first = series.slice(0, Math.min(3, series.length));
-        const last  = series.slice(-Math.min(3, series.length));
-        const r0 = avg(first, 'rmssd'), r1 = avg(last, 'rmssd');
-        const h0 = avg(first, 'bpm'),   h1 = avg(last, 'bpm');
-        const diffR = r1 - r0;
-        const diffH = h1 - h0;
-
-        const hfOk = hfSeries.length >= 3;
-        let hfFirst = 0, hfLast = 0, hfDiff = 0;
-        if (hfOk) {
-            hfFirst = avg(hfSeries.slice(0, 3), 'hf');
-            hfLast  = avg(hfSeries.slice(-3), 'hf');
-            hfDiff  = hfLast - hfFirst;
-        }
-
-        let conclusion;
-        if (diffR > 5 && (!hfOk || hfDiff >= 0))      conclusion = t('本次放松度上升，调整有效', 'Relaxation increased, effective');
-        else if (diffR > 5 && hfOk && hfDiff < 0)      conclusion = t('放松度上升，呼吸性心率略降', 'Relaxation up, HF slightly down');
-        else if (diffR < -5)                           conclusion = t('本次放松度下降，建议再听一段', 'Relaxation decreased');
-        else                                           conclusion = t('本次放松度平稳，效果不明显', 'Relaxation stable');
-        html.push(`<div class="qx2-analysis-conclusion">${conclusion}</div>`);
-
-        html.push(`<div class="qx2-analysis-row">
-            ${t('开始时', 'Start')}：${t('放松度', 'Relax')} ${Math.round(r0)} · ${t('心率', 'HR')} ${Math.round(h0)}<br>
-            ${t('结束时', 'End')}：${t('放松度', 'Relax')} ${Math.round(r1)} · ${t('心率', 'HR')} ${Math.round(h1)}
-        </div>`);
-
-        let hfText;
-        if (!hfOk) {
-            hfText = t('本次 HF 数据不够，未能分析', 'HF data insufficient');
-        } else if (hfDiff > 0.5) {
-            hfText = t('本次情绪调节过程从呼吸性心率看有效', 'Effective per HF');
-        } else if (hfDiff < -0.5) {
-            hfText = t('本次呼吸性心率下降，放松效果不明显', 'HF decreased, weak effect');
-        } else {
-            hfText = t('本次呼吸性心率变化不大', 'HF stable');
-        }
-        html.push(`<div class="qx2-analysis-item"><b>${t('呼吸性心率', 'Respiratory HR')}</b><br>${hfText}</div>`);
-
-        let trend;
-        if (diffR > 3) trend = t('放松度整体上升', 'Overall rising');
-        else if (diffR < -3) trend = t('放松度整体下降', 'Overall falling');
-        else trend = t('放松度整体平稳', 'Overall stable');
-        html.push(`<div class="qx2-analysis-item"><b>${t('过程变化', 'Progress')}</b><br>${trend}</div>`);
-
-        const avgH = avg(series, 'bpm'), avgR = avg(series, 'rmssd');
-        let st;
-        if (avgH >= 75 && avgR < 45) st = t('紧张·压力', 'Tense·Stress');
-        else if (avgH < 75 && avgR >= 45) st = t('放松·恢复', 'Relaxed·Recovery');
-        else if (avgH >= 75 && avgR >= 45) st = t('兴奋·调节好', 'Excited·Well');
-        else st = t('疲劳·耗竭', 'Fatigue·Burnout');
-        html.push(`<div class="qx2-analysis-item"><b>${t('整体状态', 'Overall')}</b><br>${st}</div>`);
-
-        let consistent;
-        const fb = state.feedback;
-        if ((fb === 'better' && diffR > 0) || (fb === 'worse' && diffR < 0) || (fb === 'same' && Math.abs(diffR) < 5)) {
-            consistent = t('数据与您的感受一致', 'Consistent with your feeling');
-        } else {
-            consistent = t('数据与您的感受不一致', 'Inconsistent with your feeling');
-        }
-        html.push(`<div class="qx2-analysis-item"><b>${t('与自评', 'Self-report')}</b><br>${consistent}</div>`);
-
-        let advice;
-        if (diffR > 5) advice = t('保持这种调节节奏', 'Keep this rhythm');
-        else if (diffR < -5) advice = t('下次可换一组曲', 'Try another playlist');
-        else advice = t('建议有时间多用情绪宝', 'Use Emo Treasure more often');
-        html.push(`<div class="qx2-analysis-item"><b>${t('建议', 'Advice')}</b><br>${advice}</div>`);
-
-        let maxIdx = 0;
-        series.forEach((p, i) => { if ((p.rmssd || 0) > (series[maxIdx].rmssd || 0)) maxIdx = i; });
-        const maxP = series[maxIdx];
-        const mmin = Math.floor((maxP.t || 0) / 60);
-        const msec = (maxP.t || 0) % 60;
-        html.push(`<div class="qx2-analysis-item"><b>${t('最放松时刻', 'Best moment')}</b><br>${t('第', 'at')} ${mmin}:${String(msec).padStart(2, '0')} · ${t('放松度', 'Relax')} ${maxP.rmssd}</div>`);
-
-        const hrHint = diffH < -3 ? t(`您的心率下降 ${Math.abs(Math.round(diffH))}，说明身心在放松`, `HR dropped ${Math.abs(Math.round(diffH))}`)
-                    : diffH > 3 ? t(`您的心率上升 ${Math.round(diffH)}，请留意`, `HR rose ${Math.round(diffH)}`)
-                    : t('心率变化不大，状态平稳', 'HR stable');
-        html.push(`<div class="qx2-analysis-item"><b>${t('身体信号', 'Body signal')}</b><br>${hrHint}</div>`);
-
-        body.innerHTML = html.join('');
-    }
-
-    let _timelineCache = {};
-    let _workInfo = { work: null, timelines: [], tags: { instruments: [], styles: [] } };
 
     async function renderWorkInfo(work) {
         const card = document.getElementById('qx2_work_info');
@@ -565,10 +316,6 @@
                 <div class="qx2-wi-label">${escapeHtml(t('全曲结构', 'Structure'))}</div>
                 <div class="qx2-wi-seg-list" id="qx2_wi_seg_list"></div>
             </div>
-            <div class="qx2-wi-section" id="qx2_wi_tags_sec" style="display:none;">
-                <div class="qx2-wi-label">${escapeHtml(t('配器与风格', 'Instruments & Style'))}</div>
-                <div class="qx2-wi-tags" id="qx2_wi_tags"></div>
-            </div>
         `;
 
         _workInfo = { work: work, timelines: [], tags: { instruments: [], styles: [] } };
@@ -578,20 +325,17 @@
                 `emo_work_timelines?workid=eq.${work.workid}&select=start_time,end_time,ai_guide_text,ai_guide_text_en,section_name,emotion_tag,arousal_score,instruments,dynamics,form_section&order=start_time.asc`
             );
             _workInfo.timelines = timelines || [];
-            _timelineCache[work.workid] = _workInfo.timelines;
             const structSec = document.getElementById('qx2_wi_struct_sec');
             const segList = document.getElementById('qx2_wi_seg_list');
             
             if (structSec && segList && _workInfo.timelines.length > 0) {
                 structSec.style.display = 'block';
-                
-                segList.innerHTML = _workInfo.timelines.filter(tl => tl.start_time !== tl.end_time).map((tl, i) => {
+                segList.innerHTML = _workInfo.timelines.filter(tl => tl.start_time !== tl.end_time).map((tl) => {
                     const mm = Math.floor(tl.start_time / 60);
                     const ss = String(tl.start_time % 60).padStart(2, '0');
                     return `<span class="qx2-wi-seg-item" data-seg="${tl.start_time}">${mm}:${ss} ${escapeHtml(translateSectionName(tl.section_name) || tl.emotion_tag || '')}</span>`;
                 }).join('');
 
-                // 🚀 绑定点击跳转事件！
                 segList.querySelectorAll('.qx2-wi-seg-item').forEach(btn => {
                     btn.style.cursor = 'pointer';
                     btn.onclick = () => {
@@ -603,67 +347,11 @@
                     };
                 });
             }
-        } catch (e) { 
-            console.warn('[qx2] 拉 timelines 失败', e); 
-        }
-
-        try {
-            const tags = await restGet(`emo_work_tags?workid=eq.${work.workid}&select=instrument_name,style_tag`);
-            const instruments = new Set();
-            const styles = new Set();
-            (tags || []).forEach(tg => {
-                if (tg.instrument_name) instruments.add(tg.instrument_name);
-                if (tg.style_tag) styles.add(tg.style_tag);
-            });
-            _workInfo.tags = { instruments: [...instruments], styles: [...styles] };
-            const tagsSec = document.getElementById('qx2_wi_tags_sec');
-            const tagsEl = document.getElementById('qx2_wi_tags');
-            if (tagsSec && tagsEl && (instruments.size + styles.size) > 0) {
-                tagsSec.style.display = 'block';
-                const arr = [];
-                [...instruments].forEach(n => arr.push(`<span class="qx2-wi-tag">🎻 ${escapeHtml(n)}</span>`));
-                [...styles].forEach(n => arr.push(`<span class="qx2-wi-tag">🎨 ${escapeHtml(n)}</span>`));
-                tagsEl.innerHTML = arr.join('');
-            }
-        } catch (e) { console.warn('[qx2] 拉 tags 失败', e); }
-
-        if (work.title_cn.includes('春天里')) {
-            if (window.speechSynthesis) window.speechSynthesis.cancel();
-            if (window.qxHelpCard && typeof qxHelpCard.show === 'function') {
-                const cardEl = document.getElementById('qx2_work_info');
-                if (cardEl) { cardEl.style.backgroundImage = 'none'; cardEl.style.backgroundColor = '#f8f9fa'; }
-                const bodyText = t(` 《春天里》歌中那句“如果有一天，我老无所依，请把我留在，在这春天里”总能触动人心底最柔软的地方。在这个快节奏的时代，我们像陀螺一样旋转，很难静下心来察觉情绪，更别提自我调节了。我们缺少的往往不是道理，而是一个有效、触手可及的工具。`, `In "Spring"
-在情绪宝的创作过程中，我并不孤单。衷心感谢高天教授对我的多次悉心培训；衷心感谢多位前辈老师的倾囊相授；特别感谢 Ms. Jane Wu 给了巨大的支持；感谢 Mr. Jerry Jarod 在关键问题上提出的宝贵建议。
-情绪宝做了一些用心的、有价值的创新工作——比如把人脸情绪识别与情绪的选择、情绪“温度”的视觉化设计；比如引入科学地测量 HRV 数据印证实际的情绪反映，把抽象的自主神经变化成肉眼可见的图形；比如把相关学科专家积累多年的科学的生活事件量表，与移动互联网结合让大家都方便的监督自己的情绪与健康、特别是情绪宝把丰富的古典音乐华彩乐章送到我们身边，按照您不同的情绪状态，与您“情绪同步”，在欣赏音乐的同时自我调整情绪、我们还努力地根据您最近遇到的生活事件，把相关的有价值信息送到“知识问答”……
-无论你是老朋友还是新朋友，我都诚挚地欢迎你留下宝贵的意见和建议。
-联系方式：
-情绪宝邮箱：13269592986@163.com
-情绪宝微信：13269592986`);
-                qxHelpCard.show({ title: t('情绪宝 · 代序', 'EmoBao · Prologue'), body: bodyText });
-            }
-        }
-    }
-
-    function showFloatingTag(text) {
-        if (!text) return;
-        const container = document.getElementById('qx2_container');
-        if (!container) return;
-        const tag = document.createElement('div');
-        tag.className = 'qx2-floating-tag';
-        tag.innerText = text;
-        tag.style.position = 'absolute'; tag.style.bottom = '20%'; tag.style.left = '50%'; tag.style.transform = 'translateX(-50%) translateY(0)';
-        tag.style.background = 'rgba(0, 0, 0, 0.6)'; tag.style.color = '#1DB954'; tag.style.padding = '8px 16px'; tag.style.borderRadius = '20px';
-        tag.style.fontSize = '14px'; tag.style.border = '1px solid rgba(29, 185, 84, 0.4)'; tag.style.backdropFilter = 'blur(4px)';
-        tag.style.pointerEvents = 'none'; tag.style.opacity = '0'; tag.style.transition = 'opacity 1s ease, transform 3s ease'; tag.style.zIndex = '9999';
-        container.appendChild(tag);
-        requestAnimationFrame(() => { tag.style.opacity = '1'; tag.style.transform = 'translateX(-50%) translateY(-50px)'; });
-        setTimeout(() => { tag.style.opacity = '0'; setTimeout(() => tag.remove(), 1000); }, 3500);
+        } catch (e) { console.warn('[qx2] 拉 timelines 失败', e); }
     }
 
     function updateWorkInfoProgress(currentSec) {
         if (!_workInfo.work) return;
-        if (_workInfo.work.title_cn.includes('春天里')) return;
-
         const seg = _workInfo.timelines.find(x => currentSec >= x.start_time && currentSec < x.end_time && x.start_time !== x.end_time);
         const segBox = document.getElementById('qx2_wi_curr_seg');
         const titleEl = document.getElementById('qx2_wi_curr_title');
@@ -672,16 +360,7 @@
         if (segBox && titleEl && textEl) {
             if (seg) {
                 segBox.style.display = 'block';
-                const lang = getLang();
-                const guideText = lang === 2 ? (seg.ai_guide_text_en || seg.ai_guide_text || '') : (seg.ai_guide_text || '');
-
-                if (state.lastSpokenText !== guideText && seg.instruments) {
-                    let tagText = '';
-                    if (seg.instruments) tagText += `🎻 ${seg.instruments}`;
-                    if (seg.dynamics) tagText += ` · ${seg.dynamics}`;
-                    showFloatingTag(tagText);
-                }
-
+                const guideText = getLang() === 2 ? (seg.ai_guide_text_en || seg.ai_guide_text || '') : (seg.ai_guide_text || '');
                 const titleStr = `${translateSectionName(seg.section_name) || ''} ${seg.form_section ? '· ' + translateSectionName(seg.form_section) : ''}`;
                 titleEl.innerText = titleStr.trim();
                 textEl.innerText = guideText;
@@ -689,319 +368,731 @@
                 segBox.style.display = 'none';
             }
         }
-        
         const list = document.getElementById('qx2_wi_seg_list');
         if (list) {
             list.querySelectorAll('.qx2-wi-seg-item').forEach((el) => {
-                const segStartTime = parseFloat(el.dataset.seg);
-                if (seg && seg.start_time === segStartTime) el.classList.add('active');
+                if (seg && seg.start_time === parseFloat(el.dataset.seg)) el.classList.add('active');
                 else el.classList.remove('active');
             });
         }
     }
 
-    function hideWorkInfo() {
-        const card = document.getElementById('qx2_work_info');
-        if (card) card.style.display = 'none';
-        _workInfo = { work: null, timelines: [], tags: { instruments: [], styles: [] } };
-        state.lastSpokenText = '';
+    function bindFeedbackRadios() {
+        document.querySelectorAll('input[name="qx2_feedback"]').forEach(r => {
+            r.addEventListener('change', () => { state.feedback = r.value; });
+        });
     }
 
-    async function showTimelineGuide(workid, currentSec) {
-        if (!workid) return;
-        if (state.playMode === 'musicOnly') updateWorkInfoProgress(currentSec);
-    }
+    // ==========================================
+    // 🌟 听前/听后语音确认与采样（极简沉浸版）
+    // ==========================================
+    function runHrvCapture(phase, onFinish) {
+        const isPre = (phase === 'pre');
+        const voiceText = isPre 
+            ? t("为了对情绪调整做出客观分析，建议您进行听前 60 秒的心率变异性测试。请将干净的手指放在摄像头上。如果您不想测试，可以直接跳过。", "We recommend a 60-second pre-listening HRV test. You can skip.")
+            : t("音乐播放完毕。请闭上眼睛，保持手指不动，我们再进行 60 秒的后测，看看您的身体发生了哪些变化。不想测的话可以直接跳过。", "Music finished. Please keep your finger still for a 60-second post-test. You can skip.");
+        
+        if (window.qxSpeak) window.qxSpeak(voiceText, null);
 
-    function transferVideoStream() {
-        const srcVideo = document.getElementById('qx2_trend_video');
-        const destVideo = document.getElementById('qx2_trend_video_overlay');
-        if (srcVideo && destVideo && srcVideo.srcObject) {
-            destVideo.srcObject = srcVideo.srcObject;
-            destVideo.play().catch(e => console.warn('视频接力播放失败', e));
+        const modal = document.getElementById('qx1_heal_modal');
+        if (!modal) { onFinish(false); return; }
+
+        modal.classList.add('show');
+        const progressEl = document.getElementById('qx1_heal_modal_progress');
+        if (progressEl) progressEl.style.width = '0%';
+
+        const closeBtn = document.getElementById('qx1_heal_modal_close');
+        const originalOnclick = closeBtn.onclick;
+        closeBtn.onclick = () => {
+            modal.classList.remove('show');
+            try { window.qx2_hrv_engine.stop(); } catch(e){}
+            if(originalOnclick) closeBtn.onclick = originalOnclick;
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            onFinish(false); 
+        };
+
+        if (window.qxHealChart) {
+            try { qxHealChart.start('qx1_heal_canvas'); } catch (e) {}
         }
+
+        if (window.qx2_hrv_engine) {
+            window.qx2_hrv_engine.start('qx1_heal_canvas', {
+                duration: 60,
+                onProgress: (remain, total, isWarmup, hintText) => {
+                    const timer = document.getElementById('qx1_heal_modal_timer');
+                    const progressEl = document.getElementById('qx1_heal_modal_progress');
+                    const hintEl = document.getElementById('qx1_heal_modal_hint');
+                    
+                    // 1. 底部提示框逻辑：只做手指检测提示，去重倒计时
+                    if (hintEl) {
+                        if (isWarmup) {
+                            hintEl.innerHTML = `<span style="color:#B9770E; font-weight:bold;">${hintText || '请调整手指...'}</span>`;
+                        } else {
+                            // 判断是否已经真正开始播放音乐（组曲）
+                            if (state.started) {
+                                const waveSvg = `<svg viewBox="0 0 100 20" style="width:100px; height:16px; vertical-align:middle; margin-left:10px;">
+                                    <path fill="none" stroke="#2ECC71" stroke-width="2" d="M0,15 L10,12 L20,17 L30,10 L40,14 L50,8 L60,11 L70,5 L80,9 L90,4 L100,7" />
+                                </svg>`;
+                                hintEl.innerHTML = `
+                                    <div style="display:flex; justify-content:flex-end; align-items:center; width:100%;">
+                                        <span style="font-size:12px; color:#5A6B87; display:flex; align-items:center;">🎵 组曲走势 ${waveSvg}</span>
+                                    </div>
+                                `;
+                            } else {
+                                // 还没放音乐，只显示手指检测状态
+                                hintEl.innerHTML = `<span style="color:#1A2B4A; font-size:14px;">${hintText || '信号良好，采集中...'}</span>`;
+                            }
+                        }
+                    }
+
+                    // 2. 顶部计时器与进度条（只留顶部一个倒计时）
+                    if (isWarmup) {
+                        if (timer) timer.innerText = t(`${remain} 秒后开始采集`, `Starting in ${remain}s`);
+                        if (progressEl) progressEl.style.width = `${total}%`; 
+                    } else {
+                        if (timer) timer.innerText = t(`${remain} / ${total} 秒`, `${remain} / ${total} s`);
+                        if (progressEl) progressEl.style.width = Math.min(100, ((total - remain) / total) * 100) + '%';
+                    }
+                },                onComplete: (result) => {
+                    modal.classList.remove('show');
+                    if (result) { 
+                        if (isPre) state.hrvResultBefore = result; 
+                        else state.hrvResult = result; 
+                        onFinish(true); 
+                    } else onFinish(false);
+                },
+                onError: (err) => {
+                    console.error('[HRV引擎错误]', err);
+                    toast('摄像头打开失败', 'error');
+                    modal.classList.remove('show');
+                    onFinish(false);
+                }
+            });
+        }
+    }
+
+    // ==========================================
+    // 🌟 音乐播放与流程控制
+    // ==========================================
+    function initAudio() {
+        if (!state.audio) {
+            state.audio = new Audio(); state.audio.preload = 'auto';
+            state.audio.addEventListener('ended', onTrackEnded);
+            
+            state.audio.addEventListener('timeupdate', () => {
+                if (!state.started || state.finished) return;
+                if (state.playMode === 'musicOnly') {
+                    if (state.isWorkMode && _workInfo.work) updateWorkInfoProgress(state.audio.currentTime);
+                    return;
+                }
+                if (state.isWorkMode && _workInfo.timelines && _workInfo.timelines.length > 0) {
+                    const seg = _workInfo.timelines[state.currentSegIndex];
+                    if (seg && seg.end_time > seg.start_time && state.audio.currentTime >= seg.end_time - 0.3) {
+                        state.audio.pause(); playSegment(state.currentSegIndex + 1);
+                    }
+                }
+            });
+            state.audio.addEventListener('stalled', () => { if (state.audio && !state.finished) { state.audio.load(); state.audio.play().catch(() => {}); } });
+        }
+    }
+
+    function playCurrentTrack() {
+        if (state.currentIndex >= state.playlist.length) { onPlaylistFinished(); return; }
+        const track = state.playlist[state.currentIndex];
+        if (!track || !track.fileurl) { toast(t('曲目文件缺失', 'Track missing'), 'error'); return; }
+        initAudio();
+        
+        if (!state.audio.src || state.audio.src.indexOf(track.fileurl) === -1) {
+            state.audio.src = track.fileurl;
+        }
+        if (state.playMode === 'musicOnly' && !state.isWorkMode) {
+            state.audio.currentTime = 0; state.audio.play().catch(e=>{});
+        }
+        if (state.isWorkMode) return; 
+
+        state.audio.play().then(() => { updateActionBar(2); })
+        .catch(err => { if (err.name !== 'AbortError') console.error('播放失败', err); });
+    }
+
+    function playSegment(index) {
+        if (index >= _workInfo.timelines.length) { onPlaylistFinished(); return; }
+        state.currentSegIndex = index;
+        const seg = _workInfo.timelines[index];
+        if (state.audio) state.audio.pause();
+        
+        updateWorkInfoProgress(seg.start_time);
+        const text = getLang() === 2 ? (seg.ai_guide_text_en || seg.ai_guide_text) : seg.ai_guide_text;
+
+        if (state.playMode === 'musicOnly') {
+            if (seg.end_time > seg.start_time) { state.audio.currentTime = seg.start_time; state.audio.play().catch(()=>{}); } 
+            else playSegment(index + 1); 
+            return;
+        }
+
+        if (text && window.qxSpeak) {
+            let hasTriggered = false;
+            const triggerMusic = () => {
+                if (hasTriggered) return; hasTriggered = true; clearTimeout(speakWatchdog); 
+                if (state.playMode !== 'guided') return; 
+                if (seg.end_time > seg.start_time) { state.audio.currentTime = seg.start_time; state.audio.play().catch(()=>{}); } 
+                else playSegment(index + 1);
+            };
+            const expectedSeconds = Math.ceil(text.length / 1.5) + 10;
+            clearTimeout(speakWatchdog);
+            speakWatchdog = setTimeout(() => { if (window.speechSynthesis) window.speechSynthesis.cancel(); triggerMusic(); }, expectedSeconds * 1000);
+            window.qxSpeak(text, triggerMusic);
+        } else {
+            if (seg.end_time > seg.start_time) { state.audio.currentTime = seg.start_time; state.audio.play().catch(()=>{}); } 
+            else playSegment(index + 1);
+        }
+    }
+
+    function onTrackEnded() { state.currentIndex++; if (state.currentIndex < state.playlist.length) playCurrentTrack(); else onPlaylistFinished(); }
+    
+    function onPlaylistFinished() {
+        if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
+        state.finished = true;
+        try { qxHrvCapture.stop(); } catch (e) {}
+        if (window.qxHealChart) { try { qxHealChart.finish(); } catch (e) {} }
+        
+        runHrvCapture('post', () => {
+            const container = document.getElementById('qx2_container');
+            if (container) container.classList.remove('step1-mode', 'step2-mode', 'work-mode');
+            
+            setStep(3);
+            if (mirrorAfterId) qxMoodMirror.setDoIt('qx2_wheel_after', '做');
+            toast(t('请填写听后评价并选择听后情绪', 'Please fill output emotion'), 'success');
+        });
     }
 
     async function enterAdjustStep() {
-        state.isWorkMode = false;
-        hideWorkInfo();
-        setStep(2);
+        state.isWorkMode = false; hideWorkInfo(); setStep(2);
         if (mirrorBeforeId) { try { qxMoodMirror.setDoIt('qx2_wheel_before', '不做'); } catch (e) {} }
         try {
-            const ruleRes = await loadSystemRule(state.inputEmotionCode);
-            if (!ruleRes.ok) { toast(errorToToast(ruleRes.error), 'error'); setStep(1); return; }
-            const genRes = await generatePlaylist(ruleRes.rule);
-            if (!genRes.ok) { toast(errorToToast(genRes.error), 'error'); setStep(1); return; }
-            state.playlist = genRes.playlist;
-            state.currentIndex = 0;
-            state.started = true;
+            const ruleRes = await restGet(`emobao_regulationrule?emotioncode=eq.${state.inputEmotionCode}&isactive=eq.true&ruletype=eq.system&limit=1`);
+            if (!ruleRes || ruleRes.length === 0) { toast('暂无此情绪的规则', 'error'); setStep(1); return; }
+            
+            const playlist = [];
+            for (const item of ruleRes[0].sequence) {
+                if (item.mode === 'random') {
+                    const tracks = await restGet(`emobao_musictrack?musictypecode=eq.${item.musictypecode}&isactive=eq.true`);
+                    if (tracks && tracks.length > 0) playlist.push({ trackid: tracks[0].trackid, fileurl: tracks[0].fileurl, musictypecode: tracks[0].musictypecode });
+                } else if (item.mode === 'fixed' && item.trackid) {
+                    const tracks = await restGet(`emobao_musictrack?trackid=eq.${item.trackid}`);
+                    if (tracks && tracks.length > 0) playlist.push({ trackid: tracks[0].trackid, fileurl: tracks[0].fileurl, musictypecode: tracks[0].musictypecode });
+                }
+            }
+            
+            if (playlist.length === 0) {
+                toast(t('未能获取到音乐，请检查网络或曲库', 'No music found, please check network'), 'error');
+                setStep(1);
+                return;
+            }
+
+            state.playlist = playlist; state.currentIndex = 0; 
+            state.started = true; 
             state.finished = false;
-            state.hrvSeries = [];
-            state.hfSeries = [];
-            renderTrendMini();
-            renderAnalysisLive();
+            state.hrvSeries = []; state.hfSeries = [];
+            
             if (window.qxHealChart) { try { qxHealChart.start('qx2_heal_canvas'); } catch (e) {} }
             
-            const hidId = 'qx2_hrv_wave_hidden';
-            if (!document.getElementById(hidId)) {
-                const hid = document.createElement('div');
-                hid.id = hidId;
-                hid.style.position = 'absolute';
-                hid.style.width = '1px';
-                hid.style.height = '1px';
-                hid.style.overflow = 'hidden';
-                hid.style.opacity = '0';
-                document.body.appendChild(hid);
-            }
-
-            const ok = await qxHrvCapture.start(hidId, {
-                duration: 9999, abortOnNoFinger: false,
-                onProgress: (rt) => {
-                    if (!rt) return;
-                    if (rt.hint !== undefined) state.latestHint = rt.hint;
-                    if (rt.quality) state.latestQuality = rt.quality;
-                    if (rt.quality === 'good' && rt.bpm > 0) {
-                        state.hrvSeries.push({ t: rt.elapsed, bpm: rt.bpm, rmssd: rt.rmssd });
-                        if (rt.hf > 0) state.hfSeries.push({ t: rt.elapsed, hf: rt.hf });
-                    }
-                    if (window.qxHealChart) { try { qxHealChart.push(rt); } catch (e) {} }
-                    if (state.step === 2) renderAnalysisLive();
-                },
-                onComplete: (result) => { state.hrvResult = result; },
-                onAbort: (info) => { state.hrvAborted = true; }
-            });
-            if (!ok) { toast(t('摄像头不可用，请检查权限', 'Camera unavailable'), 'error'); setStep(1); return; }
-            const s = document.querySelector('#' + hidId + ' .qx-hrv-btn-start');
-            if (s && !s.disabled) s.click();
-
-            const guideText = getCameraGuideText();
-            if (window.qxSpeak) window.qxSpeak(guideText, () => playCurrentTrack());
-            else playCurrentTrack();
-
-            setTimeout(() => { if (!state.audio || state.audio.paused) playCurrentTrack(); }, 6000);
-            updateAllButtonsState();
-        } catch (e) {
-            console.error('[qx2] enterAdjustStep 异常', e);
-            toast(t('进入调整失败：', 'Enter adjust failed: ') + e.message, 'error');
-            setStep(1);
+            playCurrentTrack();
+        } catch (e) { 
+            console.error(e); 
+            toast('加载组曲失败，请重试', 'error'); 
+            setStep(1); 
         }
     }
 
-    async function enterAdjustStepForWork(work) {
-        state.isWorkMode = true; state.playMode = 'guided'; state.currentSegIndex = 0;
-        setStep(2); transferVideoStream();
-        if (mirrorBeforeId) { try { qxMoodMirror.setDoIt('qx2_wheel_before', '不做'); } catch (e) {} }
-        try {
-            state.playlist = [{ trackid: work.workid, title_cn: work.title_cn, title_en: work.title_en, fileurl: work.audio_url, musictypecode: 0, isWork: true, workInfo: work }];
-            state.currentIndex = 0; state.started = true; state.finished = false;
-            state.hrvSeries = []; state.hfSeries = []; state.latestHint = ''; state.latestQuality = 'unknown';
+    function onFlowStepClick(step) {
+        // 🌟 核心修复：去掉那个坑爹的 if (step === state.step + 1) 限制，改成允许直接跳转！
+        if (step === 4) {
+            console.log('🔥 准备进入第 4 步分析！');
+            if (!state.outputEmotionCode || !state.feedback) { 
+                toast(t('请先选择听后情绪和主观评价', 'Please fill output emotion and feedback'), 'warning'); 
+                return; 
+            }
+            setStep(4); 
             
-            await renderWorkInfo(work);
-            renderTrendMini();
-            renderAnalysisLive();
-            if (window.qxHealChart) { try { qxHealChart.start('qx2_heal_canvas'); } catch (e) {} }
+            // 暴力强行替换容器
+            const healArea = document.querySelector('.qx2-heal-area');
+            if (healArea) {
+                console.log('🔥 找到了大球容器，正在清空并塞入报告！');
+                healArea.innerHTML = ''; 
+                healArea.style.setProperty('flex', '1 1 100%', 'important');
+                healArea.style.setProperty('width', '100%', 'important');
+                healArea.style.setProperty('padding', '0', 'important');
+                healArea.style.setProperty('background', '#F8FBFF', 'important');
+                
+                const reportDiv = document.createElement('div');
+                reportDiv.id = 'qx2_analysis_body';
+                reportDiv.style.cssText = 'width: 100%; height: 100%; overflow-y: auto;';
+                healArea.appendChild(reportDiv);
+            } else {
+                console.error('❌ 没找到 .qx2-heal-area 容器！');
+            }
             
-            const hidId = 'qx2_hrv_wave_hidden';
-            if (!document.getElementById(hidId)) {
-                const hid = document.createElement('div');
-                hid.id = hidId;
-                hid.style.position = 'absolute';
-                hid.style.width = '1px';
-                hid.style.height = '1px';
-                hid.style.overflow = 'hidden';
-                hid.style.opacity = '0';
-                document.body.appendChild(hid);
-            }
-
-            const ok = await qxHrvCapture.start(hidId, {
-                duration: 9999, abortOnNoFinger: false,
-                onProgress: (rt) => {
-                    if (!rt) return;
-                    if (rt.quality) state.latestQuality = rt.quality;
-                    if (rt.quality === 'good' && rt.bpm > 0) {
-                        state.hrvSeries.push({ t: rt.elapsed, bpm: rt.bpm, rmssd: rt.rmssd });
-                        if (rt.hf > 0) state.hfSeries.push({ t: rt.elapsed, hf: rt.hf });
-                    }
-                    if (window.qxHealChart) { try { qxHealChart.push(rt); } catch (e) {} }
-                    if (state.step === 2) renderAnalysisLive();
-                },
-                onComplete: (result) => { state.hrvResult = result; },
-                onAbort: (info) => { state.hrvAborted = true; }
-            });
-            if (!ok) { toast(t('摄像头不可用，请检查权限', 'Camera unavailable'), 'error'); setStep(1); return; }
-            const s = document.querySelector('#' + hidId + ' .qx-hrv-btn-start');
-            if (s && !s.disabled) s.click();
-
-            initAudio();
-            if (!state.audio.src || state.audio.src.indexOf(work.audio_url) === -1) {
-                state.audio.src = work.audio_url;
-            }
-
-            // 🚀 核心修复：无论用户是否开启摄像头，流程的生命周期必须完整！
-            // 激活计时器/图表显示
-            if (window.qxHealChart) { try { qxHealChart.start('qx2_heal_canvas'); } catch (e) {} }
-
-            // 确保 HRV 采集处于活跃状态
-            if (qxHrvCapture && qxHrvCapture.start) {
-                qxHrvCapture.start('qx2_hrv_wave_hidden', {
-                    duration: 9999, 
-                    abortOnNoFinger: false,
-                    onProgress: (rt) => {
-                        if (!rt) return;
-                        if (rt.quality) state.latestQuality = rt.quality;
-                        if (rt.quality === 'good' && rt.bpm > 0) {
-                            state.hrvSeries.push({ t: rt.elapsed, bpm: rt.bpm, rmssd: rt.rmssd });
-                            if (rt.hf > 0) state.hfSeries.push({ t: rt.elapsed, hf: rt.hf });
-                        }
-                        if (window.qxHealChart) { try { qxHealChart.push(rt); } catch (e) {} }
-                        if (state.step === 2) renderAnalysisLive();
-                    }
-                });
-            }
-
-            setTimeout(() => { playSegment(0); transferVideoStream(); }, 500);
-            updateAllButtonsState();
-        } catch (e) {
-            console.error('[qx2] enterAdjustStepForWork 异常', e);
-            toast(t('进入调整失败：', 'Enter adjust failed: ') + e.message, 'error');
-            setStep(1);
+            // 调用渲染
+            window.renderCombinedReport('qx2_analysis_body'); 
+            return;
         }
-    }
 
-    function bindFeedbackRadios() {
-        document.querySelectorAll('input[name="qx2_feedback"]').forEach(r => {
-            r.addEventListener('change', () => { state.feedback = r.value; updateAllButtonsState(); });
-        });
-    }
-
-    function closeCollectModal() {
-        const modal = document.getElementById('qx2_collect_modal');
-        if (modal) modal.classList.remove('show');
-    }
-
-    async function onPickCollection() {
-        if (state.step !== 1) return;
-        if (!state.inputEmotionCode || state.inputEmotionCode === 0) { toast(t('请先选择听前情绪', 'Please select input emotion first'), 'warning'); return; }
-        const modal = document.getElementById('qx2_collect_modal');
-        const list = document.getElementById('qx2_collect_modal_list');
-        if (!modal || !list) return;
-        list.innerHTML = '<div class="qx2-collect-empty">' + t('加载中…', 'Loading…') + '</div>';
-        modal.classList.add('show');
-        const works = await loadWorks();
-        if (!works || works.length === 0) { list.innerHTML = `<div class="qx2-collect-empty">${t('暂无经典作品', 'No classic works yet')}</div>`; return; }
-        const lang = getLang();
-        list.innerHTML = works.map(w => {
-            const dur = w.total_duration ? Math.floor(w.total_duration / 60) + ':' + String(w.total_duration % 60).padStart(2, '0') : '--';
-            const cover = w.cover_url ? `style="background-image:url('${escapeHtml(w.cover_url)}')"` : '';
-            const title = lang === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
-            return `<div class="qx2-work-item" data-workid="${escapeHtml(w.workid)}"><div class="qx2-work-cover" ${cover}></div><div class="qx2-work-info"><div class="qx2-work-title">${escapeHtml(title)}</div><div class="qx2-work-meta">${escapeHtml(w.composer || '')} · ${dur}${w.era ? ' · ' + escapeHtml(w.era) : ''}</div></div></div>`;
-        }).join('');
-        list.querySelectorAll('.qx2-work-item').forEach(el => {
-            el.onclick = () => {
-                const wid = el.dataset.workid;
-                const work = works.find(w => w.workid === wid);
-                if (!work) return;
-                modal.classList.remove('show');
-                enterAdjustStepForWork(work);
-            };
-        });
+        // 其他步骤的限制保留
+        if (step === state.step + 1) {
+            if (step === 2) {
+                if (!state.inputEmotionCode || state.inputEmotionCode === 0) { toast(t('请先用魔镜选出情绪', 'Please pick emotion first'), 'warning'); return; }
+                runHrvCapture('pre', (done) => {
+                    setStep(2); 
+                }); 
+                return;
+            }
+            if (step === 3) {
+                if (!state.finished) { toast(t('请先等音乐播放完成', 'Please wait'), 'warning'); return; }
+                setStep(3); 
+                if (mirrorAfterId) qxMoodMirror.setDoIt('qx2_wheel_after', '做');    
+                return;
+            }
+        }
     }
 
     function onRestart() {
         state.isWorkMode = false; state.playMode = 'guided'; state.currentSegIndex = 0;
         hideWorkInfo();
-        if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
         if (state.audio) { try { state.audio.pause(); state.audio.src = ''; state.audio.load(); } catch (e) {} }
-        try { qxHrvCapture.stop(); } catch (e) {}
-        try { qxHrvCapture.release(); } catch (e) {}
+        try { qxHrvCapture.stop(); qxHrvCapture.release(); } catch (e) {}
         state.outputEmotionCode = 0; state.feedback = null; state.playlist = []; state.currentIndex = 0; state.started = false; state.finished = false;
-        state.hrvResult = null; state.hrvAborted = false; state.hrvSeries = []; state.hfSeries = []; state.latestHint = ''; state.latestQuality = 'unknown';
+        state.hrvResult = null; state.hrvAborted = false; state.hrvSeries = []; state.hfSeries = []; state.hrvResultBefore = null;
         _timelineCache = {};
         if (window.speechSynthesis) window.speechSynthesis.cancel();
-
         if (mirrorBeforeId) { try { qxMoodMirror.setDoIt('qx2_wheel_before', '做'); } catch (e) {} }
-        if (mirrorAfterId) qxMoodMirror.setDoIt('qx2_wheel_after', '不做');
-        if (mirrorAfterId) qxMoodMirror.setValue('qx2_wheel_after', 0);
-
+        if (mirrorAfterId) { try { qxMoodMirror.setDoIt('qx2_wheel_after', '不做'); } catch (e) {} }
+        if (mirrorAfterId) { try { qxMoodMirror.setValue('qx2_wheel_after', 0); } catch (e) {} }
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
         const body = document.getElementById('qx2_analysis_body');
         if (body) body.innerHTML = '<div class="qx2-analysis-placeholder">' + t('进第 4 步，自动给出分析', 'Analysis at step 4') + '</div>';
         setStep(1);
         document.querySelectorAll('input[name="qx2_feedback"]').forEach(r => r.checked = false);
-        renderTrendMini();
-        updateAllButtonsState();
     }
 
     function onExit() {
-        if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
         if (window.speechSynthesis) window.speechSynthesis.cancel();
         if (state.started && !state.finished) { if (!confirm(t('正在调整中，确定退出吗？', 'Regulating. Exit?'))) return; }
-        if (state.audio) { try { state.audio.pause(); } catch (e) {} state.audio.src = ''; }
-        try { qxHrvCapture.stop(); } catch (e) {}
-        try { qxHrvCapture.release(); } catch (e) {}
+        if (state.audio) { try { state.audio.pause(); state.audio.src = ''; } catch (e) {} }
+        try { qxHrvCapture.stop(); qxHrvCapture.release(); } catch (e) {}
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
         window.returnToMain();
     }
 
     async function qx2_init() {
         if (state.initialized) return;
-        state.isGuest = (getUserType() === 14); state.step = 1; state.inputEmotionCode = 0; state.outputEmotionCode = 0; state.feedback = null;
-        state.playlist = []; state.currentIndex = 0; state.started = false; state.finished = false;
-        state.hrvResult = null; state.hrvAborted = false; state.hrvSeries = []; state.hfSeries = []; state.latestHint = ''; state.latestQuality = 'unknown';
-        state.isWorkMode = false; state.playMode = 'guided'; state.currentSegIndex = 0; _timelineCache = {};
+        
+        // 🌟 物理超度：既然抛弃旧 UI，从 DOM 里彻底移除左右侧边栏，绝不让它渲染出来！
+        const analysisArea = document.getElementById('qx2_analysis_area');
+        const feedbackArea = document.querySelector('.qx2-feedback-area');
+        if (analysisArea) analysisArea.remove();
+        if (feedbackArea) feedbackArea.remove();
 
-        if (!document.getElementById('qx2_hrv_wave_hidden')) {
-            const hid = document.createElement('div');
-            hid.id = 'qx2_hrv_wave_hidden';
-            hid.style.position = 'absolute'; hid.style.width = '1px'; hid.style.height = '1px'; hid.style.overflow = 'hidden'; hid.style.opacity = '0';
-            document.body.appendChild(hid);
-        }
+        state.step = 1; state.inputEmotionCode = 0; state.outputEmotionCode = 0; state.feedback = null;
+        state.playlist = []; state.currentIndex = 0; state.started = false; state.finished = false;
+        state.hrvResult = null; state.hrvAborted = false; state.hrvSeries = []; state.hfSeries = []; state.hrvResultBefore = null;
 
         if (window.qx0ApplyDataI18n) window.qx0ApplyDataI18n();
 
-        let inputCode = 0;
+        // 自动带入情绪
+        initMirrorBefore(0);
         if (!state.isGuest) {
-            try {
-                const result = await rpc('emobao_get_today_perception', { p_userid: getUserId() });
+            rpc('emobao_get_today_perception', { p_userid: getUserId() }).then((result) => {
                 const row = Array.isArray(result) ? result[0] : result;
-                if (row && row.emotion_code != null) inputCode = row.emotion_code;
-            } catch (e) { console.error('读 qx1 情绪失败', e); }
+                if (row && row.emotion_code != null) {
+                    if (typeof qxMoodMirror !== 'undefined' && qxMoodMirror.setValue) {
+                        qxMoodMirror.setValue('qx2_wheel_before', row.emotion_code);
+                    }
+                    state.inputEmotionCode = row.emotion_code;
+                }
+            }).catch(e => console.warn('拉取今日情绪失败', e));
         }
-        state.inputEmotionCode = inputCode;
 
-        initMirrorBefore(inputCode); initMirrorAfter(); bindFeedbackRadios();
+        initMirrorAfter(); 
+        
         document.getElementById('qx2_btn_restart').onclick = onRestart;
         document.getElementById('qx2_btn_exit').onclick = onExit;
-        document.getElementById('qx2_btn_collection').onclick = onPickCollection;
-        const btnStart = document.getElementById('qx2_btn_start');
-        if (btnStart) btnStart.onclick = () => { onFlowStepClick(2); };
-
-        const closeBtn = document.getElementById('qx2_collect_modal_close');
-        if (closeBtn) closeBtn.onclick = closeCollectModal;
-        const modal = document.getElementById('qx2_collect_modal');
-        if (modal) modal.onclick = (e) => { if (e.target === modal) closeCollectModal(); };
 
         document.querySelectorAll('#qx2_flow_bar .qx2-flow-step').forEach(el => {
-            el.addEventListener('click', () => { if (!el.classList.contains('disabled')) onFlowStepClick(parseInt(el.dataset.step)); });
+            el.addEventListener('click', () => { 
+                if (!el.classList.contains('disabled')) {
+                    const stepNum = parseInt(el.dataset.step);
+                    if (stepNum === 2) {
+                        if (!state.inputEmotionCode || state.inputEmotionCode === 0) { toast(t('请先用魔镜选出情绪', 'Please pick emotion first'), 'warning'); return; }
+                        runHrvCapture('pre', (done) => {
+                            setStep(2); 
+                        }); 
+                    } else {
+                        onFlowStepClick(stepNum);
+                    }
+                } 
+            });
         });
 
-        setStep(1); renderTrendMini(); updateAllButtonsState(); state.initialized = true;
+        setStep(1); 
+        
+        if (window.qxHealChart) { 
+            try { 
+                qxHealChart.start('qx2_heal_canvas'); 
+                qxHealChart.push({ quality: 'good', bpm: 70, rmssd: 50, elapsed: 1 });
+            } catch (e) {} 
+        }
+        
+        setTimeout(() => {
+            if (window.qxSpeak) {
+                const guideText = t(
+                    "朋友，您现在可以通过左上角的情绪宝魔镜，选择您的情绪，点击镜框自动识别，点击镜子把儿的小黄点你手动选择，越向左旋转情绪越低落，越向右情绪越高涨。为了对情绪调整做出客观分析，建议您用选定的设备进行60秒的HRV测试，这将为您得到有趣的分析图准备有价值的数据。",
+                    "Friend, you can now use the emotion mirror at the top left to select your emotion. Click the frame for automatic recognition, or click the yellow dot to select manually. Rotate left for lower emotions, right for higher emotions. For objective analysis, we recommend a 60-second HRV test."
+                );
+                window.qxSpeak(guideText, null);
+            }
+        }, 500);
+
+        state.initialized = true;
     }
 
     function qx2_destroy() {
         state.initialized = false;
         if (window.speechSynthesis) window.speechSynthesis.cancel();
         if (state.audio) { try { state.audio.pause(); } catch (e) {} state.audio.src = ''; state.audio = null; }
-        try { qxHrvCapture.stop(); } catch (e) {}
-        try { qxHrvCapture.release(); } catch (e) {}
+        try { qxHrvCapture.stop(); qxHrvCapture.release(); } catch (e) {}
         if (mirrorBeforeId) { qxMoodMirror.destroy('qx2_wheel_before'); mirrorBeforeId = null; }
         if (mirrorAfterId) { qxMoodMirror.destroy('qx2_wheel_after'); mirrorAfterId = null; }
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
-        closeCollectModal(); hideWorkInfo();
-        const mid = document.querySelector('.qx2-mid-row'); if (mid) mid.classList.remove('step2-mode');
-        const container = document.getElementById('qx2_container'); if (container) container.classList.remove('work-mode');
-        const hid = document.getElementById('qx2_hrv_wave_hidden'); if (hid) hid.remove();
-        state.playlist = []; state.currentIndex = 0; state.started = false; state.finished = false; state.playMode = 'guided'; state.currentSegIndex = 0;
-        state.hrvResult = null; state.hrvAborted = false; state.hrvSeries = []; state.hfSeries = []; _timelineCache = {};
+        hideWorkInfo();
+    }
+    // ==========================================
+    // 🌟 全屏分析报告渲染器（qx2 页签专业版）
+    // ==========================================
+    window.renderCombinedReport = function(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const hrvBefore = state.hrvResultBefore || {};
+        const hrvAfter = state.hrvResult || {};
+        const hasHrv = hrvBefore.rmssd != null && hrvAfter.rmssd != null;
+        
+        const inEmotion = state.inputEmotionCode || 5;
+        const outEmotion = state.outputEmotionCode || 5;
+        const rmssdBefore = hrvBefore.rmssd || 0;
+        const rmssdAfter = hrvAfter.rmssd || 0;
+        const bpmBefore = hrvBefore.bpm || 0;
+        const bpmAfter = hrvAfter.bpm || 0;
+        
+        const rmssdDiff = rmssdAfter - rmssdBefore;
+        const bpmDiff = bpmBefore - bpmAfter; 
+        const emoImprove = outEmotion - inEmotion;
+
+        const curWork = state.playlist[state.currentIndex] || {};
+        const workName = state.isWorkMode ? (curWork.title_cn || '经典作品') : '系统推荐组曲';
+        const feedbackText = state.feedback === 'better' ? '更好' : (state.feedback === 'worse' ? '更差' : '一样');
+
+        // ==== 核心数据计算 ====
+        let musicPower = state.feedback === 'better' ? 90 : (state.feedback === 'worse' ? 30 : 60);
+        let relaxScore = hasHrv ? Math.max(10, Math.min(100, 50 + rmssdDiff * 5)) : 50;
+        let emoScore = Math.max(0, Math.min(100, 50 + emoImprove * 20));
+        let hrScore = hasHrv ? Math.max(10, Math.min(100, 50 + bpmDiff * 6)) : 50;
+        let radarData = [musicPower, relaxScore, hrScore, (state.feedback === 'same' ? 50 : 80), emoScore];
+
+        // ==== 生成专业 AI 解析文字 ====
+        let aiComment = "";
+        if (!hasHrv) {
+            aiComment = "本次您跳过了生理数据采集，主要依据您的主观感受和情绪变化为您生成画像。建议下次完整测试，能获得更精准的生理反馈。";
+        } else if (rmssdDiff > 5 && emoImprove > 0) {
+            aiComment = "身心完美共振！您的心率（BPM）下降，代表副交感神经的 RMSSD 显著提升。同时您的情绪代码呈正向跳跃，这是一次极其成功的深度放松与情绪疗愈。";
+        } else if (rmssdDiff < -5 && emoImprove > 0) {
+            aiComment = "您主观觉得情绪变好了，但生理数据（RMSSD 下降）显示您的身体依然处于隐性防御或紧绷状态。音乐虽然取悦了意识，但身体还没有完全卸下防备。建议再听一段舒缓的曲子。";
+        } else if (rmssdDiff < 0 && bpmDiff < 0) {
+            aiComment = "本次心率和 RMSSD 双双下降，这通常是慢性疲劳或精力耗竭的生理表现。音乐可能让您感到了一丝安宁，但身体的精力储备需要更多的休息来恢复。";
+        } else {
+            aiComment = "本次自主神经未发生剧烈波动。身体可能还在寻找平衡，请坚持倾听，关注长期的趋势变化。";
+        }
+
+        const emoFileMap = {
+            1: '1_焦躁.png', 2: '2_热烈.png', 3: '3_欢快.png',
+            4: '4_轻快.png', 5: '5_明朗.png', 6: '6_平静.png',
+            7: '7_压抑.png', 8: '8_忧伤.png', 9: '9_悲伤.png'
+        };
+        const imgPath = `picture/${emoFileMap[inEmotion] || '6_平静.png'}`;
+        const imgPathAfter = `picture/${emoFileMap[outEmotion] || '6_平静.png'}`;
+
+        const isEn = getLang() === 2;
+
+        container.innerHTML = `
+            <div class="qx2-report-container" style="width: 100%; height: 100%; display: flex; flex-direction: column; background: #F8FBFF;">
+                <!-- 页签栏 -->
+                <div class="qx2-report-tabs" style="display: flex; gap: 6px; padding: 12px 16px 0; border-bottom: 1px solid #E1E8F0; flex-shrink: 0; overflow-x: auto;">
+                    <button class="qx2-report-tab active" data-tab="1" style="flex:1; padding:10px; border:none; background:#fff; border-radius:8px 8px 0 0; font-weight:bold; color:#2C7BE5; box-shadow:0 -2px 10px rgba(0,0,0,0.03); cursor:pointer; white-space:nowrap;">${isEn ? 'Mood' : '情绪对比'}</button>
+                    <button class="qx2-report-tab" data-tab="2" style="flex:1; padding:10px; border:none; background:transparent; border-radius:8px 8px 0 0; font-weight:bold; color:#5A6B87; cursor:pointer; white-space:nowrap;">${isEn ? 'Radar' : '心身雷达'}</button>
+                    <button class="qx2-report-tab" data-tab="3" style="flex:1; padding:10px; border:none; background:transparent; border-radius:8px 8px 0 0; font-weight:bold; color:#5A6B87; cursor:pointer; white-space:nowrap;">${isEn ? 'Tri-Ring' : '三色环'}</button>
+                    <button class="qx2-report-tab" data-tab="4" style="flex:1; padding:10px; border:none; background:transparent; border-radius:8px 8px 0 0; font-weight:bold; color:#5A6B87; cursor:pointer; white-space:nowrap;">${isEn ? 'AI' : 'AI 判官'}</button>
+                </div>
+
+                <!-- 内容区 -->
+                <div class="qx2-report-content" style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; position: relative;">
+                    
+                    <!-- Tab 1: 情绪对比 -->
+                    <div class="qx2-tab-pane active" id="qx2_report_pane_1" style="display: block;">
+                        <div style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(44,123,229,0.08); display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 13px; color: #64748B; margin-bottom: 8px;">${isEn ? 'Before' : '听前情绪'}</div>
+                                <img src="${imgPath}" style="height: 50px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                                <div style="font-size: 24px; color: #CBD5E1; margin-bottom: 8px;">→</div>
+                                <div style="font-size: 13px; font-weight: bold; color: #2ECC71; background: #E8F8F0; padding: 4px 12px; border-radius: 12px;">
+                                    ${isEn ? 'Feel: ' : '主观感受：'}${feedbackText}
+                                </div>
+                            </div>
+                            <div style="text-align: center; flex: 1;">
+                                <div style="font-size: 13px; color: #64748B; margin-bottom: 8px;">${isEn ? 'After' : '听后情绪'}</div>
+                                <img src="${imgPathAfter}" style="height: 50px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+                            </div>
+                        </div>
+                        <div style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(44,123,229,0.08);">
+                            <div style="font-size: 15px; font-weight: bold; color: #1A2B4A; margin-bottom: 12px;">${isEn ? 'Music Prescription' : '🎵 音乐处方验证'}</div>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5A6B87;">
+                                    <span>${isEn ? 'Work: ' : '本次聆听作品：'}</span>
+                                    <b style="color: #1A2B4A;">《${workName}》</b>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5A6B87;">
+                                    <span>${isEn ? 'Subjective: ' : '主观情绪改善：'}</span>
+                                    <b style="color: #2ECC71;">${feedbackText}</b>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5A6B87;">
+                                    <span>${isEn ? 'Objective: ' : '客观生理改善：'}</span>
+                                    <b style="color: ${hasHrv && rmssdDiff > 0 ? '#2ECC71' : '#E74C3C'};">
+                                        ${hasHrv ? (rmssdDiff > 0 ? 'RMSSD +' + rmssdDiff.toFixed(1) : 'RMSSD ' + rmssdDiff.toFixed(1)) : (isEn ? 'No Data' : '无数据')}
+                                    </b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: 心身雷达 -->
+                    <div class="qx2-tab-pane" id="qx2_report_pane_2" style="display: none;">
+                        <div style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(44,123,229,0.08); display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 15px; font-weight: bold; color: #1A2B4A; margin-bottom: 4px; width: 100%; text-align: center;">${isEn ? '5D Resonance' : '心身共振五维画像'}</div>
+                            <canvas id="qx2_radar_canvas" width="320" height="320" style="width: 100%; max-width: 340px; height: auto;"></canvas>
+                            <div style="font-size: 13px; color: #5A6B87; text-align: center; margin-top: 10px; line-height: 1.6; background: #F8FBFF; padding: 10px; border-radius: 8px; width: 100%;">
+                                ${isEn ? 'Five dimensions covering music experience, physical response, and mood shifts. Closer to the outer ring means better results.' : '五个维度涵盖了您的音乐体验、生理反应与情绪波动。越靠近外圈，代表本次调节的效果越显著。'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: 三色环 -->
+                    <div class="qx2-tab-pane" id="qx2_report_pane_3" style="display: none;">
+                        <div style="background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(44,123,229,0.08); display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 15px; font-weight: bold; color: #1A2B4A; margin-bottom: 8px; width: 100%; text-align: center;">${isEn ? 'Tri-Ring' : '三色环（音乐·生理·情绪）'}</div>
+                            <canvas id="qx2_tri_color_canvas" width="320" height="320" style="width: 100%; max-width: 340px; height: auto;"></canvas>
+                            <div style="font-size: 13px; color: #5A6B87; text-align: center; margin-top: 10px; line-height: 1.6; background: #F8FBFF; padding: 10px; border-radius: 8px; width: 100%;">
+                                ${isEn ? 'Blue: Music effect, Green: Physical relaxation, Orange: Mood improvement. More balanced rings indicate better healing.' : '蓝色代表音乐本身带来的主观效力，绿色代表真实的生理放松程度，橙色代表情绪状态的改善。三色越饱满、越均衡，说明音乐对您的整体疗愈效果越好。'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: AI 判官 -->
+                    <div class="qx2-tab-pane" id="qx2_report_pane_4" style="display: none;">
+                        <div style="background: linear-gradient(135deg, #E8F8F0 0%, #FFFFFF 100%); border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(46,204,113,0.1); border-left: 6px solid #2ECC71;">
+                            <div style="font-size: 16px; font-weight: bold; color: #2C7BE5; margin-bottom: 12px;">✨ ${isEn ? 'AI Analyzer' : 'AI 生理判官'}</div>
+                            <div style="font-size: 15px; color: #1A2B4A; line-height: 1.8;">${aiComment}</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `;
+
+        // 初始化图表绘制
+        drawRadar('qx2_radar_canvas', 
+            isEn ? ['Music', 'Relax', 'HR Stable', 'Subjective', 'Mood'] : ['音乐效力', '生理放松', '心率平稳', '主观契合', '情绪改善'], 
+            radarData
+        );
+        drawTriColorRing('qx2_tri_color_canvas', musicPower, relaxScore, emoScore);
+
+        // 🌟 页签切换与专属语音播报逻辑
+        const tabs = container.querySelectorAll('.qx2-report-tab');
+        const panes = container.querySelectorAll('.qx2-tab-pane');
+        
+        const speakTab1 = isEn 
+            ? `Here is your emotion comparison. You listened to ${workName}. Your subjective feeling was ${feedbackText}.` 
+            : `这是您的情绪对比图。您刚刚聆听了《${workName}》，主观感受是${feedbackText}，客观生理数据已为您在下方列出。`;
+
+        const speakTab2 = isEn
+            ? `This is your 5-dimension resonance radar. It covers music effect, physical relaxation, and mood improvement.`
+            : `这是您的心身共振五维画像。雷达图面积越大，说明音乐、生理和情绪的综合共振效果越强。`;
+
+        const speakTab3 = isEn
+            ? `This is the tri-color ring. Music power ${Math.round(musicPower)}, Relaxation ${Math.round(relaxScore)}, Mood ${Math.round(emoScore)}.`
+            : `这是您的三色环。音乐效力 ${Math.round(musicPower)} 分，生理放松 ${Math.round(relaxScore)} 分，情绪改善 ${Math.round(emoScore)} 分。`;
+
+        const speakTab4 = isEn
+            ? `Let's hear the AI analyzer. ${aiComment}`
+            : `最后，AI 生理判官为您总结。${aiComment}`;
+
+        const speakMap = { 1: speakTab1, 2: speakTab2, 3: speakTab3, 4: speakTab4 };
+
+        tabs.forEach(tab => {
+            tab.onclick = () => {
+                // 重置样式
+                tabs.forEach(t => {
+                    t.style.background = 'transparent';
+                    t.style.color = '#5A6B87';
+                    t.style.boxShadow = 'none';
+                });
+                // 激活当前
+                tab.style.background = '#fff';
+                tab.style.color = '#2C7BE5';
+                tab.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.03)';
+
+                // 切换内容
+                const targetTabNum = tab.dataset.tab;
+                const targetId = 'qx2_report_pane_' + targetTabNum;
+                panes.forEach(p => p.style.display = 'none');
+                const activePane = document.getElementById(targetId);
+                if (activePane) activePane.style.display = 'block';
+
+                // 🌟 触发对应页签的语音播报
+                if (window.qxSpeak) {
+                    window.qxSpeak(speakMap[targetTabNum], null);
+                }
+            };
+        });
+
+        // 页面初次加载时，自动播报第一个页签
+        setTimeout(() => {
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 强制掐断之前没播完的废话
+            if (window.qxSpeak) {
+                window.qxSpeak(speakTab1, null);
+            }
+        }, 666); // 延迟 666 毫秒，等界面动画和画布彻底渲染完，然后再播
+    };
+
+    function getEmoji(code) {
+        const map = { 1:'😫', 2:'😟', 3:'😐', 4:'🙂', 5:'😌', 6:'😊', 7:'😄', 8:'🤩', 9:'😎' };
+        return map[code] || '😐';
+    }
+    
+    function drawRadar(canvasId, labels, data) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const R = Math.min(cx, cy) - 40;
+        const N = labels.length;
+        const angleStep = (Math.PI * 2) / N;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#E1E8F0';
+        ctx.lineWidth = 1;
+        for (let level = 1; level <= 4; level++) {
+            const r = (R / 4) * level;
+            ctx.beginPath();
+            for (let i = 0; i < N; i++) {
+                const x = cx + r * Math.cos(i * angleStep - Math.PI / 2);
+                const y = cy + r * Math.sin(i * angleStep - Math.PI / 2);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.closePath(); ctx.stroke();
+        }
+
+        ctx.fillStyle = '#5A6B87'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (let i = 0; i < N; i++) {
+            const ang = i * angleStep - Math.PI / 2;
+            const x = cx + R * Math.cos(ang);
+            const y = cy + R * Math.sin(ang);
+            ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+            ctx.fillText(labels[i], cx + (R + 20) * Math.cos(ang), cy + (R + 20) * Math.sin(ang));
+        }
+
+        ctx.beginPath();
+        for (let i = 0; i < N; i++) {
+            const r = R * 0.5;
+            const x = cx + r * Math.cos(i * angleStep - Math.PI / 2);
+            const y = cy + r * Math.sin(i * angleStep - Math.PI / 2);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(200, 207, 216, 0.3)'; ctx.fill();
+        ctx.strokeStyle = '#C8CFD8'; ctx.stroke();
+
+        ctx.beginPath();
+        for (let i = 0; i < N; i++) {
+            const val = Math.max(0, Math.min(100, data[i]));
+            const r = R * (val / 100);
+            const x = cx + r * Math.cos(i * angleStep - Math.PI / 2);
+            const y = cy + r * Math.sin(i * angleStep - Math.PI / 2);
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(44, 123, 229, 0.3)'; ctx.fill();
+        ctx.strokeStyle = '#2C7BE5'; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    function drawTriColorRing(canvasId, musicPower, relaxScore, emoScore) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const R = Math.min(cx, cy) - 60; 
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const isEn = getLang() === 2;
+        const values = [
+            { name: isEn ? 'Music' : '音乐效力', val: musicPower, color: '#2C7BE5' },
+            { name: isEn ? 'Relax' : '生理放松', val: relaxScore, color: '#2ECC71' },
+            { name: isEn ? 'Mood' : '情绪改善', val: emoScore,   color: '#F39C12' }
+        ];
+        
+        let startAngle = -Math.PI / 2;
+        const gap = 0.2;
+        
+        values.forEach(item => {
+            const angle = (item.val / 100) * (Math.PI * 2 / 3) - gap; 
+            const endAngle = startAngle + angle;
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, startAngle, endAngle);
+            ctx.strokeStyle = item.color;
+            ctx.lineWidth = 18;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            
+            const midAngle = startAngle + angle / 2;
+            const textR = R + 30; 
+            const lx = cx + Math.cos(midAngle) * textR;
+            const ly = cy + Math.sin(midAngle) * textR;
+            
+            const lineStartR = R + 12;
+            const lineEndR = R + 24;
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(midAngle) * lineStartR, cy + Math.sin(midAngle) * lineStartR);
+            ctx.lineTo(cx + Math.cos(midAngle) * lineEndR, cy + Math.sin(midAngle) * lineEndR);
+            ctx.strokeStyle = item.color;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
+            ctx.fillStyle = '#5A6B87';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(item.name, lx, ly - 8);
+            
+            ctx.fillStyle = item.color;
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText(Math.round(item.val), lx, ly + 12);
+            
+            startAngle = endAngle + gap;
+        });
     }
 
     window.qx2_init = qx2_init;

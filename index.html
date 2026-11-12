@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- ================================================================
-     index.html   v30 (二维码版+雨声)
-     日期：2026-10-31
+     index.html   v31 (二维码版+雨声+QX2净化版)
+     日期：2026-11-08
      ================================================================ -->
 <html lang="zh-CN">
      <head>
@@ -19,16 +19,13 @@
         </head>
      <body class="main-page">
      
-         <!-- ============ 状态栏（直接把静音键硬编码在这里） ============ -->
+         <!-- ============ 状态栏 ============ -->
          <div class="qx0-status-bar">
              <div class="date" id="status_date"></div>
              <div class="brand" id="status_title">情绪宝 / Emo Treasure</div>
-             
-             <!-- 强行写死的静音按钮，放弃 JS 动态生成 -->
              <button id="global_mute_btn" style="margin-left: auto; margin-right: 12px; font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 12px; background: transparent; border: 1px solid transparent; color: #333; transition: all 0.2s ease; display: flex; align-items: center; outline: none;">
                 🤭
             </button>
-     
              <div class="user" id="status_user">👤 访客</div>
          </div>
      
@@ -62,8 +59,7 @@
                              <div class="qx1-impact-summary" id="qx1_impact_summary"></div>
                              <div class="qx1-heart-col heart-white" id="qx1_heart_icon" data-i18n-title="qx1_heart_title" title="点击查看 HRV 图">
                                  <svg class="heart-svg heart-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-                                     <path fill="none" stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
-                                           d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
+                                     <path fill="none" stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
                                  </svg>
                                  <svg class="heart-svg heart-red" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
                                      <path fill="#E53935" d="M60 100 C 30 78, 12 62, 12 42 C 12 26, 24 14, 40 14 C 50 14, 57 19, 60 26 C 63 19, 70 14, 80 14 C 96 14, 108 26, 108 42 C 108 62, 90 78, 60 100 Z"/>
@@ -151,21 +147,8 @@
                      </div>
                  </div>
      
-                 <div class="qx2-music-row">
-                     <div class="qx2-camera-hint" id="qx2_camera_hint" data-i18n="qx2_camera_hint">
-                         请把干净的手指放在摄像头上，准备安静地听音乐
-                     </div>
-                     <div class="qx2-trend-mini" id="qx2_trend_mini">
-                         <div class="qx2-trend-video-wrap">
-                             <video id="qx2_trend_video" class="qx2-trend-video" autoplay playsinline muted></video>
-                         </div>
-                     </div>
-                     <div class="qx-hrv-dots qx-hrv-dots-qx2">
-                         <span class="qx-hrv-dot" id="qx2_dot_a"></span>
-                         <span class="qx-hrv-dot" id="qx2_dot_b"></span>
-                     </div>
-                     <button class="qx2-btn-collection" id="qx2_btn_collection" data-i18n="qx2_btn_pick">选曲</button>
-                     <button class="qx2-btn-start" id="qx2_btn_start" data-i18n="qx2_btn_start">开始</button>
+                 <div class="qx2-music-row" id="qx2_music_row">
+                    <!-- 这里面的内容全由 JS 动态生成 -->
                  </div>
      
                  <div class="qx2-mid-row">
@@ -177,23 +160,13 @@
                      </div>
      
                      <div class="qx2-heal-area">
-                         <div class="qx2-heal-title" data-i18n="qx2_heal_title">实时治愈主图</div>
-                         <div class="qx2-work-info-card" id="qx2_work_info" style="display:none;"></div>
-                         <div class="qx2-heal-tabs" id="qx2_heal_tabs"></div>
-                         
-                         <div class="qx2-heal-canvas-wrap" style="position:relative;">
-                             <div class="qx2-heal-canvas" id="qx2_heal_canvas">
-                                 <span class="qx2-heal-placeholder" data-i18n="qx2_heal_ph">待定</span>
-                             </div>
-                             <div class="qx2-heal-overlay-bar" id="qx2_heal_overlay">
-                                 <div class="qx2-trend-mini" id="qx2_trend_mini_overlay">
-                                     <div class="qx2-trend-video-wrap">
-                                         <video id="qx2_trend_video_overlay" class="qx2-trend-video" autoplay playsinline muted></video>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
+                        <div class="qx2-heal-title" data-i18n="qx2_heal_title">实时治愈主图</div>
+                        <div class="qx2-work-info-card" id="qx2_work_info" style="display:none;"></div>
+                        <!-- 只保留大球的画布容器 -->
+                        <div class="qx2-heal-canvas-wrap">
+                            <div class="qx2-heal-canvas" id="qx2_heal_canvas"></div>
+                        </div>
+                    </div>
      
                      <div class="qx2-feedback-area">
                          <div class="qx2-feedback-title" data-i18n="qx2_feedback_title">主观评价</div>
@@ -389,7 +362,7 @@
              <div class="qx1-heal-modal-inner">
                  <div class="qx1-heal-modal-header">
                      <div class="qx1-heal-modal-title" data-i18n="qx1_heal_title">情绪宝 HRV 采集 · 实时治愈主图</div>
-                     <div class="qx1-heal-modal-timer" id="qx1_heal_modal_timer">0 / 120 秒</div>
+                     <div class="qx1-heal-modal-timer" id="qx1_heal_modal_timer">0 / 60 秒</div>
                      <button class="qx1-heal-modal-close" id="qx1_heal_modal_close" data-i18n="qx1_heal_close">关闭</button>
                  </div>
                  <div class="qx1-heal-modal-progress">
@@ -444,11 +417,12 @@
          <script src="js/qx_help_card.js"></script>
          <script src="js/qx1_perceive.js"></script>
          <script src="js/qx2_heal_chart.js"></script>
+         <script src="js/qx2_hrv_engine.js"></script>         
          <script src="js/qx2_regulate.js"></script>
          <script src="js/qx3_report.js"></script>
          <script src="js/qx4_qa.js"></script>
          <script src="js/qx5_engine.js"></script>
-         <script src="js/qx5_scenarios.js"></script> <!-- 务必确认有这行 -->
+         <script src="js/qx5_scenarios.js"></script>
          <script src="js/qx5_games_job.js"></script>         
          <script src="js/qx5_games.js"></script>
          <script src="js/qx5_games_extra.js"></script>
@@ -460,8 +434,7 @@
          <script src="js/qx5_holland.js"></script>
          <script src="js/qx5_card_poker.js"></script>
          <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>         
-         <script src="js/qx5_main.js"></script>
-     
+         <script src="js/qx5_main.js"></script>   
          <script src="js/qx6/qx6_utils.js"></script>
          <script src="js/qx6/qx6_registry.js"></script>
          <script src="js/qx6/qx6_1_account.js"></script>
@@ -479,5 +452,4 @@
          <script src="js/qx6/qx6_11_finance.js"></script>
          <script src="js/qx6/qx6_12_sys_exit.js"></script>
          <script src="js/qx6/qx6_settings.js"></script>
-
      </html>

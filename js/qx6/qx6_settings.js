@@ -65,7 +65,7 @@
             const contentItems = [
                 { id: 'qa_engine',        icon: '📚', cn: '知识库维护',     en: 'Knowledge Base' },
                 { id: 'music_lib',        icon: '🎵', cn: '音乐库管理',     en: 'Music Library' },
-                { id: 'music_workbench',  icon: '🎼', cn: '音乐导师工作台',  en: 'Music Workbench' },
+                { id: 'music_workbench',  icon: '🎼', cn: '音乐导播台',  en: 'Music Console' },
             ];
             if (U.isAdmin()) {
                 contentItems.push({ id: 'rule_edit', icon: '🎼', cn: '组曲规则', en: 'Playlist Rules' });
@@ -107,7 +107,7 @@
         manage_users:    { cn: '用户管理',   en: 'User Management' },
         qa_engine:       { cn: '知识库维护', en: 'Knowledge Base' },
         music_lib:       { cn: '音乐库管理', en: 'Music Library' },
-        music_workbench: { cn: '音乐导师工作台', en: 'Music Workbench' },
+        music_workbench: { cn: '音乐导播台', en: 'Music Console' },
         rule_edit:       { cn: '组曲规则',   en: 'Playlist Rules' },
         finance:         { cn: '财务管理',   en: 'Finance' },
         sys_exit:        { cn: '退出情绪宝', en: 'Exit' },

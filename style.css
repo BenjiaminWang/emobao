@@ -1,6 +1,6 @@
 /* ================================================================
-   style.css  V67 (强制修复版)
-   日期：2026-10-18
+   style.css  V68 (终极净化版)
+   日期：2026-11-09
    ================================================================ */
 
    :root {
@@ -3507,361 +3507,103 @@ body.lang-en .qx2-flow-name {
         max-width: 36%;
     }
 }
-
 /* ================================================================
-   qx2 作品选择弹层
-   ================================================================ */
-.qx2-work-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    border: 1px solid #E1E8F0;
-    border-radius: 8px;
-    background: #FAFAFA;
-    cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
-}
-.qx2-work-item:hover {
-    border-color: #2C7BE5;
-    background: #EEF4FF;
-}
-.qx2-work-cover {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border-radius: 6px;
-    background-color: #E1E8F0;
-    background-size: cover;
-    background-position: center;
-}
-.qx2-work-info { flex: 1; min-width: 0; }
-.qx2-work-title {
-    font-size: 14px;
-    font-weight: bold;
-    color: #1A2B4A;
-    margin-bottom: 3px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.qx2-work-meta {
-    font-size: 12px;
-    color: #5A6B87;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* ================================================================
-   qx2 作品信息卡
-   ================================================================ */
-.qx2-work-info-card {
-    background: #F8FBFF;
-    border: 1px solid #DCE9FF;
-    border-radius: 6px;
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    max-height: 40vh;
-    overflow-y: auto;
-    font-size: 12px;
-    line-height: 1.5;
-    color: #1A2B4A;
-    -webkit-overflow-scrolling: touch;
-}
-.qx2-wi-title {
-    font-size: 14px;
-    font-weight: bold;
-    color: #1A5BB8;
-    margin-bottom: 2px;
-}
-.qx2-wi-meta {
-    font-size: 11px;
-    color: #5A6B87;
-    margin-bottom: 6px;
-}
-.qx2-wi-section {
-    margin-top: 6px;
-    padding-top: 6px;
-    border-top: 1px dashed #DCE9FF;
-}
-.qx2-wi-label {
-    font-weight: bold;
-    color: #5A6B87;
-    font-size: 11px;
-    margin-bottom: 3px;
-}
-.qx2-wi-curr-seg {
-    background: #EEF4FF;
-    padding: 6px 8px;
-    border-radius: 4px;
-    border-left: 3px solid #2C7BE5;
-    margin-bottom: 6px;
-}
-.qx2-wi-curr-seg-title {
-    font-weight: bold;
-    color: #2C7BE5;
-    font-size: 12px;
-    margin-bottom: 2px;
-}
-.qx2-wi-guide {
-    color: #333;
-    font-size: 12px;
-    line-height: 1.6;
-}
-.qx2-wi-seg-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 4px;
-}
-.qx2-wi-seg-item {
-    font-size: 10px;
-    padding: 2px 6px;
-    background: #fff;
-    border: 1px solid #DCE9FF;
-    border-radius: 10px;
-    color: #5A6B87;
-}
-.qx2-wi-seg-item.active {
-    background: #2C7BE5;
-    color: #fff;
-    border-color: #2C7BE5;
-}
-.qx2-wi-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-}
-.qx2-wi-tag {
-    font-size: 10px;
-    padding: 2px 8px;
-    background: #FFF8E1;
-    border: 1px solid #FBC02D;
-    border-radius: 10px;
-    color: #B9770E;
-}
-.qx2-wi-va {
-    font-size: 11px;
-    color: #5A6B87;
-}
-
-/* ================================================================
-   qx2 布局与状态控制（V67 终极强制版）
+   QX2 终极净体重构版（V100 完美工作流专用）
    ================================================================ */
 
-/* 基础：左右分析和评价区默认可见 */
-.qx2-analysis-area,
-.qx2-feedback-area {
-    display: flex;
-}
+/* 1. 基础框架与顶部 */
+.qx2-container { display: flex; flex-direction: column; height: 100%; padding: 8px; box-sizing: border-box; background: #F5F7FA; gap: 8px; overflow: hidden; }
+.qx2-top-bar { display: flex; align-items: stretch; gap: 8px; flex-shrink: 0; height: 130px !important; min-height: 130px !important; }
 
-/* ----------------------------------------------------------------
-   核心修复：仅当进入 Step 2 且为 work-mode 时，隐藏那一行
-   ---------------------------------------------------------------- */
-.qx2-container.step2-mode.work-mode .qx2-music-row {
-    display: none !important;
-}
-
-/* Step 2 且选曲：隐藏左右分析/评价区，让治愈图铺满中间 */
-.qx2-container.step2-mode.work-mode .qx2-analysis-area,
-.qx2-container.step2-mode.work-mode .qx2-feedback-area {
-    display: none !important;
-}
-
-/* Step 2 且选曲：让中间的治愈图区域撑满所有剩余高度 */
-.qx2-container.step2-mode.work-mode .qx2-heal-area {
-    flex: 1 !important;
-    width: 100% !important;
-}
-
-/* Step 2 且选曲：隐藏治愈图自己的标题和切换 Tab，让画面更大 */
-.qx2-container.step2-mode.work-mode .qx2-heal-title,
-.qx2-container.step2-mode.work-mode .qx2-heal-tabs {
-    display: none !important;
-}
-
-/* ----------------------------------------------------------------
-   qx2 悬浮波形栏与画布设置（选曲模式专用）
-   ---------------------------------------------------------------- */
-.qx2-container.work-mode .qx2-heal-canvas-wrap {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    display: flex;
-}
-
-.qx2-container.work-mode .qx2-heal-canvas {
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
-    border-radius: 4px;
-    overflow: hidden;
-    background: #0A1628;
-    display: flex;
+/* 2. 🌟 动态操作提示栏（全宇宙最强） */
+.qx2-music-row {
+    display: flex !important;
     align-items: center;
     justify-content: center;
-}
-
-/* 底部悬浮条（选曲模式专用） */
-.qx2-container.work-mode .qx2-heal-overlay-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 10px;
-    background: linear-gradient(to top, rgba(10, 22, 40, 0.8) 0%, transparent 100%);
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    pointer-events: none;
-    z-index: 2;
-}
-
-.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-mini {
-    flex: 1;
-    height: 30px;
-    background: transparent;
-    border: none;
-    display: flex;
-    align-items: flex-end;
-    padding: 0;
-}
-.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-score {
-    display: none !important;
-}
-.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-mini svg {
-    width: 100%;
-    height: 24px;
-}
-.qx2-container.work-mode .qx2-heal-overlay-bar .qx2-trend-video-wrap {
-    border-color: rgba(255,255,255,0.3);
-    margin-left: 10px;
-}
-
-/* 无数据提示框 */
-.qx2-analysis-tip {
-    padding: 16px 12px;
-    font-size: 13px;
-    color: #5A6B87;
-    line-height: 1.7;
-    text-align: center;
-    background: #F8FBFF;
-    border-radius: 6px;
-    border: 1px dashed #DCE9FF;
+    background: #fff;
+    border-radius: 8px;
+    padding: 0 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    height: 64px;
+    min-height: 64px;
     margin: 8px 0;
+    overflow: visible;
+    position: relative;
+    z-index: 10;
 }
+.qx2-ab-text { font-size: 15px; font-weight: bold; color: #1E293B; flex: 1; text-align: center; }
+.qx2-ab-btns { display: flex; gap: 12px; justify-content: center; flex: 1; }
+.qx2-ab-btn { padding: 8px 24px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; border: none; }
+.qx2-ab-btn-primary { background: #2C7BE5; color: #fff; }
+.qx2-ab-btn-secondary { background: #fff; color: #64748B; border: 1px solid #CBD5E1; }
+
+/* 选曲下拉列表 */
+.qx2-ab-dropdown { position: absolute; top: 70px; left: 16px; right: 16px; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-height: 300px; overflow-y: auto; z-index: 100; display: none; padding: 8px; border: 1px solid #E2E8F0; }
+.qx2-ab-dropdown.show { display: block; }
+.qx2-ab-dropdown-item { padding: 12px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #1E293B; transition: background 0.2s; }
+.qx2-ab-dropdown-item:hover { background: #F1F5F9; }
+
+/* 3. 中部布局区 */
+.qx2-mid-row { flex: 1; min-height: 0; display: flex; gap: 8px; overflow: hidden; }
+.qx2-analysis-area { flex: 0 0 24%; background: #fff; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; overflow: hidden; }
+.qx2-heal-area { flex: 1; background: #fff; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; overflow: hidden; }
+.qx2-heal-canvas-wrap { flex: 1; min-height: 0; display: flex; position: relative; }
+.qx2-heal-canvas { flex: 1; min-height: 0; border-radius: 4px; overflow: hidden; background: #0A1628; display: flex; align-items: center; justify-content: center; }
+.qx2-feedback-area { flex: 0 0 16%; background: #fff; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; overflow: hidden; }
+
+/* 4. 🌟 状态切换（极简/听歌/选曲/报告） */
+/* 第一步：隐藏左右，主图居中放大 */
+.qx2-container.step1-mode .qx2-analysis-area,
+.qx2-container.step1-mode .qx2-feedback-area { display: none !important; }
+.qx2-container.step1-mode .qx2-heal-area { flex: 1 !important; max-width: 600px; margin: 0 auto; }
+
+/* 选曲模式：隐藏呼吸球，展示作品介绍 */
+.qx2-container.step2-mode.work-mode .qx2-heal-canvas-wrap { display: none !important; }
+.qx2-container.step2-mode.work-mode .qx2-work-info-card { display: flex !important; flex-direction: column; height: 100%; max-height: none; margin: 0; }
+.qx2-container.step2-mode.work-mode .qx2-analysis-area,
+.qx2-container.step2-mode.work-mode .qx2-feedback-area { display: none !important; }
+
+/* 第四步：全屏报告霸体 */
+.qx2-container.step4-mode .qx2-music-row,
+.qx2-container.step4-mode .qx2-heal-area,
+.qx2-container.step4-mode .qx2-feedback-area { display: none !important; }
+.qx2-container.step4-mode .qx2-mid-row { display: block !important; width: 100% !important; flex: 1 !important; margin: 0 !important; padding: 0 !important; }
+.qx2-container.step4-mode .qx2-analysis-area { flex: 1 1 100% !important; width: 100% !important; height: 100% !important; max-width: none !important; padding: 12px !important; background: transparent !important; box-shadow: none !important; }
+.qx2-container.step4-mode .qx2-analysis-title { display: none !important; }
+
+/* 5. 底部按钮 */
+.qx2-actions-row { display: flex; gap: 8px; flex-shrink: 0; height: 44px; }
+.qx2-btn { flex: 1; border-radius: 10px; font-size: 14px; font-weight: bold; color: #fff; background: #2C7BE5; cursor: pointer; border: none; box-shadow: 0 3px 0 #1A5BB8; }
+.qx2-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #1A5BB8; }
 
 /* ================================================================
-   qx2 作品信息卡在 Step 2 下的高度约束
+   6. 报告图专用样式（原汁原味保留）
    ================================================================ */
-.qx2-container.step2-mode .qx2-work-info-card {
-    max-height: 50vh;
-    overflow-y: auto;
-    flex-shrink: 0;
-}
-
-/* 治愈主图在 Step 2 里占剩下的空间 */
-.qx2-container.step2-mode .qx2-heal-canvas-wrap {
-    flex: 1;
-    min-height: 200px;
-}
-
-/* ================================================================
-   终极修复：无论之前怎么写的，强制恢复 QX1 的点击层级
-   ================================================================ */
-.qx1-tree {
-    position: relative !important;
-    z-index: 10 !important;
-}
-.qx1-tree-children {
-    position: relative !important;
-    z-index: 20 !important;
-}
-.qx1-tree-item {
-    position: relative !important;
-    z-index: 30 !important;
-    display: block !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-}
-/* 🌟 针对左侧事件列表容器的滚动条美化与高度限制 */
-.qx1-tree-children { 
-    max-height: 250px !important; /* 加上 !important 强行覆盖，你可以根据手机屏幕大小改成 300px 或 200px */
-    overflow-y: auto !important; 
-    padding-right: 4px; /* 留点空间给滚动条 */
-}
-
-/* 滚动条轨道 */
-.qx1-tree-children::-webkit-scrollbar {
-    width: 8px !important;
-}
-.qx1-tree-children::-webkit-scrollbar-track {
-    background: #f1f1f1 !important;
-    border-radius: 4px;
-}
-
-/* 滚动条滑块（蓝色显眼） */
-.qx1-tree-children::-webkit-scrollbar-thumb {
-    background: #2C7BE5 !important;
-    border-radius: 4px;
-    border: 2px solid #fff; /* 增加一点白边，显得更精致 */
-}/* 🌟 缩小 HRV 治愈主图弹窗，上下留白，露出上下操作区 */
-#qx1_heal_modal .modal-content, 
-#qx1_heal_modal > div {
-    height: 60vh !important; /* 高度只占屏幕 60%（上下都缩小） */
-    margin-top: 20vh !important; /* 往下推 20%，居中，上方露出生活事件 */
-    border-radius: 12px; 
-    overflow: hidden;
-}
-
-#qx1_heal_canvas {
+.qx2-report-container { display: flex; flex-direction: column; gap: 16px; padding: 12px; background: #F8FBFF; border-radius: 12px; border: 1px solid #DCE9FF; }
+.qx2-temp-card { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative; overflow: hidden; }
+.qx2-temp-side { text-align: center; flex: 1; }
+.qx2-temp-label { font-size: 12px; color: #64748B; margin-bottom: 4px; }
+.qx2-temp-emoji { font-size: 32px; line-height: 1; margin-bottom: 4px; }
+.qx2-temp-name { font-size: 14px; font-weight: bold; }
+.qx2-temp-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.qx2-temp-arrow { width: 40px; height: 2px; background: #CBD5E1; position: relative; }
+.qx2-temp-arrow::after { content: ''; position: absolute; right: 0; top: -4px; border-left: 6px solid #CBD5E1; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.qx2-temp-ai-text { font-size: 13px; color: #2C7BE5; font-weight: bold; margin-top: 12px; text-align: center; width: 150%; }
+.qx2-dual-chart-wrap { background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.qx2-dual-title { font-size: 14px; font-weight: bold; color: #1E293B; margin-bottom: 8px; text-align: center; }
+.qx2-dual-canvas { width: 100%; height: 180px; position: relative; }
+.qx2-highlights { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.qx2-highlight-item { background: #fff; border-radius: 8px; padding: 10px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.qx2-hl-title { font-size: 11px; color: #64748B; margin-bottom: 4px; }
+.qx2-hl-val { font-size: 16px; font-weight: bold; color: #1E293B; }
+.qx2-work-info-card { background: #F8FBFF; border: 1px solid #DCE9FF; border-radius: 6px; padding: 12px; overflow-y: auto; font-size: 12px; line-height: 1.5; color: #1A2B4A; display: none; }
+/* 确保大球容器完全撑满并居中 */
+.qx2-heal-area { flex: 1 !important; display: flex; flex-direction: column; width: 100% !important; height: 100% !important; padding: 0 !important; }
+.qx2-heal-canvas-wrap { flex: 1 !important; width: 100% !important; height: 100% !important; position: relative; display: flex; }
+.qx2-heal-canvas { flex: 1 !important; width: 100% !important; height: 100% !important; border-radius: 0 !important; }
+.qx2-container.step4-mode .qx2-heal-area {
+    display: flex !important;
+    flex: 1 1 100% !important;
     width: 100% !important;
-    height: 100% !important; /* 让画布严格贴合 60vh 的容器 */
-    object-fit: contain;
-}
-/* ================================================================
-   二维码卡片终极修复补丁
-   ================================================================ */
-   .qx-print-card {
-    width: 280px !important;
-    height: 380px !important;
-    background: #ffffff !important;
-    border-radius: 12px !important;
-    border: 1px solid #E2E8F0 !important;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
-    position: relative !important;
-    box-sizing: border-box !important;
-    margin: 10px !important;
-    overflow: hidden !important;
-}
-
-/* 强行给二维码容器分配空间并置顶 */
-[id^="qr_holder_"] {
-    position: absolute !important;
-    top: 110px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 160px !important;
-    height: 160px !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    z-index: 10 !important;
-}
-
-/* 强行让里面的 canvas 或 img 显示出来 */
-[id^="qr_holder_"] canvas, 
-[id^="qr_holder_"] img {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    width: 160px !important;
-    height: 160px !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    height: 100% !important;
 }

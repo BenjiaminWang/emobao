@@ -423,29 +423,16 @@
                     const progressEl = document.getElementById('qx1_heal_modal_progress');
                     const hintEl = document.getElementById('qx1_heal_modal_hint');
                     
-                    // 1. 底部提示框逻辑：只做手指检测提示，去重倒计时
+                    // 强制只显示手指状态，绝对不画假波浪线！
                     if (hintEl) {
                         if (isWarmup) {
                             hintEl.innerHTML = `<span style="color:#B9770E; font-weight:bold;">${hintText || '请调整手指...'}</span>`;
                         } else {
-                            // 判断是否已经真正开始播放音乐（组曲）
-                            if (state.started) {
-                                const waveSvg = `<svg viewBox="0 0 100 20" style="width:100px; height:16px; vertical-align:middle; margin-left:10px;">
-                                    <path fill="none" stroke="#2ECC71" stroke-width="2" d="M0,15 L10,12 L20,17 L30,10 L40,14 L50,8 L60,11 L70,5 L80,9 L90,4 L100,7" />
-                                </svg>`;
-                                hintEl.innerHTML = `
-                                    <div style="display:flex; justify-content:flex-end; align-items:center; width:100%;">
-                                        <span style="font-size:12px; color:#5A6B87; display:flex; align-items:center;">🎵 组曲走势 ${waveSvg}</span>
-                                    </div>
-                                `;
-                            } else {
-                                // 还没放音乐，只显示手指检测状态
-                                hintEl.innerHTML = `<span style="color:#1A2B4A; font-size:14px;">${hintText || '信号良好，采集中...'}</span>`;
-                            }
+                            hintEl.innerHTML = `<span style="color:#1A2B4A; font-size:14px; font-weight:bold;">${hintText || '信号良好，采集中...'}</span>`;
                         }
                     }
 
-                    // 2. 顶部计时器与进度条（只留顶部一个倒计时）
+                    // 顶部计时器与进度条
                     if (isWarmup) {
                         if (timer) timer.innerText = t(`${remain} 秒后开始采集`, `Starting in ${remain}s`);
                         if (progressEl) progressEl.style.width = `${total}%`; 
@@ -453,7 +440,8 @@
                         if (timer) timer.innerText = t(`${remain} / ${total} 秒`, `${remain} / ${total} s`);
                         if (progressEl) progressEl.style.width = Math.min(100, ((total - remain) / total) * 100) + '%';
                     }
-                },                onComplete: (result) => {
+                },
+                onComplete: (result) => {
                     modal.classList.remove('show');
                     if (result) { 
                         if (isPre) state.hrvResultBefore = result; 
@@ -786,9 +774,21 @@
         const rmssdDiff = rmssdAfter - rmssdBefore;
         const bpmDiff = bpmBefore - bpmAfter; 
         const emoImprove = outEmotion - inEmotion;
-
-        const curWork = state.playlist[state.currentIndex] || {};
-        const workName = state.isWorkMode ? (curWork.title_cn || '经典作品') : '系统推荐组曲';
+        // 🌟 终极修复真实曲名（绝不偷懒，取实际播放的那首）
+        let workName = '系统推荐组曲';
+        if (state.isWorkMode) {
+            if (state.playlist && state.playlist.length > 0) {
+                // 校验 currentIndex 是否越界，如果越界，说明刚播完，取最后一首
+                let idx = state.currentIndex;
+                if (idx >= state.playlist.length || idx < 0) {
+                    idx = state.playlist.length - 1;
+                }
+                const curWork = state.playlist[idx] || {};
+                workName = curWork.title_cn || curWork.title_en || '经典作品';
+            } else {
+                workName = '经典作品';
+            }
+        }
         const feedbackText = state.feedback === 'better' ? '更好' : (state.feedback === 'worse' ? '更差' : '一样');
 
         // ==== 核心数据计算 ====

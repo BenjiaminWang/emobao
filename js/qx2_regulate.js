@@ -184,17 +184,35 @@
         const dropdown = document.getElementById('qx2_ab_dropdown');
         if (!dropdown) return;
         dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">加载中...</div>';
-        
         try {
             const works = await restGet(`emo_works?is_published=eq.true&order=created_at.asc`);
             if (!works || works.length === 0) {
                 dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">暂无作品</div>';
                 return;
             }
-            
             dropdown.innerHTML = works.map(w => {
                 const title = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
-                return `<div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')">${escapeHtml(title)}</div>`;
+                const composer = w.composer || '';                
+                // 格式化时长（秒 -> 分:秒）
+                let durStr = '';
+                if (w.total_duration) {
+                    const m = Math.floor(w.total_duration / 60);
+                    const s = String(w.total_duration % 60).padStart(2, '0');
+                    durStr = `${m}:${s}`;
+                }
+                let metaInfo = '';
+                if (composer || durStr) {
+                    const parts = [];
+                    if (composer) parts.push(escapeHtml(composer));
+                    if (durStr) parts.push(durStr);
+                    metaInfo = `<span style="font-size: 12px; color: #96A3B8; font-weight: normal; margin-left: 8px;">${parts.join(' · ')}</span>`;
+                }
+                return `
+                    <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #F0F4F9;">
+                        <span style="font-weight: 500; color: #1A2B4A;">${escapeHtml(title)}</span>
+                        ${metaInfo}
+                    </div>
+                `;
             }).join('');
         } catch (e) {
             dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#E74C3C;">网络错误，请重试</div>';

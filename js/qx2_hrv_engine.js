@@ -199,18 +199,24 @@
                                     waveEl.setAttribute('points', points);
                                 }
                             }
-
-                            // 让大球转动并实时更新萤火虫（真实峰值计算）
-                            // 🌟 彻底修复：去掉数据长度的死板限制，实时计算
-                            let realBpm = 70, realRmssd = 50;
-                            // 只要有超过 20 个采样点，就开始实时计算
-                            if (samples.length > 20) {
-                                const recentSamples = samples.slice(-150); // 取最近 150 个点
+                            // 🌟 终极修复：对齐 qx1，用最少数据算出真实心率推给图表
+                            if (samples.length > 30) {
+                                const recentSamples = samples.slice(-150); 
                                 const peaks = DSP.peaks(DSP.movingAverage(DSP.bandpass(recentSamples), 5), 30);
                                 const rr = DSP.rr(peaks, 30);
-                                if (rr.length > 2) {
-                                    realRmssd = Math.max(10, Math.min(100, DSP.rmssd(rr))); 
-                                    realBpm = DSP.bpm(rr);
+                                if (rr.length >= 2) {
+                                    const finalRmssd = Math.max(10, Math.min(100, DSP.rmssd(rr))); 
+                                    const finalBpm = DSP.bpm(rr);
+                                    if (window.qxHealChart && window.qxHealChart.push) {
+                                        try { 
+                                            window.qxHealChart.push({ 
+                                                quality: 'good', 
+                                                bpm: finalBpm, 
+                                                rmssd: finalRmssd, 
+                                                elapsed: elapsed 
+                                            }); 
+                                        } catch (e) {}
+                                    }
                                 }
                             }
                             if (window.qxHealChart && window.qxHealChart.push) {
@@ -225,11 +231,9 @@
                             }
                         }
                     }
-
                     if (options.onProgress) {
                         options.onProgress(remain, isWarmup ? warmupSec : duration, isWarmup, hint);
-                    }
-                    
+                    }                    
                     rafId = requestAnimationFrame(loop);
                 };
                 loop();
@@ -238,7 +242,6 @@
                 this.stop();
                 if (options.onError) options.onError(e);
             });
-
             this.stop = () => {
                 running = false;
                 if (rafId) cancelAnimationFrame(rafId);

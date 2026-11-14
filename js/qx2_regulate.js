@@ -180,42 +180,87 @@
         if (window.qxSpeak) window.qxSpeak(`已记录：${zhVal}。请去右上角选择情绪，然后点击分析`, null);
     };
 
-    window.qx2_renderDropdown = async function() {
+        window.qx2_renderDropdown = async function() {
         const dropdown = document.getElementById('qx2_ab_dropdown');
         if (!dropdown) return;
         dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">加载中...</div>';
+        
         try {
-            const works = await restGet(`emo_works?is_published=eq.true&order=created_at.asc`);
+            const works = await restGet(`emo_works?is_published=eq.true&order=created_at.desc`);
             if (!works || works.length === 0) {
                 dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">暂无作品</div>';
                 return;
             }
-            dropdown.innerHTML = works.map(w => {
-                const title = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
-                const composer = w.composer || '';                
-                // 格式化时长（秒 -> 分:秒）
-                let durStr = '';
-                if (w.total_duration) {
-                    const m = Math.floor(w.total_duration / 60);
-                    const s = String(w.total_duration % 60).padStart(2, '0');
-                    durStr = `${m}:${s}`;
+
+            const composers = [...new Set(works.map(w => w.composer).filter(Boolean))];
+            const forms = [...new Set(works.map(w => w.form).filter(Boo: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;" id="qx2_filter_tags">
+                    <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer;">全部</button>
+                    ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer;">${c}</button>`).join('')}
+                    ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer;">${f}</button>`).join('')}
+                </div>
+                <div id="work_list_container" style="max-height: 300px; overflow-y: auto;"></div>
+            `;
+            dropdown.innerHTML = filterHtml;
+
+            const listContainer = document.getElementById('qx2_work_list_container');
+            const filterBtns = dropdown.querySelectorAll('.qx2-filter-btn');
+
+            function renderList(filterType = 'all', filterVal = 'all') {
+                const filteredWorks = works.filter(w => {
+                    if (filterType === 'all') return true;
+                    if (filterType === 'composer') return w.composer === filterVal;
+                    if (filterType === 'form') return w.form === filterVal;
+                    return true;
+                });
+
+                if (filteredWorks.length === 0) {
+                    listContainer.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">没有符合条件的曲目</div>';
+                    return;
                 }
-                let metaInfo = '';
-                if (composer || durStr) {
-                    const parts = [];
-                    if (composer) parts.push(escapeHtml(composer));
-                    if (durStr) parts.push(durStr);
-                    metaInfo = `<span style="font-size: 12px; color: #96A3B8; font-weight: normal; margin-left: 8px;">${parts.join(' · ')}</span>`;
-                }
-                return `
-                    <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #F0F4F9;">
-                        <span style="font-weight: 500; color: #1A2B4A;">${escapeHtml(title)}</span>
-                        ${metaInfo}
-                    </div>
-                `;
-            }).join('');
+
+                listContainer.innerHTML = filteredWorks.map(w => {
+              = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
+                    const composer = w.composer || '';
+                    const dur = w.total_duration ? `${Math.floor(w.total_duration / 60)}:${String(w.total_duration % 60).padStart(2, '0')}` : '--';
+                    
+                    let metaInfo = '';
+                    if (composer || dur) {
+                        const parts = [];
+                        if (composer) parts.push(escapeHtml(composer));
+                        if (dur) parts.push(dur);
+                        metaInfo = `<span style="font-size: 12px; color: #96A3B8; font-weight: normal; margin-left: 8px;">${parts.join(' · ')}</span>`;
+                    }
+
+                    return `
+                        <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F0F4F9; cursor: pointer;">
+                           <span style="font-weight: 500; color: #1A2B4A;">${escapeHtml(title)}</span>
+                            ${metaInfo}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderList();
+
+            filterBtns.forEach(btn => {
+                btn.onclick = () => {
+                    filterBtns.forEach(b => {
+                        b.style.background = '#fff';
+                        b.style.color = '#5A6B87';
+                        b.style.borderColor = '#E1E8F0';
+                        b.classList.remove('active');
+                    });
+                    btn.style.background = '#2C7BE5';
+                    btn.style.color = '#fff';
+                    btn.style.borderColor = '#2C7BE5';
+                    btn.classList.add('active');
+                    
+                    renderList(btn.dataset.filterType, btn.dataset.filterVal);
+                };
+            });
+
         } catch (e) {
-            dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#E74C3C;">网络错误，请重试</div>';
+            console.error('加载曲库失败'      dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#E74C3C;">网络错误，请重试</div>';
         }
     };
 

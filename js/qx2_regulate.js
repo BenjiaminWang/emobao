@@ -207,8 +207,17 @@
                 <div id="qx2_work_list_container" style="max-height: 40vh; overflow-y: auto; width: 100%;"></div>
             `;
             // 🌟 核心修复：强制下拉框绝对定位，悬浮在页面最上层，绝不挤占底部按钮的空间！
-            dropdown.style.cssText = 'position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 999; display: flex; flex-direction: column; max-height: 60vh; overflow: hidden;';
-            dropdown.innerHTML = filterHtml; 
+            // 🌟 绝对定位，悬浮在上方，绝不挤占下方空间
+            dropdown.style.cssText = 'position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 999; display: flex; flex-direction: column; max-height: 60vh; overflow: hidden; width: 100%;';
+            
+            dropdown.innerHTML = `
+                <div style="padding: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; width: 100%; box-sizing: border-box;" id="qx2_filter_tags">
+                    <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer; flex-shrink: 0;">全部</button>
+                    ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${c}</button>`).join('')}
+                    ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${f}</button>`).join('')}
+                </div>
+                <div id="qx2_work_list_container" style="max-height: 40vh; overflow-y: auto; width: 100%;"></div>
+            `;
             const listContainer = document.getElementById('qx2_work_list_container');
             const filterBtns = dropdown.querySelectorAll('.qx2-filter-btn');
 
@@ -404,11 +413,16 @@
             const isPureMusic = _workInfo.timelines.length === 1 && _workInfo.timelines[0].start_time === 0;
 
             if (isPureMusic) {
-                // 🎵 纯音乐模式：隐藏文字，把空间留给大球
-                card.style.display = 'none'; 
+                // 🎵 纯音乐：保留容器，清空丑文字，把整个屏幕留给大球！
+                card.style.display = 'block'; 
+                card.style.background = 'transparent'; 
+                card.style.padding = '0'; 
+                card.innerHTML = ''; 
             } else {
                 // 🎙️ 精讲模式（如《春天里》）：渲染曲名、结构、导语
                 card.style.display = 'block';
+                card.style.background = ''; // 恢复默认背景
+                card.style.padding = ''; // 恢复默认内边距
                 card.innerHTML = `
                     <div class="qx2-wi-title">${escapeHtml(title)}</div>
                     <div class="qx2-wi-meta">${escapeHtml(composer)} · ${dur}${work.era ? ' · ' + escapeHtml(work.era) : ''}${work.form ? ' · ' + escapeHtml(work.form) : ''}</div>

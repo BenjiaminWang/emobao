@@ -384,18 +384,9 @@
         const composer = work.composer || ''; 
 
         const dur = work.total_duration ? Math.floor(work.total_duration / 60) + ':' + String(work.total_duration % 60).padStart(2, '0') : '--';
-        card.innerHTML = `
-            <div class="qx2-wi-title">${escapeHtml(title)}</div>
-            <div class="qx2-wi-meta">${escapeHtml(composer)} · ${dur}${work.era ? ' · ' + escapeHtml(work.era) : ''}${work.form ? ' · ' + escapeHtml(work.form) : ''}</div>
-            <div class="qx2-wi-curr-seg" id="qx2_wi_curr_seg" style="display:none;">
-                <div class="qx2-wi-curr-seg-title" id="qx2_wi_curr_title"></div>
-                <div class="qx2-wi-guide" id="qx2_wi_curr_text"></div>
-            </div>
-            <div class="qx2-wi-section" id="qx2_wi_struct_sec" style="display:none;">
-                <div class="qx2-wi-label">${escapeHtml(t('全曲结构', 'Structure'))}</div>
-                <div class="qx2-wi-seg-list" id="qx2_wi_seg_list"></div>
-            </div>
-        `;
+        
+        // 先清空卡片内容，准备生成
+        card.innerHTML = '';
 
         _workInfo = { work: work, timelines: [], tags: { instruments: [], styles: [] } };
 
@@ -408,28 +399,47 @@
             const structSec = document.getElementById('qx2_wi_struct_sec');
             const segList = document.getElementById('qx2_wi_seg_list');
             
+            // 🌟 核心判断：如果只有一条从0开始的整段，且没有时间轴的细分，那它就是纯音乐
             const isPureMusic = _workInfo.timelines.length === 1 && _workInfo.timelines[0].start_time === 0;
 
-            if (structSec && segList && _workInfo.timelines.length > 0 && !isPureMusic) {
-                structSec.style.display = 'block';
-                segList.innerHTML = _workInfo.timelines.filter(tl => tl.start_time !== tl.end_time).map((tl) => {
-                    const mm = Math.floor(tl.start_time / 60);
-                    const ss = String(tl.start_time % 60).padStart(2, '0');
-                    return `<span class="qx2-wi-seg-item" data-seg="${tl.start_time}">${mm}:${ss} ${escapeHtml(translateSectionName(tl.section_name) || tl.emotion_tag || '')}</span>`;
-                }).join('');
-
-                segList.querySelectorAll('.qx2-wi-seg-item').forEach(btn => {
-                    btn.style.cursor = 'pointer';
-                    btn.onclick = () => {
-                        if (window.speechSynthesis) window.speechSynthesis.cancel();
-                        if (state.audio) state.audio.pause();
-                        const targetStart = parseFloat(btn.dataset.seg);
-                        let targetIndex = _workInfo.timelines.findIndex(x => x.start_time === targetStart && x.end_time > x.start_time);
-                        if (targetIndex !== -1) playSegment(targetIndex);
-                    };
-                });
+            if (isPureMusic) {
+                // 🎵 纯音乐模式：隐藏文字，把空间留给大球
+                card.style.display = 'none'; 
             } else {
-                if (structSec) structSec.style.display = 'none';
+                // 🎙️ 精讲模式（如《春天里》）：渲染曲名、结构、导语
+                card.style.display = 'block';
+                card.innerHTML = `
+                    <div class="qx2-wi-title">${escapeHtml(title)}</div>
+                    <div class="qx2-wi-meta">${escapeHtml(composer)} · ${dur}${work.era ? ' · ' + escapeHtml(work.era) : ''}${work.form ? ' · ' + escapeHtml(work.form) : ''}</div>
+                    <div class="qx2-wi-curr-seg" id="qx2_wi_curr_seg" style="display:none;">
+                        <div class="qx2-wi-curr-seg-title" id="qx2_wi_curr_title"></div>
+                        <div class="qx2-wi-guide" id="qx2_wi_curr_text"></div>
+                    </div>
+                    <div class="qx2-wi-section" id="qx2_wi_struct_sec" style="display:none;">
+                        <div class="qx2-wi-label">${escapeHtml(t('全曲结构', 'Structure'))}</div>
+                        <div class="qx2-wi-seg-list" id="qx2_wi_seg_list"></div>
+                    </div>
+                `;
+
+                if (structSec && segList && _workInfo.timelines.length > 0) {
+                    structSec.style.display = 'block';
+                    segList.innerHTML = _workInfo.timelines.filter(tl => tl.start_time !== tl.end_time).map((tl) => {
+                        const mm = Math.floor(tl.start_time / 60);
+                        const ss = String(tl.start_time % 60).padStart(2, '0');
+                        return `<span class="qx2-wi-seg-item" data-seg="${tl.start_time}">${mm}:${ss} ${escapeHtml(translateSectionName(tl.section_name) || tl.emotion_tag || '')}</span>`;
+                    }).join('');
+
+                    segList.querySelectorAll('.qx2-wi-seg-item').forEach(btn => {
+                        btn.style.cursor = 'pointer';
+                        btn.onclick = () => {
+                            if (window.speechSynthesis) window.speechSynthesis.cancel();
+                            if (state.audio) state.audio.pause();
+                            const targetStart = parseFloat(btn.dataset.seg);
+                            let targetIndex = _workInfo.timelines.findIndex(x => x.start_time === targetStart && x.end_time > x.start_time);
+                            if (targetIndex !== -1) playSegment(targetIndex);
+                        };
+                    });
+                }
             }
         } catch (e) { 
             console.warn('[qx2] 拉 timelines 失败', e); 

@@ -199,15 +199,16 @@
             const forms = [...new Set(works.map(w => w.form).filter(Boolean))];
 
             let filterHtml = `
-                <div style="padding: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;" id="qx2_filter_tags">
-                    <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer;">全部</button>
-                    ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer;">${c}</button>`).join('')}
-                    ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer;">${f}</button>`).join('')}
+                <div style="padding: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch;" id="qx2_filter_tags">
+                    <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer; flex-shrink: 0;">全部</button>
+                    ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${c}</button>`).join('')}
+                    ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${f}</button>`).join('')}
                 </div>
-                <div id="qx2_work_list_container" style="max-height: 300px; overflow-y: auto;"></div>
+                <div id="qx2_work_list_container" style="max-height: 40vh; overflow-y: auto; width: 100%;"></div>
             `;
-            dropdown.innerHTML = filterHtml;
-
+            // 🌟 核心修复：强制下拉框绝对定位，悬浮在页面最上层，绝不挤占底部按钮的空间！
+            dropdown.style.cssText = 'position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 999; display: flex; flex-direction: column; max-height: 60vh; overflow: hidden;';
+            dropdown.innerHTML = filterHtml; 
             const listContainer = document.getElementById('qx2_work_list_container');
             const filterBtns = dropdown.querySelectorAll('.qx2-filter-btn');
 

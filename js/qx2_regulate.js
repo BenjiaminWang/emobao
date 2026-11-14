@@ -1,6 +1,6 @@
 /* ================================================================
-   情绪宝 - qx2 情绪调节 (纯净全屏版)
-   日期：2026-11-10
+   情绪宝 - qx2 情绪调节 (纯净稳定版)
+   日期：2026-11-14
    ================================================================ */
 
    (function () {
@@ -180,7 +180,10 @@
         if (window.qxSpeak) window.qxSpeak(`已记录：${zhVal}。请去右上角选择情绪，然后点击分析`, null);
     };
 
-        window.qx2_renderDropdown = async function() {
+    // ==========================================
+    // 🌟 多维筛选器
+    // ==========================================
+    window.qx2_renderDropdown = async function() {
         const dropdown = document.getElementById('qx2_ab_dropdown');
         if (!dropdown) return;
         dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">加载中...</div>';
@@ -193,12 +196,15 @@
             }
 
             const composers = [...new Set(works.map(w => w.composer).filter(Boolean))];
-            const forms = [...new Set(works.map(w => w.form).filter(Boo: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;" id="qx2_filter_tags">
+            const forms = [...new Set(works.map(w => w.form).filter(Boolean))];
+
+            let filterHtml = `
+                <div style="padding: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap;" id="qx2_filter_tags">
                     <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer;">全部</button>
                     ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer;">${c}</button>`).join('')}
                     ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer;">${f}</button>`).join('')}
                 </div>
-                <div id="work_list_container" style="max-height: 300px; overflow-y: auto;"></div>
+                <div id="qx2_work_list_container" style="max-height: 300px; overflow-y: auto;"></div>
             `;
             dropdown.innerHTML = filterHtml;
 
@@ -219,7 +225,7 @@
                 }
 
                 listContainer.innerHTML = filteredWorks.map(w => {
-              = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
+                    const title = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
                     const composer = w.composer || '';
                     const dur = w.total_duration ? `${Math.floor(w.total_duration / 60)}:${String(w.total_duration % 60).padStart(2, '0')}` : '--';
                     
@@ -233,7 +239,7 @@
 
                     return `
                         <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F0F4F9; cursor: pointer;">
-                           <span style="font-weight: 500; color: #1A2B4A;">${escapeHtml(title)}</span>
+                            <span style="font-weight: 500; color: #1A2B4A;">${escapeHtml(title)}</span>
                             ${metaInfo}
                         </div>
                     `;
@@ -260,7 +266,8 @@
             });
 
         } catch (e) {
-            console.error('加载曲库失败'      dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#E74C3C;">网络错误，请重试</div>';
+            console.error('加载曲库失败', e);
+            dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#E74C3C;">网络错误，请重试</div>';
         }
     };
 
@@ -286,11 +293,20 @@
                 
                 await renderWorkInfo(work);
                 initAudio();
+                if (window.qxHealChart) {
+                    try { 
+                        qxHealChart.start('qx2_heal_canvas'); 
+                        qxHealChart.push({ quality: 'good', bpm: 70, rmssd: 50, elapsed: 1 });
+                    } catch(e){}
+                }
+                
                 state.audio.src = work.audio_url;
                 playSegment(0);
                 updateActionBar(2);
             }
-        } catch (e) { toast('加载作品失败', 'error'); }
+        } catch (e) { 
+            toast('加载作品失败', 'error'); 
+        }
     };
 
     // ==========================================
@@ -388,10 +404,13 @@
                 `emo_work_timelines?workid=eq.${work.workid}&select=start_time,end_time,ai_guide_text,ai_guide_text_en,section_name,emotion_tag,arousal_score,instruments,dynamics,form_section&order=start_time.asc`
             );
             _workInfo.timelines = timelines || [];
+            
             const structSec = document.getElementById('qx2_wi_struct_sec');
             const segList = document.getElementById('qx2_wi_seg_list');
             
-            if (structSec && segList && _workInfo.timelines.length > 0) {
+            const isPureMusic = _workInfo.timelines.length === 1 && _workInfo.timelines[0].start_time === 0;
+
+            if (structSec && segList && _workInfo.timelines.length > 0 && !isPureMusic) {
                 structSec.style.display = 'block';
                 segList.innerHTML = _workInfo.timelines.filter(tl => tl.start_time !== tl.end_time).map((tl) => {
                     const mm = Math.floor(tl.start_time / 60);
@@ -409,9 +428,14 @@
                         if (targetIndex !== -1) playSegment(targetIndex);
                     };
                 });
+            } else {
+                if (structSec) structSec.style.display = 'none';
             }
-        } catch (e) { console.warn('[qx2] 拉 timelines 失败', e); }
+        } catch (e) { 
+            console.warn('[qx2] 拉 timelines 失败', e); 
+        }
     }
+
 
     function updateWorkInfoProgress(currentSec) {
         if (!_workInfo.work) return;
@@ -486,7 +510,6 @@
                     const progressEl = document.getElementById('qx1_heal_modal_progress');
                     const hintEl = document.getElementById('qx1_heal_modal_hint');
                     
-                    // 强制只显示手指状态，绝对不画假波浪线！
                     if (hintEl) {
                         if (isWarmup) {
                             hintEl.innerHTML = `<span style="color:#B9770E; font-weight:bold;">${hintText || '请调整手指...'}</span>`;
@@ -495,7 +518,6 @@
                         }
                     }
 
-                    // 顶部计时器与进度条
                     if (isWarmup) {
                         if (timer) timer.innerText = t(`${remain} 秒后开始采集`, `Starting in ${remain}s`);
                         if (progressEl) progressEl.style.width = `${total}%`; 
@@ -588,9 +610,13 @@
                 if (seg.end_time > seg.start_time) { state.audio.currentTime = seg.start_time; state.audio.play().catch(()=>{}); } 
                 else playSegment(index + 1);
             };
-            const expectedSeconds = Math.ceil(text.length / 1.5) + 10;
+            
             clearTimeout(speakWatchdog);
-            speakWatchdog = setTimeout(() => { if (window.speechSynthesis) window.speechSynthesis.cancel(); triggerMusic(); }, expectedSeconds * 1000);
+            speakWatchdog = setTimeout(() => { 
+                if (window.speechSynthesis) window.speechSynthesis.cancel(); 
+                triggerMusic(); 
+            }, 4000); 
+            
             window.qxSpeak(text, triggerMusic);
         } else {
             if (seg.end_time > seg.start_time) { state.audio.currentTime = seg.start_time; state.audio.play().catch(()=>{}); } 
@@ -598,7 +624,11 @@
         }
     }
 
-    function onTrackEnded() { state.currentIndex++; if (state.currentIndex < state.playlist.length) playCurrentTrack(); else onPlaylistFinished(); }
+    function onTrackEnded() { 
+        state.currentIndex++; 
+        if (state.currentIndex < state.playlist.length) playCurrentTrack(); 
+        else onPlaylistFinished(); 
+    }
     
     function onPlaylistFinished() {
         if (_fastTimer) { clearTimeout(_fastTimer); _fastTimer = null; }
@@ -656,19 +686,15 @@
     }
 
     function onFlowStepClick(step) {
-        // 🌟 核心修复：去掉那个坑爹的 if (step === state.step + 1) 限制，改成允许直接跳转！
         if (step === 4) {
-            console.log('🔥 准备进入第 4 步分析！');
             if (!state.outputEmotionCode || !state.feedback) { 
                 toast(t('请先选择听后情绪和主观评价', 'Please fill output emotion and feedback'), 'warning'); 
                 return; 
             }
             setStep(4); 
             
-            // 暴力强行替换容器
             const healArea = document.querySelector('.qx2-heal-area');
             if (healArea) {
-                console.log('🔥 找到了大球容器，正在清空并塞入报告！');
                 healArea.innerHTML = ''; 
                 healArea.style.setProperty('flex', '1 1 100%', 'important');
                 healArea.style.setProperty('width', '100%', 'important');
@@ -679,16 +705,12 @@
                 reportDiv.id = 'qx2_analysis_body';
                 reportDiv.style.cssText = 'width: 100%; height: 100%; overflow-y: auto;';
                 healArea.appendChild(reportDiv);
-            } else {
-                console.error('❌ 没找到 .qx2-heal-area 容器！');
             }
             
-            // 调用渲染
             window.renderCombinedReport('qx2_analysis_body'); 
             return;
         }
 
-        // 其他步骤的限制保留
         if (step === state.step + 1) {
             if (step === 2) {
                 if (!state.inputEmotionCode || state.inputEmotionCode === 0) { toast(t('请先用魔镜选出情绪', 'Please pick emotion first'), 'warning'); return; }
@@ -816,6 +838,7 @@
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
         hideWorkInfo();
     }
+
     // ==========================================
     // 🌟 全屏分析报告渲染器（qx2 页签专业版）
     // ==========================================
@@ -1002,38 +1025,33 @@
 
         tabs.forEach(tab => {
             tab.onclick = () => {
-                // 重置样式
                 tabs.forEach(t => {
                     t.style.background = 'transparent';
                     t.style.color = '#5A6B87';
                     t.style.boxShadow = 'none';
                 });
-                // 激活当前
                 tab.style.background = '#fff';
                 tab.style.color = '#2C7BE5';
                 tab.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.03)';
 
-                // 切换内容
                 const targetTabNum = tab.dataset.tab;
                 const targetId = 'qx2_report_pane_' + targetTabNum;
                 panes.forEach(p => p.style.display = 'none');
                 const activePane = document.getElementById(targetId);
                 if (activePane) activePane.style.display = 'block';
 
-                // 🌟 触发对应页签的语音播报
                 if (window.qxSpeak) {
                     window.qxSpeak(speakMap[targetTabNum], null);
                 }
             };
         });
 
-        // 页面初次加载时，自动播报第一个页签
         setTimeout(() => {
-            if (window.speechSynthesis) window.speechSynthesis.cancel(); // 强制掐断之前没播完的废话
+            if (window.speechSynthesis) window.speechSynthesis.cancel(); 
             if (window.qxSpeak) {
                 window.qxSpeak(speakTab1, null);
             }
-        }, 666); // 延迟 666 毫秒，等界面动画和画布彻底渲染完，然后再播
+        }, 666); 
     };
 
     function getEmoji(code) {

@@ -410,19 +410,32 @@
             const segList = document.getElementById('qx2_wi_seg_list');
             
             // 🌟 核心判断：如果只有一条从0开始的整段，且没有时间轴的细分，那它就是纯音乐
+            // 🌟 核心判断：如果只有一条从0开始的整段，那它就是纯音乐
             const isPureMusic = _workInfo.timelines.length === 1 && _workInfo.timelines[0].start_time === 0;
 
             if (isPureMusic) {
-                // 🎵 纯音乐：保留容器，清空丑文字，把整个屏幕留给大球！
-                card.style.display = 'block'; 
-                card.style.background = 'transparent'; 
-                card.style.padding = '0'; 
-                card.innerHTML = ''; 
-            } else {
-                // 🎙️ 精讲模式（如《春天里》）：渲染曲名、结构、导语
+                // 🎵 纯音乐模式
                 card.style.display = 'block';
-                card.style.background = ''; // 恢复默认背景
-                card.style.padding = ''; // 恢复默认内边距
+                card.style.background = 'transparent';
+                card.style.padding = '0';
+                card.innerHTML = ''; // 清空文字
+                
+                // 🌟 核心保命：把包含大球的那个大包间，强制保持显形且填满屏幕！
+                const healArea = document.querySelector('.qx2-heal-area');
+                if (healArea) {
+                    healArea.style.display = 'flex';
+                    healArea.style.flexDirection = 'column';
+                    healArea.style.width = '100%';
+                    healArea.style.height = '100%';
+                    // 隐藏上面的小标题“实时治愈主图”，极致沉浸
+                    const healTitle = healArea.querySelector('.qx2-heal-title');
+                    if (healTitle) healTitle.style.display = 'none';
+                }
+            } else {
+                // 🎙️ 精讲模式（如《春天里》）
+                card.style.display = 'block';
+                card.style.background = '';
+                card.style.padding = '';
                 card.innerHTML = `
                     <div class="qx2-wi-title">${escapeHtml(title)}</div>
                     <div class="qx2-wi-meta">${escapeHtml(composer)} · ${dur}${work.era ? ' · ' + escapeHtml(work.era) : ''}${work.form ? ' · ' + escapeHtml(work.form) : ''}</div>
@@ -435,6 +448,13 @@
                         <div class="qx2-wi-seg-list" id="qx2_wi_seg_list"></div>
                     </div>
                 `;
+
+                // 恢复包间原状
+                const healArea = document.querySelector('.qx2-heal-area');
+                if (healArea) {
+                    const healTitle = healArea.querySelector('.qx2-heal-title');
+                    if (healTitle) healTitle.style.display = 'block';
+                }
 
                 if (structSec && segList && _workInfo.timelines.length > 0) {
                     structSec.style.display = 'block';
@@ -460,8 +480,6 @@
             console.warn('[qx2] 拉 timelines 失败', e); 
         }
     }
-
-
     function updateWorkInfoProgress(currentSec) {
         if (!_workInfo.work) return;
         const seg = _workInfo.timelines.find(x => currentSec >= x.start_time && currentSec < x.end_time && x.start_time !== x.end_time);

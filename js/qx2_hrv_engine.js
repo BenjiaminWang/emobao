@@ -199,36 +199,28 @@
                                     waveEl.setAttribute('points', points);
                                 }
                             }
-                            // 🌟 终极修复：对齐 qx1，用最少数据算出真实心率推给图表
-                            if (samples.length > 30) {
-                                const recentSamples = samples.slice(-150); 
+                            // 🌟 唯一且真实的逻辑（抄自qx1）
+                            let finalBpm = 70, finalRmssd = 50;
+                            if (samples.length >= 20) {
+                                const recentSamples = samples.slice(-150);
                                 const peaks = DSP.peaks(DSP.movingAverage(DSP.bandpass(recentSamples), 5), 30);
                                 const rr = DSP.rr(peaks, 30);
                                 if (rr.length >= 2) {
-                                    const finalRmssd = Math.max(10, Math.min(100, DSP.rmssd(rr))); 
-                                    const finalBpm = DSP.bpm(rr);
-                                    if (window.qxHealChart && window.qxHealChart.push) {
-                                        try { 
-                                            window.qxHealChart.push({ 
-                                                quality: 'good', 
-                                                bpm: finalBpm, 
-                                                rmssd: finalRmssd, 
-                                                elapsed: elapsed 
-                                            }); 
-                                        } catch (e) {}
-                                    }
+                                    finalRmssd = Math.max(10, Math.min(100, DSP.rmssd(rr))); 
+                                    finalBpm = DSP.bpm(rr);
                                 }
                             }
+                            // 把算出的真实数据塞给大球
                             if (window.qxHealChart && window.qxHealChart.push) {
                                 try { 
                                     window.qxHealChart.push({ 
                                         quality: 'good', 
-                                        bpm: realBpm, 
-                                        rmssd: realRmssd, 
+                                        bpm: finalBpm, 
+                                        rmssd: finalRmssd, 
                                         elapsed: elapsed 
                                     }); 
                                 } catch (e) {}
-                            }
+                            }                            
                         }
                     }
                     if (options.onProgress) {

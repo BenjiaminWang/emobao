@@ -291,10 +291,10 @@
                 const work = works[0];
                 state.isWorkMode = true;
                 state.started = true;
+                state.finished = false;
                 state.playlist = [{ trackid: work.workid, title_cn: work.title_cn, title_en: work.title_en, fileurl: work.audio_url, musictypecode: 0, isWork: true, workInfo: work }];
                 state.currentIndex = 0;
-                state.finished = false;
-                
+                         
                 const container = document.getElementById('qx2_container');
                 if (container) {
                     container.classList.remove('step1-mode');
@@ -631,6 +631,11 @@
     }
 
     function playSegment(index) {
+         // 🌟 核心防错：如果时间轴还没拉回来（数据为空），先等 100 毫秒再试，绝不盲目认为“播放结束”！
+        if (!_workInfo.timelines || _workInfo.timelines.length === 0) {
+            setTimeout(() => playSegment(index), 100);
+            return;
+        }
         if (index >= _workInfo.timelines.length) { onPlaylistFinished(); return; }
         state.currentSegIndex = index;
         const seg = _workInfo.timelines[index];
@@ -786,6 +791,7 @@
         if (window.qxHealChart) { try { qxHealChart.reset(); } catch (e) {} }
         const body = document.getElementById('qx2_analysis_body');
         if (body) body.innerHTML = '<div class="qx2-analysis-placeholder">' + t('进第 4 步，自动给出分析', 'Analysis at step 4') + '</div>';
+        state.finished = false; // 这里必须有
         setStep(1);
         document.querySelectorAll('input[name="qx2_feedback"]').forEach(r => r.checked = false);
     }

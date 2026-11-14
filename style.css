@@ -3607,3 +3607,44 @@ body.lang-en .qx2-flow-name {
     width: 100% !important;
     height: 100% !important;
 }
+/* ================================================================
+   QX2 下拉框筛选器美化
+   ================================================================ */
+   .qx2-filter-btn {
+    transition: all 0.2s ease;
+}
+.qx2-filter-btn:active {
+    transform: scale(0.95);
+}
+.qx2-ab-dropdown-item:active {
+    background-color: #F0F6FF;
+}
+/* ==========================================
+   🌟 大球保命补丁：强行撑开纯音乐下的治愈主图
+   ========================================== */
+   .qx2-heal-area {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1 !important;
+    min-height: 400px !important; /* 强行兜底高度 */
+}
+
+.qx2-heal-canvas-wrap {
+    flex: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 350px !important; /* 画布容器兜底 */
+    display: flex !important;
+    position: relative !important;
+}
+
+.qx2-heal-canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+}

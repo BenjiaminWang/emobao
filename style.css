@@ -3558,8 +3558,7 @@ body.lang-en .qx2-flow-name {
 .qx2-container.step1-mode .qx2-heal-area { flex: 1 !important; max-width: 600px; margin: 0 auto; }
 
 /* 选曲模式：隐藏呼吸球，展示作品介绍 */
-.qx2-container.step2-mode.work-mode .qx2-heal-canvas-wrap { display: none !important; }
-.qx2-container.step2-mode.work-mode .qx2-work-info-card { display: flex !important; flex-direction: column; height: 100%; max-height: none; margin: 0; }
+.qx2-container.step2-mode.work-mode .qx2-work-info-card { display: none !important; }
 .qx2-container.step2-mode.work-mode .qx2-analysis-area,
 .qx2-container.step2-mode.work-mode .qx2-feedback-area { display: none !important; }
 

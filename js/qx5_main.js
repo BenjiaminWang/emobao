@@ -1,8 +1,7 @@
 /* ================================================================
    情绪宝 - qx5 入口
-   v6：暴力注入 MBTI 精选卡片
+   v7：完美闭环版
    ================================================================ */
-
    (function () {
     'use strict';
 
@@ -11,7 +10,6 @@
         return lang === 1 ? cn : en;
     }
 
-    /* 大类定义与顺序 */
     const COLLECTIONS = [
         { id: 'speed',     cn: '反应速度', en: 'Speed' },
         { id: 'attention', cn: '注意力',   en: 'Attention' },
@@ -46,7 +44,6 @@
         getEl('qx5_play_host').innerHTML = '';
     }
 
-    /* ============ 树形列表渲染 ============ */
     function renderGameList() {
         const grid = getEl('qx5_game_grid');
         if (!grid) return;
@@ -59,10 +56,17 @@
             return;
         }
 
-        // ================= 主打精选推荐区（暴力注入 MBTI） =================
+        // ================= 主打精选推荐区 =================
         let featuredGames = games.filter(g => g.isFeatured);
-        
-        // 强制塞入 MBTI，不管引擎有没有注册成功
+
+        // 手机鼓棒置顶：作为第一个游戏展示
+        const drumIdx = featuredGames.findIndex(g => g.id === 'body_drum');
+        if (drumIdx > 0) {
+            const drum = featuredGames.splice(drumIdx, 1)[0];
+            featuredGames.unshift(drum);
+        }
+
+        // 1. MBTI
         const hasMbti = featuredGames.some(g => g.id === 'mbti_test');
         if (!hasMbti) {
             featuredGames.push({
@@ -72,7 +76,8 @@
                 isFeatured: true
             });
         }
-        // 强制塞入 霍兰德
+
+        // 2. 霍兰德
         const hasHolland = featuredGames.some(g => g.id === 'holland_test');
         if (!hasHolland) {
             featuredGames.push({
@@ -81,8 +86,9 @@
                 subtitle: { cn: '测测你最适合什么工作', en: 'Find your ideal career path' },
                 isFeatured: true
             });
-        }        
-        // 👇 强制塞入 心理扑克 👇
+        }
+
+        // 3. 心理扑克
         const hasPoker = featuredGames.some(g => g.id === 'poker_test');
         if (!hasPoker) {
             featuredGames.push({
@@ -92,11 +98,21 @@
                 isFeatured: true
             });
         }
-        // 👆 新增结束 👆
+
+        // 4. 手机鼓棒（原体感架子鼓已由此替代）
+        const hasDrum = featuredGames.some(g => g.id === 'body_drum');
+        if (!hasDrum) {
+            featuredGames.push({
+                id: 'body_drum',
+                title: { cn: '手机鼓棒', en: 'Phone Drumsticks' },
+                subtitle: { cn: '手机当鼓棒，挥出进行曲的节奏', en: 'Swing your phone to the marching beat' },
+                isFeatured: true
+            });
+        }
+
         if (featuredGames.length > 0) {
             const featuredWrap = document.createElement('div');
             featuredWrap.style.cssText = 'display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;';
-            
             featuredWrap.innerHTML = `<div style="font-size: 13px; font-weight: bold; color: #64748B; letter-spacing: 1px; margin-bottom: 4px;">⭐ ${t('精选主打测评', 'Featured Assessments')}</div>`;
 
             featuredGames.forEach(g => {
@@ -112,9 +128,9 @@
                     position: relative;
                     overflow: hidden;
                 `;
-                
+                const featuredIcon = (g.id === 'body_drum') ? '🥁' : '🧠';
                 card.innerHTML = `
-                    <div style="position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg);">🧠</div>
+                    <div style="position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg);">${featuredIcon}</div>
                     <div style="font-size: 22px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1;">
                         <span>${t(g.title.cn, g.title.en)}</span>
                         <span style="font-size: 14px; font-weight: normal; opacity: 0.8; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px;">${t('立即测试', 'Start')} →</span>
@@ -123,7 +139,6 @@
                         ${t(g.subtitle.cn, g.subtitle.en)}
                     </div>
                 `;
-
                 card.onmouseenter = () => {
                     card.style.transform = 'translateY(-2px)';
                     card.style.boxShadow = '0 12px 24px rgba(44, 123, 229, 0.35)';
@@ -132,11 +147,10 @@
                     card.style.transform = 'translateY(0)';
                     card.style.boxShadow = '0 8px 20px rgba(44, 123, 229, 0.25)';
                 };
-
                 card.onclick = function () { startGame(g.id); };
                 featuredWrap.appendChild(card);
             });
-            
+
             grid.appendChild(featuredWrap);
 
             const divider = document.createElement('div');
@@ -145,7 +159,7 @@
         }
         // ================= 精选区结束 =================
 
-        // ============ 原有的树形列表渲染 ============
+        // ============ 树形列表渲染 ============
         const byCollection = {};
         games.forEach(g => {
             const cid = g.collectionId || 'misc';
@@ -183,7 +197,7 @@
                     const card = document.createElement('div');
                     card.className = 'qx5-game-card';
                     card.dataset.gameId = g.id;
-                    
+
                     card.innerHTML = `
                         <div class="qx5-game-card-title" style="display:flex; justify-content:space-between; align-items:center;">
                             <span>${t(g.title.cn, g.title.en)}</span>
@@ -191,18 +205,21 @@
                         </div>
                         <div class="qx5-game-card-sub">${t(g.subtitle.cn, g.subtitle.en)}</div>
                     `;
-                    
+
                     const voiceBtn = card.querySelector('.qx5-voice-btn');
                     voiceBtn.onmouseenter = () => voiceBtn.style.opacity = '1';
                     voiceBtn.onmouseleave = () => voiceBtn.style.opacity = '0.6';
                     voiceBtn.onclick = function (e) {
-                        e.stopPropagation(); 
+                        e.stopPropagation();
                         if (window.qxSpeak) {
-                            const speakContent = t(`欢迎来到 ${g.title.cn}。${g.subtitle.cn}`, `Welcome to ${g.title.en}. ${g.subtitle.en}`);
+                            const speakContent = t(
+                                `欢迎来到 ${g.title.cn}。${g.subtitle.cn}`,
+                                `Welcome to ${g.title.en}. ${g.subtitle.en}`
+                            );
                             window.qxSpeak(speakContent);
                         }
                     };
-                    
+
                     card.onclick = function () { startGame(g.id); };
                     childrenEl.appendChild(card);
                 });
@@ -215,18 +232,15 @@
     }
 
     async function startGame(gameId) {
-        // 【核心修复】如果是 MBTI，绕过引擎字典，直接启动
         if (gameId === 'mbti_test') {
             const hostEl = getEl('qx5_play_host');
             getEl('qx5_list_view').style.display = 'none';
             getEl('qx5_play_view').style.display = 'flex';
             getEl('qx5_play_title').innerText = t('16型人格测试', '16 Personalities');
             hostEl.innerHTML = '';
-            // 直接调 MBTI 模块内部渲染
             if (window._mbtiStart) window._mbtiStart(hostEl);
             return;
         }
-        // 【核心修复】如果是霍兰德，绕过引擎直接启动
         if (gameId === 'holland_test') {
             const hostEl = getEl('qx5_play_host');
             getEl('qx5_list_view').style.display = 'none';
@@ -236,7 +250,6 @@
             if (window._hollandStart) window._hollandStart(hostEl);
             return;
         }
-        // 👇 如果是 情绪宝心理扑克 👇
         if (gameId === 'poker_test') {
             const hostEl = getEl('qx5_play_host');
             getEl('qx5_list_view').style.display = 'none';
@@ -246,41 +259,76 @@
             if (window._pokerStart) window._pokerStart(hostEl);
             return;
         }
-        // 👆 新增结束 👆   
+
         const game = window.qx5Engine.getGame(gameId);
         if (!game) {
             console.error('[qx5] 找不到游戏', gameId);
             return;
         }
+
         state.currentGame = game;
         showPlayView(game);
 
         const hostEl = getEl('qx5_play_host');
-        await window.qx5Engine.start(gameId, hostEl, {
-            onComplete: function (data) {
-                console.log('[qx5] 游戏结束', gameId, data);
+        try {
+            const ok = await window.qx5Engine.start(gameId, hostEl, {
+                onComplete: function (data) {
+                    console.log('[qx5] 游戏结束', gameId, data);
+                    state.currentGame = null;
+                    if (window.qx5Profile && typeof window.qx5Profile.refreshBar === 'function') {
+                        try { window.qx5Profile.refreshBar(); } catch (e) {}
+                    }
+                },
+            });
+            if (ok === false) {
                 state.currentGame = null;
-                if (window.qx5Profile && typeof window.qx5Profile.refreshBar === 'function') {
-                    try { window.qx5Profile.refreshBar(); } catch (e) {}
+                showListView();
+                if (window.toast) {
+                    try { window.toast(t('启动失败，请重试', 'Failed to start, please retry')); } catch (e) {}
                 }
-            },
-        });
+            }
+        } catch (e) {
+            console.error('[qx5] 启动游戏异常', gameId, e);
+            state.currentGame = null;
+            showListView();
+            if (window.toast) {
+                try { window.toast(t('启动失败，请重试', 'Failed to start, please retry')); } catch (err) {}
+            }
+        }
     }
 
     window.qx5_onExit = function () {
+        const host = getEl('qx5_play_host');
+        const cleanup = host ? qx5_findCleanup(host.firstElementChild) : null;
+        if (cleanup) { try { cleanup(); } catch (e) {} }
         state.currentGame = null;
         showListView();
     };
 
-    function onQuitClick() {
-        if (state.currentGame) {
-            if (!confirm(t('确定退出游戏吗？本次进度会保存', 'Quit? Progress will be saved.'))) return;
-            try { window.qx5Engine.abort(); } catch (e) {}
-            state.currentGame = null;
-            showListView();
-        } else {
-            window.returnToMain();
+    function qx5_findCleanup(el) {
+        let n = el;
+        while (n && n !== document.body) {
+            if (typeof n.__qx5Cleanup === 'function') return n.__qx5Cleanup;
+            n = n.parentElement;
         }
+        return null;
+    }
+
+    function onQuitClick() {
+        if (!state.currentGame) {
+            window.returnToMain();
+            return;
+        }
+        if (!confirm(t('确定退出游戏吗？本次进度会保存', 'Quit? Progress will be saved.'))) return;
+
+        const host = getEl('qx5_play_host');
+        const cleanup = host ? qx5_findCleanup(host.firstElementChild) : null;
+        if (cleanup) { try { cleanup(); } catch (e) {} }
+
+        try { window.qx5Engine.abort(); } catch (e) {}
+
+        state.currentGame = null;
+        showListView();
     }
 
     async function qx5_init() {
@@ -310,12 +358,17 @@
 
     function qx5_destroy() {
         console.log('qx5_destroy');
+        const host = getEl('qx5_play_host');
+        const cleanup = host ? qx5_findCleanup(host.firstElementChild) : null;
+        if (cleanup) { try { cleanup(); } catch (e) {} }
+
         state.initialized = false;
         state.currentGame = null;
+
         try { window.qx5Engine.abort(); } catch (e) {}
+
         const grid = getEl('qx5_game_grid');
         if (grid) grid.innerHTML = '';
-        const host = getEl('qx5_play_host');
         if (host) host.innerHTML = '';
     }
 

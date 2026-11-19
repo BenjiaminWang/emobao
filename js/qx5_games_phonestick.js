@@ -196,7 +196,7 @@
             let learnPad = null;
             let keyListenerOn = false;
             let refreshKeyRows = function () {};
-            const $ = id => root.querySelector('#' + id);
+            const $ = id => root.querySelector(String(id).charAt(0) === '#' ? id : '#' + id);
             const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
             const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -485,7 +485,7 @@
                     </div>
                 `;
                 $('#ps-try').onclick = tryPreview;
-                $('#ps-go').onclick = () => { stopPreviewAudio(); goPlay(); };
+                $('#ps-go').onclick = () => { stopPreviewAudio(); buildPlay(); };
                 $('#ps-track').onchange = onPickTrack;
                 fetchTracks().then(list => {
                     if (finished) return;

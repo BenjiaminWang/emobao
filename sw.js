@@ -1,4 +1,4 @@
-const CACHE_NAME = 'emobao-v12';
+const CACHE_NAME = 'emobao-v13';
 const ASSETS = [
   './',
   './index.html',

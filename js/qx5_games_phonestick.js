@@ -15,6 +15,7 @@
     /* ---------- 真实曲库（与 body_drum 同一数据源，绝不合成假曲目） ---------- */
     const SB_URL = 'https://api.emobao.com';
     const SB_KEY = 'sb_publishable_hl4A5eAr-AS_ZlCr0bP2tg_E_n-LY5a';
+    const ML = (cn, en) => (((window.mQxb && window.mQxb.Language) || 1) === 2) ? en : cn;
     function isMarch(t) {
         return /进行曲|march/i.test(((t && t.title) || '') + ' ' + ((t && t.cat) || ''));
     }
@@ -45,13 +46,13 @@
             const list = [];
             (Array.isArray(rows) ? rows : []).forEach(r => {
                 if (!r.fileurl) return;
-                list.push({ id: 'r' + r.trackid, title: r.title_cn || r.title_en || '未命名曲目',
-                    author: '', cat: catMap[r.musictypecode] || '曲库', duration: Number(r.duration) || 120, fileurl: r.fileurl });
+                list.push({ id: 'r' + r.trackid, title: r.title_cn || r.title_en || ML('未命名曲目', 'Untitled track'),
+                    author: '', cat: catMap[r.musictypecode] || ML('曲库', 'Library'), duration: Number(r.duration) || 120, fileurl: r.fileurl });
             });
             (Array.isArray(works) ? works : []).forEach(w => {
                 if (!w.audio_url) return;
-                list.push({ id: 'w' + w.workid, title: w.title_cn || w.title_en || '未命名作品',
-                    author: w.composer || '', cat: '发布作品', duration: Number(w.total_duration) || 120, fileurl: w.audio_url });
+                list.push({ id: 'w' + w.workid, title: w.title_cn || w.title_en || ML('未命名作品', 'Untitled work'),
+                    author: w.composer || '', cat: ML('发布作品', 'Published work'), duration: Number(w.total_duration) || 120, fileurl: w.audio_url });
             });
             const seen = {}, uniq = [];
             list.forEach(t => { if (!seen[t.fileurl]) { seen[t.fileurl] = 1; uniq.push(t); } });
@@ -193,12 +194,14 @@
 
             /* ============ 共享状态 ============ */
             const PADS = [
-                { key: 'kick', nm: '大鼓', en: 'KICK', ic: '🥁', color: 'var(--kick)' },
-                { key: 'snare', nm: '军鼓', en: 'SNARE', ic: '🎵', color: 'var(--snare)' },
-                { key: 'hihat', nm: '踩镲', en: 'HIHAT', ic: '✨', color: 'var(--hihat)' },
-                { key: 'tom', nm: '通鼓', en: 'TOM', ic: '🪘', color: 'var(--tom)' },
-                { key: 'crash', nm: '吊镲', en: 'CRASH', ic: '🎶', color: 'var(--crash)' }
+                { key: 'kick',  nm: '大鼓', en: 'KICK',  voiceEn: 'Kick drum',  ic: '🥁', color: 'var(--kick)' },
+                { key: 'snare', nm: '军鼓', en: 'SNARE', voiceEn: 'Snare drum', ic: '🎵', color: 'var(--snare)' },
+                { key: 'hihat', nm: '踩镲', en: 'HIHAT', voiceEn: 'Hi-hat',     ic: '✨', color: 'var(--hihat)' },
+                { key: 'tom',   nm: '通鼓', en: 'TOM',   voiceEn: 'Tom tom',    ic: '🪘', color: 'var(--tom)' },
+                { key: 'crash', nm: '吊镲', en: 'CRASH', voiceEn: 'Crash cymbal', ic: '🎶', color: 'var(--crash)' }
             ];
+            const padNm = p => L(p.nm, p.en);            // 界面短标签
+            const padVoice = p => L(p.nm, p.voiceEn);    // 语音口语名
             const byKey = {}; PADS.forEach(p => byKey[p.key] = p);
             const cfg = { sens: 14, cool: 160, vol: 1.0 };
             const SR = 60;
@@ -220,8 +223,13 @@
             const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
             const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-            function speak(txt) {
-                try { if (window.qxSpeak) window.qxSpeak(txt); }
+            /* 本地化：1=中文，2=英文（与全站 window.mQxb.Language 一致） */
+            const isEN = () => ((window.mQxb && window.mQxb.Language) || 1) === 2;
+            const L = (cn, en) => isEN() ? en : cn;
+            /* 语音：传中英两句，按当前语言选；兼容只传一句。
+               必须带 onEnd 回调，否则上一条未播完时新语音会被 qxSpeak 丢弃 */
+            function speak(cn, en) {
+                try { if (window.qxSpeak) window.qxSpeak(en !== undefined ? L(cn, en) : cn, function () {}); }
                 catch (e) {}
             }
 
@@ -238,16 +246,17 @@
             }
             function keyLabel(code) {
                 const M = {
-                    ArrowLeft: '← 左', ArrowRight: '→ 右', ArrowUp: '↑ 上', ArrowDown: '↓ 下',
-                    PageUp: 'PgUp 上一件', PageDown: 'PgDn 下一件',
-                    MediaTrackPrevious: '媒体上一曲', MediaTrackNext: '媒体下一曲',
-                    Space: '空格', Enter: '回车', NumpadEnter: '小键盘回车'
+                    ArrowLeft: L('← 左', '← Left'), ArrowRight: L('→ 右', '→ Right'),
+                    ArrowUp: L('↑ 上', '↑ Up'), ArrowDown: L('↓ 下', '↓ Down'),
+                    PageUp: L('PgUp 上一件', 'PgUp Prev'), PageDown: L('PgDn 下一件', 'PgDn Next'),
+                    MediaTrackPrevious: L('媒体上一曲', 'Media prev'), MediaTrackNext: L('媒体下一曲', 'Media next'),
+                    Space: L('空格', 'Space'), Enter: L('回车', 'Enter'), NumpadEnter: L('小键盘回车', 'Num Enter')
                 };
                 if (M[code]) return M[code];
-                if (/^Digit\d$/.test(code)) return '数字 ' + code.slice(5);
-                if (/^Numpad\d$/.test(code)) return '小键盘 ' + code.slice(6);
-                if (/^Key[A-Z]$/.test(code)) return '字母 ' + code.slice(3);
-                return code || '（未识别）';
+                if (/^Digit\d$/.test(code)) return L('数字 ', 'Num ') + code.slice(5);
+                if (/^Numpad\d$/.test(code)) return L('小键盘 ', 'Num pad ') + code.slice(6);
+                if (/^Key[A-Z]$/.test(code)) return L('字母 ', 'Key ') + code.slice(3);
+                return code || L('（未识别）', '(Unrecognized)');
             }
             function boundKeyOf(padKey) {
                 for (const code in keyMap) if (keyMap[code] === padKey) return code;
@@ -256,14 +265,15 @@
             function cyclePad(dir) {
                 let i = PADS.findIndex(p => p.key === cur.key);
                 i = (i + dir + PADS.length) % PADS.length;
-                auditionTimbre(PADS[i].key, '切换');
+                auditionTimbre(PADS[i].key, L('切换', 'Switch'));
             }
             function auditionTimbre(padKey, prefix) {
                 unlockAudio();
-                onTimbre(padKey);
+                onTimbre(padKey, true);
                 playHit(padKey, 0.85);
                 const hw = $('#hitword');
-                if (hw) { hw.textContent = (prefix || '戒指') + ' · ' + byKey[padKey].nm; later(() => { if (hw.textContent.indexOf(prefix || '戒指') === 0) hw.textContent = ''; }, 900); }
+                const pre = prefix || L('切换', 'Switch');
+                if (hw) { hw.textContent = pre + ' · ' + padNm(byKey[padKey]); later(() => { if (hw.textContent.indexOf(pre) === 0) hw.textContent = ''; }, 900); }
                 const nm = $('cur-name'); if (nm) { nm.style.transform = 'scale(1.12)'; later(() => nm.style.transform = '', 200); }
             }
 
@@ -351,15 +361,23 @@
             }
 
             /* ============ 语义事件 ============ */
-            function onTimbre(key) {
+            let lastVoicePad = '';
+            function onTimbre(key, voiceIt) {
                 cur = byKey[key]; if (!cur) return;
                 const n = $('cur-name'), en = $('cur-en'), dot = $('cur-dot');
-                if (n) n.textContent = cur.nm;
+                if (n) n.textContent = padNm(cur);
                 if (en) en.textContent = cur.en;
                 if (dot) { dot.style.background = cur.color; dot.style.boxShadow = '0 0 18px ' + cur.color; }
                 root.querySelectorAll('.ps-pad').forEach(el => el.classList.toggle('sel', el.dataset.key === key));
+                // 换乐器时播一次乐器名（点鼓面/戒指按键/方向键切换）；同一乐器不重复念
+                if (voiceIt && key !== lastVoicePad) {
+                    lastVoicePad = key;
+                    speak(cur.nm, cur.voiceEn);
+                }
             }
-            function describeForce(v) { return v < 0.28 ? '轻敲' : (v < 0.55 ? '中等' : (v < 0.8 ? '用力' : '重击!')); }
+            function describeForce(v) {
+                return v < 0.28 ? L('轻敲', 'Soft') : (v < 0.55 ? L('中等', 'Medium') : (v < 0.8 ? L('用力', 'Hard') : L('重击!', 'Hit!')));
+            }
             function onStrike(v) {
                 const now = performance.now();
                 if (now - state.lastHitAt < cfg.cool) return;
@@ -367,9 +385,9 @@
                 playHit(cur.key, v);
                 const ring = $('ring'); if (ring) { ring.classList.add('flash'); ring.style.setProperty('--c', cur.color); later(() => ring.classList.remove('flash'), 130); }
                 const rip = $('ripple'); if (rip) { rip.style.setProperty('--c', cur.color); rip.classList.remove('go'); void rip.offsetWidth; rip.classList.add('go'); }
-                const hw = $('hitword'); if (hw) { hw.textContent = cur.nm + ' · ' + Math.round(v * 100) + '%'; later(() => hw.textContent = '', 600); }
+                const hw = $('hitword'); if (hw) { hw.textContent = padNm(cur) + ' · ' + Math.round(v * 100) + '%'; later(() => hw.textContent = '', 600); }
                 const fb = $('fbar-fill'); if (fb) fb.style.width = Math.round(v * 100) + '%';
-                const fl = $('flabel'); if (fl) fl.textContent = '力度 ' + Math.round(v * 100) + '% · ' + describeForce(v);
+                const fl = $('flabel'); if (fl) fl.textContent = L('力度 ', 'Force ') + Math.round(v * 100) + '% · ' + describeForce(v);
                 const nm = $('cur-name'); if (nm) { nm.style.transform = 'scale(1.12)'; later(() => nm.style.transform = '', 200); }
                 const sh = $('st-hits'); if (sh) sh.textContent = state.hits;
                 const sf = $('st-force'); if (sf) sf.textContent = Math.round(state.forceSum / state.hits * 100) + '%';
@@ -417,9 +435,9 @@
                 if (!DME) { motionOn = false; return Promise.resolve(true); }
                 if (typeof DME.requestPermission === 'function') {
                     return DME.requestPermission().then(s => {
-                        if (s !== 'granted') { const w = $('gate-warn'); if (w) w.textContent = '运动权限被拒绝，请到系统设置里允许「运动与健身/动作」。'; return false; }
+                        if (s !== 'granted') { const w = $('gate-warn'); if (w) w.textContent = L('运动权限被拒绝，请到系统设置里允许「运动与健身/动作」。', 'Motion access denied. Please enable Motion & Orientation in system settings.'); return false; }
                         window.addEventListener('devicemotion', onMotion); motionOn = true; return true;
-                    }).catch(() => { const w = $('gate-warn'); if (w) w.textContent = '运动权限请求失败，请确认用手机 HTTPS 打开后重试。'; return false; });
+                    }).catch(() => { const w = $('gate-warn'); if (w) w.textContent = L('运动权限请求失败，请确认用手机 HTTPS 打开后重试。', 'Motion permission failed. Make sure you opened this page over HTTPS, then retry.'); return false; });
                 }
                 window.addEventListener('devicemotion', onMotion); motionOn = true;
                 return Promise.resolve(true);
@@ -427,7 +445,7 @@
             function localStrike() {
                 unlockAudio();
                 onStrike(0.45 + Math.random() * 0.5);
-                const fl = $('flabel'); if (fl) fl.textContent += '（电脑测试）';
+                const fl = $('flabel'); if (fl) fl.textContent += L('（电脑测试）', ' (PC test)');
             }
 
             /* ============ 波形 ============ */
@@ -455,7 +473,7 @@
                 unlockAudio();
                 if (!bgAudio) bgAudio = new Audio();
                 bgAudio.src = t.fileurl; bgAudio.loop = true;
-                bgAudio.play().catch(() => { const w = $('hint'); if (w) w.textContent = '伴奏加载失败，仍可自由敲击'; });
+                bgAudio.play().catch(() => { const w = $('hint'); if (w) w.textContent = L('伴奏加载失败，仍可自由敲击', 'Backing track failed to load — you can still play freely'); });
             }
 
             /* ============ 清理 ============ */
@@ -489,17 +507,17 @@
                 const scr = $('#ps-select');
                 scr.innerHTML = `
                     <div class="ps-topbar">
-                        <button class="exit" id="ps-exit">退出</button>
-                        <button class="go" id="ps-go" disabled>开始演奏 →</button>
+                        <button class="exit" id="ps-exit">${L('退出', 'Exit')}</button>
+                        <button class="go" id="ps-go" disabled>${L('开始演奏', 'Start Playing')} →</button>
                     </div>
                     <div class="ps-head">
-                        <div class="ps-title">① 选择进行曲</div>
-                        <div class="ps-sub">从真实曲库里选一支进行曲跟着敲<br>点曲目选中，可上下滑动查看全部</div>
+                        <div class="ps-title">${L('① 选择进行曲', '① Pick a March')}</div>
+                        <div class="ps-sub">${L('从真实曲库里选一支进行曲跟着敲<br>点曲目选中，可上下滑动查看全部', 'Pick a march from the real music library<br>Tap to select, scroll to see all')}</div>
                     </div>
-                    <div class="ps-tracklist" id="ps-track"><div class="ps-track-item"><div class="info"><div class="nm">曲库加载中…</div></div></div></div>
+                    <div class="ps-tracklist" id="ps-track"><div class="ps-track-item"><div class="info"><div class="nm">${L('曲库加载中…', 'Loading library…')}</div></div></div></div>
                     <div class="ps-selectfoot">
                         <div class="ps-meta" id="ps-meta"></div>
-                        <button class="ps-preview" id="ps-try">▶ 试听选中曲目</button>
+                        <button class="ps-preview" id="ps-try">▶ ${L('试听选中曲目', 'Preview selected track')}</button>
                     </div>
                 `;
                 $('#ps-exit').onclick = () => exitGame(false);
@@ -512,8 +530,8 @@
                     const opts = (marches.length ? marches : tracks);
                     const box = $('#ps-track'); if (!box) return;
                     if (!opts.length) {
-                        box.innerHTML = '<div class="ps-track-item"><div class="info"><div class="nm">（曲库暂无带音频曲目）</div></div></div>';
-                        $('#ps-meta').textContent = '当前曲库没有可直接播放的曲目，仍可进入自由敲击。';
+                        box.innerHTML = '<div class="ps-track-item"><div class="info"><div class="nm">' + L('（曲库暂无带音频曲目）', '(No playable tracks in library)') + '</div></div></div>';
+                        $('#ps-meta').textContent = L('当前曲库没有可直接播放的曲目，仍可进入自由敲击。', 'No playable tracks now — you can still play freely.');
                     } else {
                         box.innerHTML = opts.map((t, i) => {
                             const bits = [t.cat, t.author].filter(Boolean);
@@ -548,14 +566,14 @@
                 m.textContent = bits.join(' · ') + (selectedTrack.duration ? ' · ' + formatDur(selectedTrack.duration) : '');
             }
             function formatDur(s) { s = Math.round(s || 0); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-            function stopPreviewAudio() { if (previewAudio) { try { previewAudio.pause(); previewAudio.src = ''; } catch (e) {} } previewAudio = null; const b = $('#ps-try'); if (b) b.textContent = '▶ 试听选中曲目'; }
+            function stopPreviewAudio() { if (previewAudio) { try { previewAudio.pause(); previewAudio.src = ''; } catch (e) {} } previewAudio = null; const b = $('#ps-try'); if (b) b.textContent = '▶ ' + L('试听选中曲目', 'Preview selected track'); }
             function tryPreview() {
-                if (!selectedTrack || !selectedTrack.fileurl) { const m = $('#ps-meta'); if (m) m.textContent = '这首曲目没有可播放的音频链接。'; return; }
+                if (!selectedTrack || !selectedTrack.fileurl) { const m = $('#ps-meta'); if (m) m.textContent = L('这首曲目没有可播放的音频链接。', 'This track has no playable audio link.'); return; }
                 unlockAudio();
                 if (previewAudio && !previewAudio.paused) { stopPreviewAudio(); return; }
                 previewAudio = new Audio(selectedTrack.fileurl);
-                const b = $('#ps-try'); if (b) b.textContent = '■ 停止试听';
-                previewAudio.play().catch(() => { if (b) b.textContent = '▶ 试听失败，点此重试'; });
+                const b = $('#ps-try'); if (b) b.textContent = '■ ' + L('停止试听', 'Stop preview');
+                previewAudio.play().catch(() => { if (b) b.textContent = '▶ ' + L('试听失败，点此重试', 'Preview failed, tap to retry'); });
                 previewAudio.onended = () => stopPreviewAudio();
             }
 
@@ -563,49 +581,49 @@
             function buildPlay() {
                 showScreen('play');
                 const scr = $('#ps-play');
-                const tname = selectedTrack ? selectedTrack.title : '自由演奏';
+                const tname = selectedTrack ? selectedTrack.title : L('自由演奏', 'Free Play');
                 scr.innerHTML = `
-                    <button class="ps-quit" id="ps-quit">退出</button>
+                    <button class="ps-quit" id="ps-quit">${L('退出', 'Exit')}</button>
                     <div class="ps-tools">
-                        <div class="ps-icbtn" id="btn-keys" title="戒指按键设置">⌨</div>
-                        <div class="ps-icbtn" id="btn-sound" title="开声">🔇</div>
+                        <div class="ps-icbtn" id="btn-keys" title="${L('戒指按键设置', 'Ring key setup')}">⌨</div>
+                        <div class="ps-icbtn" id="btn-sound" title="${L('开声', 'Sound on')}">🔇</div>
                     </div>
                     <div class="ps-head">
                         <div class="ps-title">🥁 ${esc(tname)}</div>
-                        <div class="ps-cur"><span class="dot" id="cur-dot"></span><span class="name" id="cur-name">大鼓</span><span class="en" id="cur-en">KICK</span></div>
+                        <div class="ps-cur"><span class="dot" id="cur-dot"></span><span class="name" id="cur-name">${padNm(PADS[0])}</span><span class="en" id="cur-en">${PADS[0].en}</span></div>
                     </div>
                     <div class="ps-stage">
                         <canvas class="ps-wave" id="wave"></canvas>
                         <div class="ps-ripple" id="ripple"></div>
                         <div class="ps-ring" id="ring">
-                            <div class="lvl">实时加速度</div>
+                            <div class="lvl">${L('实时加速度', 'Live motion')}</div>
                             <div class="mag" id="mag">0.0</div>
                             <div class="ps-fbar"><i id="fbar-fill"></i></div>
-                            <div class="ps-flabel" id="flabel">挥得越快越重 → 声音越响</div>
+                            <div class="ps-flabel" id="flabel">${L('挥得越快越重 → 声音越响', 'Swing faster & harder → louder sound')}</div>
                             <div class="ps-hitword" id="hitword"></div>
                         </div>
-                        <div class="ps-hint" id="hint">右手挥动 = 击打　·　左手点下方按钮 / 戒指按键 = 换乐器<br>戒指先点右上角 ⌨ 学习按键；电脑：空格击打，1–5 换乐器，←→ 切换</div>
+                        <div class="ps-hint" id="hint">${L('右手挥动 = 击打　·　左手点下方按钮 / 戒指按键 = 换乐器<br>戒指先点右上角 ⌨ 学习按键；电脑：空格击打，1–5 换乐器，←→ 切换', 'Right hand swing = hit　·　Left hand tap pads / ring key = switch instrument<br>Tap ⌨ top-right to learn ring keys; PC: Space to hit, 1–5 switch, ←→ cycle')}</div>
                     </div>
                     <div class="ps-stats">
-                        <span>击打 <b id="st-hits">0</b></span>
-                        <span>平均力度 <b id="st-force">0%</b></span>
+                        <span>${L('击打', 'Hits')} <b id="st-hits">0</b></span>
+                        <span>${L('平均力度', 'Avg force')} <b id="st-force">0%</b></span>
                     </div>
                     <div class="ps-deck" id="deck"></div>
                     <div class="ps-keypad" id="ps-keypad" style="display:none">
-                        <button class="close" id="key-close">关闭</button>
-                        <h2>💍 戒指 / 蓝牙键盘按键</h2>
-                        <div class="sub">把戒指和手机配对成蓝牙键盘后，点某一行的「学习」，再按一下戒指按键，就完成绑定。<br>绑定存在本机，下次打开依然有效；不换手机无需重新设置。</div>
+                        <button class="close" id="key-close">${L('关闭', 'Close')}</button>
+                        <h2>💍 ${L('戒指 / 蓝牙键盘按键', 'Ring / Bluetooth keyboard keys')}</h2>
+                        <div class="sub">${L('把戒指和手机配对成蓝牙键盘后，点某一行的「学习」，再按一下戒指按键，就完成绑定。<br>绑定存在本机，下次打开依然有效；不换手机无需重新设置。', 'Pair the ring as a Bluetooth keyboard, tap "Learn" on a row, then press the ring once to bind it.<br>Bindings are saved on this device and persist across sessions.')}</div>
                         <div id="key-rows" style="margin-top:12px"></div>
                         <div class="ps-keylast" id="key-last"></div>
-                        <div class="ps-keytip">没配对戒指也能用：键盘数字 1–5 直接换乐器，← / → 或 PgUp / PgDn 依次切换，空格击打（电脑测试）。<br>一个按键只想循环切换五种乐器？把这个键绑定到「依次切换」即可。</div>
+                        <div class="ps-keytip">${L('没配对戒指也能用：键盘数字 1–5 直接换乐器，← / → 或 PgUp / PgDn 依次切换，空格击打（电脑测试）。<br>一个按键只想循环切换五种乐器？把这个键绑定到「依次切换」即可。', 'No ring needed: number keys 1–5 select instruments, ← / → or PgUp / PgDn cycle, Space to hit (PC test).<br>Want one key to cycle all five? Bind it to "Cycle instruments".')}</div>
                     </div>
                     <div class="ps-overlay" id="gate">
-                        <h1>📱 手机当鼓棒</h1>
-                        <div class="ps-badge">情绪宝 · 手机鼓棒</div>
-                        <p>右手握稳手机（务必套好挂绳），向下一挥就是一次击打；左手点屏幕下方按钮切换乐器。<br>点下面按钮开启声音和运动权限。</p>
-                        <button class="ps-btn primary" id="btn-start" style="max-width:320px">开启声音 + 运动权限</button>
+                        <h1>📱 ${L('手机当鼓棒', 'Phone as Drumsticks')}</h1>
+                        <div class="ps-badge">${L('情绪宝 · 手机鼓棒', 'Emo Treasure · Phone Drumsticks')}</div>
+                        <p>${L('右手握稳手机（务必套好挂绳），向下一挥就是一次击打；左手点屏幕下方按钮切换乐器。<br>点下面按钮开启声音和运动权限。', 'Hold your phone firmly (use a wrist strap!), swing down to hit; left hand taps the pads to switch instruments.<br>Tap below to enable sound and motion access.')}</p>
+                        <button class="ps-btn primary" id="btn-start" style="max-width:320px">${L('开启声音 + 运动权限', 'Enable Sound + Motion')}</button>
                         <div class="ps-warn" id="gate-warn"></div>
-                        <p class="ps-sub" style="font-size:12px">iPhone 请用 Safari 通过 HTTPS 打开以授权运动传感器；安卓 Chrome 同样需要 HTTPS。</p>
+                        <p class="ps-sub" style="font-size:12px">${L('iPhone 请用 Safari 通过 HTTPS 打开以授权运动传感器；安卓 Chrome 同样需要 HTTPS。', 'On iPhone open in Safari over HTTPS to grant motion access; Android Chrome also needs HTTPS.')}</p>
                     </div>
                 `;
                 // 鼓面按钮
@@ -614,28 +632,28 @@
                     const b = document.createElement('div');
                     b.className = 'ps-pad' + (p.key === cur.key ? ' sel' : '');
                     b.dataset.key = p.key; b.style.setProperty('--c', p.color);
-                    b.innerHTML = '<div class="ic">' + p.ic + '</div><div class="nm">' + p.nm + '</div><div class="ky">' + p.en + '</div>';
-                    b.addEventListener('pointerdown', ev => { ev.preventDefault(); unlockAudio(); onTimbre(p.key); playHit(p.key, 0.85); const hw = $('#hitword'); if (hw) hw.textContent = '试听 · ' + p.nm; });
+                    b.innerHTML = '<div class="ic">' + p.ic + '</div><div class="nm">' + padNm(p) + '</div><div class="ky">' + p.en + '</div>';
+                    b.addEventListener('pointerdown', ev => { ev.preventDefault(); unlockAudio(); onTimbre(p.key, true); playHit(p.key, 0.85); const hw = $('#hitword'); if (hw) hw.textContent = L('试听', 'Preview') + ' · ' + padNm(p); });
                     deck.appendChild(b);
                 });
 
                 /* 戒指按键学习面板 */
                 function renderKeyRows() {
                     const box = $('#key-rows'); if (!box) return;
-                    const rows = PADS.map(p => ({ key: p.key, nm: p.ic + ' ' + p.nm }));
-                    rows.push({ key: '__cycle', nm: '🔄 依次切换五种乐器（一个键轮播）' });
+                    const rows = PADS.map(p => ({ key: p.key, nm: p.ic + ' ' + padNm(p) }));
+                    rows.push({ key: '__cycle', nm: '🔄 ' + L('依次切换五种乐器（一个键轮播）', 'Cycle all five instruments (one key)') });
                     box.innerHTML = rows.map(r => {
                         const bound = boundKeyOf(r.key);
                         return '<div class="ps-keyrow"><span class="nm">' + esc(r.nm) + '</span>' +
                             '<span class="ps-keycap' + (learnPad === r.key ? ' learning' : '') + '">' +
-                            (learnPad === r.key ? '按一下…' : (bound ? esc(keyLabel(bound)) : '未绑定')) + '</span>' +
-                            '<button data-learn="' + esc(r.key) + '">' + (learnPad === r.key ? '等待按键' : '学习') + '</button>' +
-                            (bound ? '<button class="ghost" data-clear="' + esc(r.key) + '">清除</button>' : '') + '</div>';
+                            (learnPad === r.key ? L('按一下…', 'Press now…') : (bound ? esc(keyLabel(bound)) : L('未绑定', 'Unbound'))) + '</span>' +
+                            '<button data-learn="' + esc(r.key) + '">' + (learnPad === r.key ? L('等待按键', 'Waiting…') : L('学习', 'Learn')) + '</button>' +
+                            (bound ? '<button class="ghost" data-clear="' + esc(r.key) + '">' + L('清除', 'Clear') + '</button>' : '') + '</div>';
                     }).join('');
                     box.querySelectorAll('[data-learn]').forEach(btn => btn.onclick = () => {
                         learnPad = btn.dataset.learn; renderKeyRows(); unlockAudio();
-                        const l = $('#key-last'); if (l) l.textContent = '等待按键… 现在按一下戒指 / 蓝牙键盘上的按键';
-                        speak('请按一下戒指按键');
+                        const l = $('#key-last'); if (l) l.textContent = L('等待按键… 现在按一下戒指 / 蓝牙键盘上的按键', 'Waiting… press a key on your ring / Bluetooth keyboard now');
+                        speak('请按一下戒指按键', 'Press your ring button now');
                     });
                     box.querySelectorAll('[data-clear]').forEach(btn => btn.onclick = () => {
                         const k = btn.dataset.clear;
@@ -658,9 +676,14 @@
                     requestMotion().then(ok => {
                         if (!ok) return;
                         const gate = $('#gate'); if (gate) gate.style.display = 'none';
-                        if (!motionOn) { const fl = $('flabel'); if (fl) fl.textContent = '电脑测试模式 · 点圆圈击打'; }
+                        if (!motionOn) { const fl = $('flabel'); if (fl) fl.textContent = L('电脑测试模式 · 点圆圈击打', 'PC test mode · tap the circle to hit'); }
                         if (selectedTrack && selectedTrack.fileurl) playBacking(selectedTrack);
-                        speak('开始演奏。右手挥动手机敲鼓，左手点按钮换乐器。');
+                        // 选曲提示语音：先报曲目，再报玩法
+                        const tName = selectedTrack ? selectedTrack.title : '';
+                        if (tName) speak('即将演奏《' + tName + '》', 'Now playing ' + tName);
+                        later(() => speak(
+                            '开始演奏。右手挥动手机敲鼓，左手点按钮或按戒指键换乐器。',
+                            'Let\'s play. Swing your right hand to hit, use left-hand pads or ring key to switch instruments.'), 1400);
                     });
                 };
                 $('#ring').addEventListener('pointerdown', ev => { ev.preventDefault(); if ($('#gate').style.display === 'none') localStrike(); });
@@ -687,21 +710,21 @@
                     ev.preventDefault();
                     for (const k in keyMap) if (k === code || keyMap[k] === learnPad) delete keyMap[k];
                     keyMap[code] = learnPad; saveKeyMap();
-                    const label = learnPad === '__cycle' ? '依次切换' : (byKey[learnPad] ? byKey[learnPad].nm : learnPad);
-                    if (last) last.textContent = '已绑定：' + keyLabel(code) + ' → ' + label;
-                    learnPad = null; refreshKeyRows(); unlockAudio(); speak('绑定成功');
+                    const label = learnPad === '__cycle' ? L('依次切换', 'Cycle instruments') : (byKey[learnPad] ? padNm(byKey[learnPad]) : learnPad);
+                    if (last) last.textContent = L('已绑定：', 'Bound: ') + keyLabel(code) + ' → ' + label;
+                    learnPad = null; refreshKeyRows(); unlockAudio(); speak('绑定成功', 'Binding saved');
                     return;
                 }
-                if (learnOpen) { ev.preventDefault(); if (last) last.textContent = '检测到按键：' + keyLabel(code) + '（' + code + '）'; return; }
+                if (learnOpen) { ev.preventDefault(); if (last) last.textContent = L('检测到按键：', 'Key detected: ') + keyLabel(code) + '（' + code + '）'; return; }
                 if (Object.prototype.hasOwnProperty.call(keyMap, code)) {
                     ev.preventDefault();
                     const target = keyMap[code];
                     if (target === '__cycle') cyclePad(1);
-                    else if (byKey[target]) auditionTimbre(target, '戒指');
+                    else if (byKey[target]) auditionTimbre(target, L('戒指', 'Ring'));
                     return;
                 }
                 if (/^Digit[1-5]$/.test(code) || /^Numpad[1-5]$/.test(code)) {
-                    ev.preventDefault(); auditionTimbre(PADS[parseInt(code.slice(-1), 10) - 1].key, '键盘'); return;
+                    ev.preventDefault(); auditionTimbre(PADS[parseInt(code.slice(-1), 10) - 1].key, L('键盘', 'Keyboard')); return;
                 }
                 if (Object.prototype.hasOwnProperty.call(NEXT_KEYS, code)) { ev.preventDefault(); cyclePad(NEXT_KEYS[code]); return; }
                 if (code === 'Space') { ev.preventDefault(); localStrike(); return; }

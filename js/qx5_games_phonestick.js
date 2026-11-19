@@ -87,6 +87,26 @@
           border-radius:20px;padding:8px 18px;font-size:14px;cursor:pointer}
         .ps-actions{display:flex;gap:10px;padding:12px 18px calc(16px);flex:0 0 auto}
         .ps-btn{flex:1;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:800;cursor:pointer}
+        .ps-topbar{display:flex;align-items:center;gap:10px;padding:12px 16px 4px;flex:0 0 auto}
+        .ps-topbar .exit{flex:0 0 auto;background:transparent;color:var(--sub);border:1px solid var(--line);
+          border-radius:18px;padding:9px 16px;font-size:13px;cursor:pointer}
+        .ps-topbar .go{flex:1;background:var(--hihat);color:#0B1020;border:0;border-radius:14px;
+          padding:12px;font-size:16px;font-weight:800;cursor:pointer}
+        .ps-topbar .go:disabled{opacity:.45;cursor:default}
+        .ps-topbar .go:active{transform:scale(.98)}
+        .ps-tracklist{flex:1;min-height:0;overflow-y:auto;margin:8px 16px;border:1px solid var(--line);
+          border-radius:14px;background:var(--panel)}
+        .ps-track-item{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+        .ps-track-item:last-child{border-bottom:0}
+        .ps-track-item.sel{background:color-mix(in srgb,var(--hihat) 16%,transparent)}
+        .ps-track-item .idx{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:rgba(143,163,200,.14);
+          color:var(--sub);font-size:12px;display:flex;align-items:center;justify-content:center}
+        .ps-track-item.sel .idx{background:var(--hihat);color:#0B1020;font-weight:800}
+        .ps-track-item .info{flex:1;min-width:0}
+        .ps-track-item .nm{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .ps-track-item .meta{font-size:11px;color:var(--dim);margin-top:3px}
+        .ps-track-item .arrow{color:var(--dim);font-size:16px}
+        .ps-selectfoot{flex:0 0 auto;padding:6px 16px 14px;text-align:center}
         .ps-btn.primary{background:var(--hihat);color:#0B1020}
         .ps-btn.ghost{background:transparent;color:var(--sub);border:1px solid var(--line)}
         .ps-btn:active{transform:scale(.97)}
@@ -463,51 +483,62 @@
                 const el = $('#ps-' + name); if (el) el.classList.add('active');
             }
 
-            /* ============ ① 选曲（真实曲库进行曲下拉） ============ */
+            /* ============ ① 选曲（真实曲库进行曲 · 可滚动列表） ============ */
             function buildSelect() {
                 showScreen('select');
                 const scr = $('#ps-select');
                 scr.innerHTML = `
+                    <div class="ps-topbar">
+                        <button class="exit" id="ps-exit">退出</button>
+                        <button class="go" id="ps-go" disabled>开始演奏 →</button>
+                    </div>
                     <div class="ps-head">
                         <div class="ps-title">① 选择进行曲</div>
-                        <div class="ps-sub">从真实曲库里选一支进行曲跟着敲<br>选中后可点「试听」先听一听</div>
+                        <div class="ps-sub">从真实曲库里选一支进行曲跟着敲<br>点曲目选中，可上下滑动查看全部</div>
                     </div>
-                    <div class="ps-scroll">
-                        <div class="ps-field">
-                            <label for="ps-track">进行曲曲目</label>
-                            <select class="ps-select" id="ps-track"><option>曲库加载中…</option></select>
-                            <div class="ps-meta" id="ps-meta"></div>
-                            <button class="ps-preview" id="ps-try">▶ 试听选中曲目</button>
-                        </div>
-                    </div>
-                    <div class="ps-actions">
-                        <button class="ps-btn primary" id="ps-go" disabled>开始演奏 →</button>
+                    <div class="ps-tracklist" id="ps-track"><div class="ps-track-item"><div class="info"><div class="nm">曲库加载中…</div></div></div></div>
+                    <div class="ps-selectfoot">
+                        <div class="ps-meta" id="ps-meta"></div>
+                        <button class="ps-preview" id="ps-try">▶ 试听选中曲目</button>
                     </div>
                 `;
+                $('#ps-exit').onclick = () => exitGame(false);
                 $('#ps-try').onclick = tryPreview;
                 $('#ps-go').onclick = () => { stopPreviewAudio(); buildPlay(); };
-                $('#ps-track').onchange = onPickTrack;
                 fetchTracks().then(list => {
                     if (finished) return;
                     tracks = list;
                     const marches = tracks.filter(isMarch);
                     const opts = (marches.length ? marches : tracks);
-                    const sel = $('#ps-track'); if (!sel) return;
+                    const box = $('#ps-track'); if (!box) return;
                     if (!opts.length) {
-                        sel.innerHTML = '<option>（曲库暂无带音频曲目）</option>';
+                        box.innerHTML = '<div class="ps-track-item"><div class="info"><div class="nm">（曲库暂无带音频曲目）</div></div></div>';
                         $('#ps-meta').textContent = '当前曲库没有可直接播放的曲目，仍可进入自由敲击。';
                     } else {
-                        sel.innerHTML = opts.map((t, i) => '<option value="' + i + '">' + esc(t.title) + '</option>').join('');
+                        box.innerHTML = opts.map((t, i) => {
+                            const bits = [t.cat, t.author].filter(Boolean);
+                            const meta = bits.join(' · ') + (t.duration ? (bits.length ? ' · ' : '') + formatDur(t.duration) : '');
+                            return '<div class="ps-track-item' + (i === 0 ? ' sel' : '') + '" data-i="' + i + '">' +
+                                '<div class="idx">' + (i + 1) + '</div>' +
+                                '<div class="info"><div class="nm">' + esc(t.title) + '</div>' +
+                                (meta ? '<div class="meta">' + esc(meta) + '</div>' : '') + '</div>' +
+                                '<div class="arrow">›</div></div>';
+                        }).join('');
+                        box.querySelectorAll('.ps-track-item').forEach(el => {
+                            el.onclick = () => onPickTrack(parseInt(el.dataset.i, 10));
+                        });
                         selectedTrack = opts[0]; updateMeta();
                     }
                     $('#ps-go').disabled = false;
-                    sel._opts = opts;
+                    box._opts = opts;
                 });
             }
-            function pickedOpts() { const sel = $('#ps-track'); return sel && sel._opts ? sel._opts : []; }
-            function onPickTrack() {
-                const sel = $('#ps-track'); const opts = pickedOpts();
-                selectedTrack = opts[parseInt(sel.value, 10)] || null;
+            function pickedOpts() { const box = $('#ps-track'); return box && box._opts ? box._opts : []; }
+            function onPickTrack(i) {
+                const opts = pickedOpts();
+                selectedTrack = opts[i] || null;
+                const box = $('#ps-track');
+                if (box) box.querySelectorAll('.ps-track-item').forEach(el => el.classList.toggle('sel', parseInt(el.dataset.i, 10) === i));
                 stopPreviewAudio(); updateMeta();
             }
             function updateMeta() {

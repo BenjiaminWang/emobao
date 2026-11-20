@@ -181,13 +181,50 @@
     };
 
     // ==========================================
+    // 🌟 作曲家归一化（优先数据库 composer_std，前端映射兜底）
+    // 依据线上 135 条 emo_works 实测；施特劳斯一家按作品核实后分为 4 人，不可合并
+    // ==========================================
+    const COMPOSER_ALIAS = {
+        // 贝多芬
+        '贝多芬': '贝多芬', '路德维希·凡·贝多芬': '贝多芬',
+        // 柴可夫斯基
+        '柴可夫斯基': '柴可夫斯基', '彼得·伊里奇·柴可夫斯基': '柴可夫斯基',
+        // 莫扎特
+        '莫扎特': '莫扎特', '沃尔夫冈·阿马德乌斯·莫扎特': '莫扎特',
+        // 门德尔松
+        '门德尔松': '门德尔松', '费利克斯·门德尔松': '门德尔松',
+        // 肖邦（两种译名写法）
+        '弗里德里克·肖邦': '肖邦', '弗雷德里克·肖邦': '肖邦',
+        // 勃拉姆斯
+        '勃拉姆斯': '勃拉姆斯', '约翰内斯·勃拉姆斯': '勃拉姆斯',
+        // 舒伯特
+        '舒伯特': '舒伯特', '弗朗茨·舒伯特': '舒伯特',
+        // 李斯特
+        '李斯特': '李斯特', '弗朗茨·李斯特': '李斯特',
+        // 小约翰·施特劳斯（圆舞曲之王；含"二世"与笼统写法"约翰·施特劳斯"）
+        '小约翰·施特劳斯': '小约翰·施特劳斯', '约翰·施特劳斯二世': '小约翰·施特劳斯',
+        '约翰·施特劳斯': '小约翰·施特劳斯',
+        // 老约翰·施特劳斯（拉德斯基进行曲作者；含"一世"）
+        '老约翰·施特劳斯': '老约翰·施特劳斯', '约翰·施特劳斯一世': '老约翰·施特劳斯',
+        // 约瑟夫·施特劳斯、理查德·施特劳斯是另外两位作曲家，保持独立，不并入上面两组
+    };
+    // 优先取数据库归一化字段 composer_std（已由触发器/回填保证），
+    // 缺失时回退到前端 COMPOSER_ALIAS 映射，兼容尚未回填的历史行。
+    function composerOf(w) {
+        if (!w) return '';
+        const c = w.composer_std || w.composer;
+        if (!c) return '';
+        return COMPOSER_ALIAS[c] || c;
+    }
+
+    // ==========================================
     // 🌟 多维筛选器
     // ==========================================
     window.qx2_renderDropdown = async function() {
         const dropdown = document.getElementById('qx2_ab_dropdown');
         if (!dropdown) return;
         dropdown.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">加载中...</div>';
-        
+
         try {
             const works = await restGet(`emo_works?is_published=eq.true&order=created_at.desc`);
             if (!works || works.length === 0) {
@@ -195,85 +232,95 @@
                 return;
             }
 
-            const composers = [...new Set(works.map(w => w.composer).filter(Boolean))];
-            const forms = [...new Set(works.map(w => w.form).filter(Boolean))];
+            // 归一化：只从主表 form 取曲式，composer 走 composerOf 去重
+            const composers = [...new Set(works.map(w => composerOf(w)).filter(Boolean))].sort();
+            const forms = [...new Set(works.map(w => w.form).filter(Boolean))].sort();
 
-            let filterHtml = `
-                <div style="padding: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch;" id="qx2_filter_tags">
-                    <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer; flex-shrink: 0;">全部</button>
-                    ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${c}</button>`).join('')}
-                    ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${f}</button>`).join('')}
-                </div>
-                <div id="qx2_work_list_container" style="max-height: 40vh; overflow-y: auto; width: 100%;"></div>
-            `;
-            // 🌟 核心修复：强制下拉框绝对定位，悬浮在页面最上层，绝不挤占底部按钮的空间！
-            // 🌟 绝对定位，悬浮在上方，绝不挤占下方空间
-            dropdown.style.cssText = 'position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); z-index: 999; display: flex; flex-direction: column; max-height: 60vh; overflow: hidden; width: 100%;';
-            
+            const filterState = { keyword: '', composer: 'all', form: 'all' };
+
+            const chip = 'padding:4px 12px;border-radius:16px;border:1px solid #E1E8F0;background:#fff;color:#5A6B87;font-size:12px;cursor:pointer;flex-shrink:0;';
+            const chipOn = 'padding:4px 12px;border-radius:16px;border:1px solid #2C7BE5;background:#2C7BE5;color:#fff;font-size:12px;cursor:pointer;flex-shrink:0;';
+
+            dropdown.style.cssText = 'position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:0 0 8px 8px;box-shadow:0 8px 16px rgba(0,0,0,0.1);z-index:999;display:flex;flex-direction:column;max-height:60vh;overflow:hidden;width:100%;';
+
             dropdown.innerHTML = `
-                <div style="padding: 10px 16px; border-bottom: 1px solid #F0F4F9; display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; width: 100%; box-sizing: border-box;" id="qx2_filter_tags">
-                    <button class="qx2-filter-btn active" data-filter-type="all" data-filter-val="all" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #2C7BE5; background: #2C7BE5; color: #fff; font-size: 12px; cursor: pointer; flex-shrink: 0;">全部</button>
-                    ${composers.map(c => `<button class="qx2-filter-btn" data-filter-type="composer" data-filter-val="${c}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${c}</button>`).join('')}
-                    ${forms.map(f => `<button class="qx2-filter-btn" data-filter-type="form" data-filter-val="${f}" style="padding: 4px 12px; border-radius: 16px; border: 1px solid #E1E8F0; background: #fff; color: #5A6B87; font-size: 12px; cursor: pointer; flex-shrink: 0;">${f}</button>`).join('')}
+                <div style="padding:10px 16px;border-bottom:1px solid #F0F4F9;">
+                    <input id="qx2_search_input" type="text" placeholder="输入作品名或作曲家搜索…"
+                        style="width:100%;box-sizing:border-box;padding:8px 12px;border:1px solid #E1E8F0;border-radius:8px;font-size:14px;outline:none;">
                 </div>
-                <div id="qx2_work_list_container" style="max-height: 40vh; overflow-y: auto; width: 100%;"></div>
+                <div style="padding:8px 16px 0;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;align-items:center;">
+                    <span style="font-size:11px;color:#96A3B8;flex-shrink:0;">作曲家</span>
+                    <button class="qx2-f-btn" data-dim="composer" data-val="all" style="${chipOn}">全部</button>
+                    ${composers.map(c => `<button class="qx2-f-btn" data-dim="composer" data-val="${escapeHtml(c)}" style="${chip}">${escapeHtml(c)}</button>`).join('')}
+                </div>
+                <div style="padding:8px 16px 10px;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;align-items:center;border-bottom:1px solid #F0F4F9;">
+                    <span style="font-size:11px;color:#96A3B8;flex-shrink:0;">曲式</span>
+                    <button class="qx2-f-btn" data-dim="form" data-val="all" style="${chipOn}">全部</button>
+                    ${forms.map(f => `<button class="qx2-f-btn" data-dim="form" data-val="${escapeHtml(f)}" style="${chip}">${escapeHtml(f)}</button>`).join('')}
+                </div>
+                <div id="qx2_work_list_container" style="max-height:40vh;overflow-y:auto;width:100%;"></div>
             `;
-            const listContainer = document.getElementById('qx2_work_list_container');
-            const filterBtns = dropdown.querySelectorAll('.qx2-filter-btn');
 
-            function renderList(filterType = 'all', filterVal = 'all') {
-                const filteredWorks = works.filter(w => {
-                    if (filterType === 'all') return true;
-                    if (filterType === 'composer') return w.composer === filterVal;
-                    if (filterType === 'form') return w.form === filterVal;
+            const listContainer = document.getElementById('qx2_work_list_container');
+            const searchInput = document.getElementById('qx2_search_input');
+            const dimBtns = dropdown.querySelectorAll('.qx2-f-btn');
+
+            function renderList() {
+                const kw = filterState.keyword.trim().toLowerCase();
+                const filtered = works.filter(w => {
+                    if (filterState.composer !== 'all' && composerOf(w) !== filterState.composer) return false;
+                    if (filterState.form !== 'all' && w.form !== filterState.form) return false;
+                    if (kw) {
+                        const title = ((w.title_cn || '') + ' ' + (w.title_en || '')).toLowerCase();
+                        const comp = composerOf(w).toLowerCase();
+                        if (!title.includes(kw) && !comp.includes(kw)) return false;
+                    }
                     return true;
                 });
 
-                if (filteredWorks.length === 0) {
+                if (filtered.length === 0) {
                     listContainer.innerHTML = '<div style="padding:12px;text-align:center;color:#94A3B8;">没有符合条件的曲目</div>';
                     return;
                 }
 
-                listContainer.innerHTML = filteredWorks.map(w => {
+                listContainer.innerHTML = filtered.map(w => {
                     const title = getLang() === 1 ? (w.title_cn || w.title_en) : (w.title_en || w.title_cn);
-                    const composer = w.composer || '';
-                    const dur = w.total_duration ? `${Math.floor(w.total_duration / 60)}:${String(w.total_duration % 60).padStart(2, '0')}` : '--';
-                    
-                    let metaInfo = '';
-                    if (composer || dur) {
-                        const parts = [];
-                        if (composer) parts.push(escapeHtml(composer));
-                        if (dur) parts.push(dur);
-                        metaInfo = `<span style="font-size: 12px; color: #96A3B8; font-weight: normal; margin-left: 8px;">${parts.join(' · ')}</span>`;
-                    }
-
+                    const parts = [];
+                    const comp = composerOf(w);
+                    if (comp) parts.push(escapeHtml(comp));
+                    if (w.form) parts.push(escapeHtml(w.form));
+                    if (w.era) parts.push(escapeHtml(w.era));
+                    if (w.total_duration) parts.push(`${Math.floor(w.total_duration / 60)}:${String(w.total_duration % 60).padStart(2, '0')}`);
+                    const metaInfo = parts.length
+                        ? `<span style="font-size:12px;color:#96A3B8;font-weight:normal;margin-left:8px;">${parts.join(' · ')}</span>`
+                        : '';
                     return `
-                        <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #F0F4F9; cursor: pointer;">
-                            <span style="font-weight: 500; color: #1A2B4A;">${escapeHtml(title)}</span>
+                        <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')"
+                            style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #F0F4F9;cursor:pointer;">
+                            <span style="font-weight:500;color:#1A2B4A;">${escapeHtml(title)}</span>
                             ${metaInfo}
                         </div>
                     `;
                 }).join('');
             }
 
-            renderList();
+            searchInput.addEventListener('input', () => {
+                filterState.keyword = searchInput.value;
+                renderList();
+            });
 
-            filterBtns.forEach(btn => {
+            dimBtns.forEach(btn => {
                 btn.onclick = () => {
-                    filterBtns.forEach(b => {
-                        b.style.background = '#fff';
-                        b.style.color = '#5A6B87';
-                        b.style.borderColor = '#E1E8F0';
-                        b.classList.remove('active');
-                    });
-                    btn.style.background = '#2C7BE5';
-                    btn.style.color = '#fff';
-                    btn.style.borderColor = '#2C7BE5';
-                    btn.classList.add('active');
-                    
-                    renderList(btn.dataset.filterType, btn.dataset.filterVal);
+                    const dim = btn.dataset.dim;
+                    filterState[dim] = btn.dataset.val;
+                    dropdown.querySelectorAll(`.qx2-f-btn[data-dim="${dim}"]`).forEach(b => { b.style.cssText = chip; });
+                    btn.style.cssText = chipOn;
+                    renderList();
                 };
             });
+
+            renderList();
+            if (searchInput) searchInput.focus();
 
         } catch (e) {
             console.error('加载曲库失败', e);
@@ -391,7 +438,7 @@
         
         const lang = getLang();
         const title = lang === 1 ? (work.title_cn || work.title_en) : (work.title_en || work.title_cn);
-        const composer = work.composer || ''; 
+        const composer = composerOf(work) || ''; 
 
         const dur = work.total_duration ? Math.floor(work.total_duration / 60) + ':' + String(work.total_duration % 60).padStart(2, '0') : '--';
         

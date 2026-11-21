@@ -1,8 +1,8 @@
-const CACHE_NAME = 'emobao-v15';
+const CACHE_NAME = 'emobao-v16';
 const ASSETS = [
   './',
   './index.html',
-  './style.css',
+  './style.css?v=20261121',
   './picture/icon-192.png',
   './picture/icon-512.png'
 ];

@@ -3647,3 +3647,42 @@ body.lang-en .qx2-flow-name {
     top: 0;
     left: 0;
 }
+
+
+/* ================================================================
+   🌟 精品讲座讲解浮层（2026-11-21 恢复精讲穿插播放 + 全曲结构 + 段落点选）
+   设计：大球继续全屏作背景，讲解信息以半透明浮层叠加在上方，两者兼得
+   ================================================================ */
+.qx2-heal-area { position: relative; }
+
+/* 默认（纯音乐）：work-mode 下仍隐藏卡片，保证大球全屏 */
+.qx2-container.step2-mode.work-mode .qx2-work-info-card { display: none !important; }
+
+/* 精讲模式：有 is-lecture 类时，卡片以浮层显示（覆盖上面的 none）*/
+.qx2-container.step2-mode.work-mode .qx2-work-info-card.is-lecture {
+    display: flex !important;
+    flex-direction: column;
+    position: absolute;
+    top: 8px; left: 8px; right: 8px;
+    max-height: 46%;
+    z-index: 5;
+    margin: 0;
+    padding: 10px 12px;
+    background: rgba(248, 251, 255, 0.94);
+    border: 1px solid #DCE9FF;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(20, 50, 90, 0.12);
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
+}
+.qx2-work-info-card .qx2-wi-title { font-size: 14px; font-weight: bold; color: #1A5BB8; margin-bottom: 2px; }
+.qx2-work-info-card .qx2-wi-meta { font-size: 11px; color: #5A6B87; margin-bottom: 6px; }
+.qx2-wi-section { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #DCE9FF; }
+.qx2-wi-label { font-weight: bold; color: #5A6B87; font-size: 11px; margin-bottom: 3px; }
+.qx2-wi-curr-seg { background: #EEF4FF; padding: 6px 8px; border-radius: 4px; border-left: 3px solid #2C7BE5; margin-bottom: 6px; }
+.qx2-wi-curr-seg-title { font-weight: bold; color: #2C7BE5; font-size: 12px; margin-bottom: 2px; }
+.qx2-wi-guide { color: #333; font-size: 12px; line-height: 1.6; }
+.qx2-wi-seg-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.qx2-wi-seg-item { font-size: 10px; padding: 3px 8px; background: #fff; border: 1px solid #DCE9FF; border-radius: 10px; color: #5A6B87; cursor: pointer; transition: all .15s; }
+.qx2-wi-seg-item:hover { border-color: #2C7BE5; color: #2C7BE5; }
+.qx2-wi-seg-item.active { background: #2C7BE5; color: #fff; border-color: #2C7BE5; }

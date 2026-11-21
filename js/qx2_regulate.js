@@ -236,7 +236,20 @@
             const composers = [...new Set(works.map(w => composerOf(w)).filter(Boolean))].sort();
             const forms = [...new Set(works.map(w => w.form).filter(Boolean))].sort();
 
-            const filterState = { keyword: '', composer: 'all', form: 'all' };
+            // 🌟 精品讲座识别：拉全部时间轴(仅3个字段约15KB)，按作品统计有效段数，>=3 视为有深度分段讲解
+            // 动态判定，SOP 以后新增的深度讲解作品会自动成为精品讲座，无需改代码
+            const boutiqueSet = new Set();
+            try {
+                const tls = await restGet(`emo_work_timelines?select=workid,start_time,end_time`);
+                const segCount = {};
+                (tls || []).forEach(x => {
+                    if (x.start_time !== x.end_time) segCount[x.workid] = (segCount[x.workid] || 0) + 1;
+                });
+                Object.keys(segCount).forEach(id => { if (segCount[id] >= 3) boutiqueSet.add(id); });
+            } catch (e) { console.warn('[qx2] 精品讲座判定失败', e); }
+            window.qx2_boutiqueSet = boutiqueSet;  // 供其它逻辑复用
+
+            const filterState = { keyword: '', composer: 'all', form: 'all', boutique: 'all' };
 
             const chip = 'padding:4px 12px;border-radius:16px;border:1px solid #E1E8F0;background:#fff;color:#5A6B87;font-size:12px;cursor:pointer;flex-shrink:0;';
             const chipOn = 'padding:4px 12px;border-radius:16px;border:1px solid #2C7BE5;background:#2C7BE5;color:#fff;font-size:12px;cursor:pointer;flex-shrink:0;';
@@ -258,6 +271,12 @@
                     <button class="qx2-f-btn" data-dim="form" data-val="all" style="${chipOn}">全部</button>
                     ${forms.map(f => `<button class="qx2-f-btn" data-dim="form" data-val="${escapeHtml(f)}" style="${chip}">${escapeHtml(f)}</button>`).join('')}
                 </div>
+                <div style="padding:8px 16px 10px;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;align-items:center;border-bottom:1px solid #F0F4F9;">
+                    <span style="font-size:11px;color:#96A3B8;flex-shrink:0;">${escapeHtml(t('讲座', 'Lecture'))}</span>
+                    <button class="qx2-f-btn" data-dim="boutique" data-val="all" style="${chipOn}">${escapeHtml(t('全部', 'All'))}</button>
+                    <button class="qx2-f-btn" data-dim="boutique" data-val="yes" style="${chip}">🌟 ${escapeHtml(t('精品讲座', 'Boutique lectures'))} (${boutiqueSet.size})</button>
+                    <button class="qx2-f-btn" data-dim="boutique" data-val="no" style="${chip}">${escapeHtml(t('普通作品', 'Others'))}</button>
+                </div>
                 <div id="qx2_work_list_container" style="max-height:40vh;overflow-y:auto;width:100%;"></div>
             `;
 
@@ -270,6 +289,8 @@
                 const filtered = works.filter(w => {
                     if (filterState.composer !== 'all' && composerOf(w) !== filterState.composer) return false;
                     if (filterState.form !== 'all' && w.form !== filterState.form) return false;
+                    if (filterState.boutique === 'yes' && !boutiqueSet.has(w.workid)) return false;
+                    if (filterState.boutique === 'no' && boutiqueSet.has(w.workid)) return false;
                     if (kw) {
                         const title = ((w.title_cn || '') + ' ' + (w.title_en || '')).toLowerCase();
                         const comp = composerOf(w).toLowerCase();
@@ -297,7 +318,7 @@
                     return `
                         <div class="qx2-ab-dropdown-item" onclick="window.qx2_selectWork('${w.workid}')"
                             style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #F0F4F9;cursor:pointer;">
-                            <span style="font-weight:500;color:#1A2B4A;">${escapeHtml(title)}</span>
+                            <span style="font-weight:500;color:#1A2B4A;">${boutiqueSet.has(w.workid) ? '🌟 ' : ''}${escapeHtml(title)}</span>
                             ${metaInfo}
                         </div>
                     `;
@@ -426,7 +447,7 @@
 
     function hideWorkInfo() {
         const card = document.getElementById('qx2_work_info');
-        if (card) card.style.display = 'none';
+        if (card) { card.style.display = 'none'; card.classList.remove('is-lecture'); }
         _workInfo = { work: null, timelines: [], tags: { instruments: [], styles: [] } };
         state.lastSpokenText = '';
     }
@@ -453,15 +474,12 @@
             );
             _workInfo.timelines = timelines || [];
             
-            const structSec = document.getElementById('qx2_wi_struct_sec');
-            const segList = document.getElementById('qx2_wi_seg_list');
-            
             // 🌟 核心判断：如果只有一条从0开始的整段，且没有时间轴的细分，那它就是纯音乐
-            // 🌟 核心判断：如果只有一条从0开始的整段，那它就是纯音乐
             const isPureMusic = _workInfo.timelines.length === 1 && _workInfo.timelines[0].start_time === 0;
 
             if (isPureMusic) {
                 // 🎵 纯音乐模式
+                card.classList.remove('is-lecture');
                 card.style.display = 'block';
                 card.style.background = 'transparent';
                 card.style.padding = '0';
@@ -474,7 +492,8 @@
                     if (healTitle) healTitle.style.display = 'none'; 
                 }
             } else {
-                // 🎙️ 精讲模式（如《春天里》）
+                // 🎙️ 精讲模式（有分段讲解的精品讲座）
+                card.classList.add('is-lecture');
                 card.style.display = 'block';
                 card.style.background = '';
                 card.style.padding = '';
@@ -490,6 +509,10 @@
                         <div class="qx2-wi-seg-list" id="qx2_wi_seg_list"></div>
                     </div>
                 `;
+
+                // ✅ 修复：DOM 创建后再取元素（旧版在此之前取，永远是 null，导致全曲结构/点选失效）
+                const structSec = document.getElementById('qx2_wi_struct_sec');
+                const segList = document.getElementById('qx2_wi_seg_list');
 
                 // 恢复包间原状
                 const healArea = document.querySelector('.qx2-heal-area');
